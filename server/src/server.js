@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
- //import cors from "cors";
+import cors from "cors";
 import ticketRouter from "./ticketRaising/ticket.routes.js";
 // import sn_expenseRoutes from "./routes/sn_expenseRoutes.js";
 // import usersRoutes from "./routes/vd_usersRoutes.js";
@@ -28,12 +28,12 @@ const PORT = process.env.PORT || 5001;
 
 connectDB();
 
-// app.use(
-//   cors({
-//     origin: process.env.FRONTEND_URL,
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 //middleware
 app.use(express.json());

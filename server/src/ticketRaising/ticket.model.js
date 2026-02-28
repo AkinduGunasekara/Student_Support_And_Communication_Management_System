@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const ticketSchema = new mongoose.Schema(
   {
-    serviceId: { type: String, unique: true },
-    studentId: {type: String,required: true,trim: true,},
+    serviceId: { type: String, unique: true},
+    studentId: {type: String,required: true},
     studentEmail: {
       type: String,
       required: true,

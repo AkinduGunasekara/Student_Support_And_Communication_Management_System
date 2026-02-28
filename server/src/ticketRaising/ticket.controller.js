@@ -1,7 +1,7 @@
 import Complaint from "../ticketRaising/ticket.model.js";
-//import dotenv from "dotenv";
+import dotenv from "dotenv";
 
-//dotenv.config();
+dotenv.config();
 
 /**
  * ------------------------------------------------
@@ -45,15 +45,15 @@ export const getComplaintById = async (req, res) => {
  */
 export const createComplaint = async (req, res) => {
   try {
-    const { studentId, email, complaintCategory, description } = req.body;
+    const { studentId, studentEmail, complaintCategory, description } = req.body;
 
-    if (!studentId || !email || !complaintCategory || !description) {
+    if (!studentId || !studentEmail || !complaintCategory || !description) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const complaint = new Complaint({
       studentId,
-      email,
+      studentEmail,
       complaintCategory,
       description,
     });
@@ -74,14 +74,14 @@ export const createComplaint = async (req, res) => {
  */
 export const updateComplaint = async (req, res) => {
   try {
-    const { studentId, email, complaintCategory, description, status } =
+    const { studentId, studentEmail, complaintCategory, description, status } =
       req.body;
 
     const updatedComplaint = await Complaint.findByIdAndUpdate(
       req.params.id,
       {
         studentId,
-        email,
+        studentEmail,
         complaintCategory,
         description,
       },

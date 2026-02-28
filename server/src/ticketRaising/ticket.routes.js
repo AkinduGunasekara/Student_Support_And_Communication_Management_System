@@ -28,7 +28,7 @@ router.get("/:id", getComplaintById);
  * Create New Complaint (Student Submit)
  * ----------------------------------------
  */
-router.post("/", createComplaint);
+router.post("/create", createComplaint);
 
 /**
  * ----------------------------------------
