@@ -45,16 +45,16 @@ export const getComplaintById = async (req, res) => {
  */
 export const createComplaint = async (req, res) => {
   try {
-    const { studentId, studentEmail, complaintCategory, description } = req.body;
+    const { studentId, studentEmail, ticketCategory, description } = req.body;
 
-    if (!studentId || !studentEmail || !complaintCategory || !description) {
+    if (!studentId || !studentEmail || !ticketCategory || !description) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const complaint = new Complaint({
       studentId,
       studentEmail,
-      complaintCategory,
+      ticketCategory,
       description,
     });
 
@@ -74,7 +74,7 @@ export const createComplaint = async (req, res) => {
  */
 export const updateComplaint = async (req, res) => {
   try {
-    const { studentId, studentEmail, complaintCategory, description, status } =
+    const { studentId, studentEmail, ticketCategory, description, status } =
       req.body;
 
     const updatedComplaint = await Complaint.findByIdAndUpdate(
@@ -82,7 +82,7 @@ export const updateComplaint = async (req, res) => {
       {
         studentId,
         studentEmail,
-        complaintCategory,
+        ticketCategory,
         description,
       },
       { new: true }

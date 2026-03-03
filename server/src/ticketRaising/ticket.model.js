@@ -1,15 +1,16 @@
 import mongoose from "mongoose";
+import Counter from "../config/counter.js"
 
 const ticketSchema = new mongoose.Schema(
   {
-    serviceId: { type: String, unique: true},
+    ticketId: { type: String, unique: true},
     studentId: {type: String,required: true},
     studentEmail: {
       type: String,
       required: true,
       match: [/.+@.+\..+/, "Please enter a valid email address"],
     },
-    complaintCategory: {
+    ticketCategory: {
       type: String,
       required: true,
     },
@@ -27,6 +28,26 @@ const ticketSchema = new mongoose.Schema(
   { timestamps: true } // adds createdAt and updatedAt
 );
 
-const ticket = mongoose.model("Complaint", ticketSchema);
+ticketSchema.pre("save", async function () {
+  try {
+    if (!this.ticketId) {
+      let counter = await Counter.findOne({ name: "tickets" });
+
+      if (!counter) {
+        counter = await Counter.create({ name: "tickets", seq: 0 });
+      }
+
+      counter.seq += 1;
+      await counter.save();
+
+      this.ticketId = "t" + counter.seq.toString().padStart(3, "0");
+    }
+  } catch (err) {
+    console.error("Error in pre-save hook:", err);
+    throw err; // important
+  }
+});
+
+const ticket = mongoose.model("Ticket", ticketSchema);
 
 export default ticket;
