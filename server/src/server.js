@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
 import ticketRouter from "./ticketRaising/ticket.routes.js";
@@ -21,7 +23,7 @@ import { connectDB } from "./config/db.js";
 // import searchRoutes from "./routes/vd_searchRoutes.js";
 // import { initializeParcelCronJobs } from "./jobs/ks_ParcelRemaiderJob.js";
 
-dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 5001;
