@@ -1,99 +1,99 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { MessageSquare, XCircle } from "lucide-react";
 import { FaClock, FaTools, FaTicketAlt } from "react-icons/fa";
 
 function gkAdminViewTicket() {
-  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
+  const [loadingReply, setLoadingReply] = useState(false);
 
   useEffect(() => {
     fetchTickets();
   }, []);
 
-  // Fetch all complaints
+  // Fetch all tickets
   const fetchTickets = async () => {
     try {
       const res = await axios.get("http://localhost:5001/api/tickets/getall");
       setTickets(res.data || []);
     } catch (err) {
-      console.error("Error fetching complaints:", err);
-      toast.error("Failed to fetch complaints");
+      console.error("Error fetching tickets:", err);
+      toast.error("Failed to fetch tickets");
     }
   };
 
   // Send reply
   const handleReply = async () => {
-    try {
-      if (!replyMessage) {
-        toast.error("Reply message is required");
-        return;
-      }
+    if (!replyMessage.trim()) {
+      toast.error("Reply message is required");
+      return;
+    }
 
-      await axios.put(
+    setLoadingReply(true);
+
+    try {
+      const res = await axios.put(
         `http://localhost:5001/api/tickets/${selectedTicket._id}/reply`,
         { replyMessage }
       );
 
-      toast.success("Reply sent successfully!");
-      navigate("/reply");
-      setSelectedTicket(null);
-      setReplyMessage("");
-      fetchTickets();
+      if (res.status === 200) {
+        toast.success("Reply sent successfully!");
+        setSelectedTicket(null);
+        setReplyMessage("");
+        fetchTickets(); // Refresh the tickets
+      }
     } catch (err) {
       console.error("Error sending reply:", err);
-      toast.error("Failed to send reply");
+      toast.error("Failed to send reply. Try again.");
+    } finally {
+      setLoadingReply(false);
     }
   };
 
   // Count tickets by status
   const pendingCount = tickets.filter((t) => t.status === "Pending").length;
   const inProessingCount = tickets.filter((t) => t.status === "Processing").length;
-  // const completedCount = tickets.filter((t) => t.status === "Completed").length;
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6">
 
+        {/* Ticket Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-                
-                {/* Pending Tickets */}
-                <div className="flex items-center bg-white rounded-lg shadow p-4">
-                    <div className="bg-yellow-200 text-yellow-800 p-3 rounded-lg">
-                        <FaClock size={24} />
-                    </div>
-                    <div className="ml-4">
-                        <div className="text-sm font-medium text-yellow-800">Pending Tickets</div>
-                        <div className="text-2xl font-bold">{pendingCount}</div>
-                    </div>
-                </div>
-        
-                {/* In Progress Tickets */}
-                <div className="flex items-center bg-white rounded-lg shadow p-4">
-                    <div className="bg-blue-200 text-blue-800 p-3 rounded-lg">
-                    <FaTools size={24} />
-                    </div>
-                    <div className="ml-4">
-                    <div className="text-sm font-medium text-blue-800">In Progress</div>
-                    <div className="text-2xl font-bold">{inProessingCount}</div>
-                    </div>
-                </div>
-        
-                {/* Total Tickets */}
-                <div className="flex items-center bg-white rounded-lg shadow p-4">
-                    <div className="bg-blue-200 text-blue-800 p-3 rounded-lg">
-                    <FaTicketAlt size={24} />
-                    </div>
-                    <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-800">Total Tickets</div>
-                    <div className="text-2xl font-bold">{tickets.length}</div>
-                    </div>
-                </div>
-                </div>
+          <div className="flex items-center bg-white rounded-lg shadow p-4">
+            <div className="bg-yellow-200 text-yellow-800 p-3 rounded-lg">
+              <FaClock size={24} />
+            </div>
+            <div className="ml-4">
+              <div className="text-sm font-medium text-yellow-800">Pending Tickets</div>
+              <div className="text-2xl font-bold">{pendingCount}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center bg-white rounded-lg shadow p-4">
+            <div className="bg-blue-200 text-blue-800 p-3 rounded-lg">
+              <FaTools size={24} />
+            </div>
+            <div className="ml-4">
+              <div className="text-sm font-medium text-blue-800">In Progress</div>
+              <div className="text-2xl font-bold">{inProessingCount}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center bg-white rounded-lg shadow p-4">
+            <div className="bg-blue-200 text-blue-800 p-3 rounded-lg">
+              <FaTicketAlt size={24} />
+            </div>
+            <div className="ml-4">
+              <div className="text-sm font-medium text-gray-800">Total Tickets</div>
+              <div className="text-2xl font-bold">{tickets.length}</div>
+            </div>
+          </div>
+        </div>
 
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-indigo-700 p-4 rounded-xl text-white mb-6 flex items-center gap-2">
@@ -106,7 +106,6 @@ function gkAdminViewTicket() {
           <table className="w-full text-left">
             <thead className="bg-gray-100 text-gray-700">
               <tr>
-                {/*<th className="p-3">Ticket ID</th>*/}
                 <th className="p-3">Student ID</th>
                 <th className="p-3">Email</th>
                 <th className="p-3">Category</th>
@@ -115,7 +114,6 @@ function gkAdminViewTicket() {
                 <th className="p-3 text-center">Action</th>
               </tr>
             </thead>
-
             <tbody>
               {tickets.length === 0 ? (
                 <tr>
@@ -126,18 +124,10 @@ function gkAdminViewTicket() {
               ) : (
                 tickets.map((ticket) => (
                   <tr key={ticket._id} className="border-t hover:bg-indigo-50">
-
-                    {/*<td className="p-3">{ticket.ticketId}</td>*/}
                     <td className="p-3">{ticket.studentId}</td>
                     <td className="p-3">{ticket.studentEmail}</td>
                     <td className="p-3">{ticket.ticketCategory}</td>
-
-                    {/* Description with line breaks */}
-                    <td className="p-3 max-w-md whitespace-pre-line break-words">
-                      {ticket.description}
-                    </td>
-
-                    {/* Status Badge */}
+                    <td className="p-3 max-w-md whitespace-pre-line break-words">{ticket.description}</td>
                     <td className="p-3">
                       <span
                         className={`px-2 py-1 rounded-lg text-sm font-semibold ${
@@ -151,8 +141,6 @@ function gkAdminViewTicket() {
                         {ticket.status || "Pending"}
                       </span>
                     </td>
-
-                    {/* Action */}
                     <td className="p-3 text-center">
                       {ticket.status === "Pending" ? (
                         <button
@@ -165,7 +153,6 @@ function gkAdminViewTicket() {
                         <span className="text-gray-500">Replied</span>
                       )}
                     </td>
-
                   </tr>
                 ))
               )}
@@ -211,9 +198,10 @@ function gkAdminViewTicket() {
 
             <button
               onClick={handleReply}
-              className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500 cursor-pointer"
+              disabled={loadingReply}
+              className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500 cursor-pointer disabled:opacity-50"
             >
-              Send Reply
+              {loadingReply ? "Sending..." : "Send Reply"}
             </button>
           </div>
         </div>
