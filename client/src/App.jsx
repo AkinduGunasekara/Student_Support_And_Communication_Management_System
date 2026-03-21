@@ -1,22 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-//import './App.css'
+import {Route, Routes } from "react-router";
 
-function App() {
-  const [count, setCount] = useState(0)
+import GKTicketCreate from './ticketRaising/gkTicketCreate.jsx';
+import GKTicketView from './ticketRaising/gkTicketView.jsx';
+import GKTicketUpdate from './ticketRaising/gkTicketUpdate.jsx';
+import GKTicketDelete from './ticketRaising/gkTicketDelete.jsx';
+import GkAdminViewTicket from "./ticketRaising/gkAdminViewTicket.jsx";
 
-  return (
-    <>
-      
-      <p class="text-3xl font-bold text-blue-600 bg-green-500 ">
-        Click on the Vite and React logos to learn more
-      </p>
-      <p class="text-4xl font-bold text-blue-600 bg-green-500 mt-10">
-        Click on
-      </p>
-    </>
-  )
-}
+const App = () =>{
+    return(
+        <div className="p-4">
+          <Routes>
+            <Route path="/raise-ticket" element={<GKTicketCreate />} />
+            <Route path="/view-ticket" element={<GKTicketView />} />
+            <Route path="/update-ticket/:id" element={<GKTicketUpdate />} />
+            <Route path="/delete-ticket/:id" element={<GKTicketDelete />} />
+            <Route path="/reply" element={<GkAdminViewTicket />} />
 
-export default App
+          </Routes>
+        </div>
+  );
+};
+
+export default App;

@@ -4,11 +4,19 @@ import Counter from "../config/counter.js"
 const ticketSchema = new mongoose.Schema(
   {
     ticketId: { type: String, unique: true},
-    studentId: {type: String,required: true},
+    studentId: {
+      type: String,
+      required: true
+      // match: [/^IT\d{8}$/, "Format must be IT followed by 8 digits"],
+    },
     studentEmail: {
       type: String,
       required: true,
-      match: [/.+@.+\..+/, "Please enter a valid email address"],
+      // match: [/.+@.+\..+/, "Please enter a valid email address"],
+    },
+    accodamicYear:{
+      type: String,
+      required: true,
     },
     ticketCategory: {
       type: String,
@@ -18,6 +26,9 @@ const ticketSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+    },
+    replyMessage: {
+      type: String,
     },
     status: {
       type: String,
