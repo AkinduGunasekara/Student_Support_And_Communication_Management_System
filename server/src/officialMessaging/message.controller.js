@@ -257,3 +257,38 @@ export const getPublicMessages = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+export const deleteMessage = async (req, res) => {
+  try {
+    const message = await Message.findById(req.params.id);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    // Student can delete only their own message
+    if (req.user.role === "student") {
+      if (String(message.studentId) !== String(req.user._id)) {
+        return res.status(403).json({
+          message: "Forbidden: You can delete only your own messages",
+        });
+      }
+
+      // Optional: prevent deleting answered messages
+      if (message.status === "ANSWERED") {
+        return res.status(400).json({
+          message: "Cannot delete answered messages",
+        });
+      }
+    }
+
+    await message.deleteOne();
+
+    return res.json({ message: "Message deleted successfully" });
+  } catch (error) {
+    console.error("Delete message error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

@@ -8,6 +8,7 @@ import {
   updateVisibility,
   getPublicMessages,
   markAsNotified,
+  deleteMessage, 
 } from "./message.controller.js";
 
 import { authMiddleware, requireRole } from "../middleware/auth.middleware.js";
@@ -27,5 +28,8 @@ router.get("/", authMiddleware, requireRole("lecturer", "admin"), getAllMessages
 router.get("/:id", authMiddleware, requireRole("lecturer", "admin"), getMessageById);
 router.patch("/:id/answer", authMiddleware, requireRole("lecturer", "admin"), answerMessage);
 router.patch("/:id/visibility", authMiddleware, requireRole("lecturer", "admin"), updateVisibility);
+
+
+router.delete("/:id", authMiddleware, deleteMessage);
 
 export default router;
