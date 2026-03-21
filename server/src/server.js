@@ -1,7 +1,13 @@
 import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
+import authRouter from "./userManagement/auth.routes.js";
+import userRouter from "./userManagement/user.routes.js";
 import ticketRouter from "./ticketRaising/ticket.routes.js";
+
+
 // import sn_expenseRoutes from "./routes/sn_expenseRoutes.js";
 // import usersRoutes from "./routes/vd_usersRoutes.js";
 // import adminRoutes from "./routes/vd_adminRoutes.js";
@@ -21,7 +27,7 @@ import { connectDB } from "./config/db.js";
 // import searchRoutes from "./routes/vd_searchRoutes.js";
 // import { initializeParcelCronJobs } from "./jobs/ks_ParcelRemaiderJob.js";
 
-dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -38,6 +44,8 @@ app.use(
 //middleware
 app.use(express.json());
 
+app.use("/api/auth", authRouter);
+app.use("/api/users", userRouter);
 app.use("/api/tickets", ticketRouter);
 
 app.listen(PORT, () => {
