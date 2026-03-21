@@ -9,7 +9,7 @@ dotenv.config();
  * Get All Complaints (Admin / Lecturer Dashboard)
  * ------------------------------------------------
  */
-export const getAllComplaints = async (req, res) => {
+export async function getAllComplaints(req, res){
   try {
     const complaints = await Complaint.find().sort({ createdAt: -1 });
     res.status(200).json(complaints);
@@ -24,7 +24,7 @@ export const getAllComplaints = async (req, res) => {
  * Get Complaint By ID
  * ------------------------------------------------
  */
-export const getComplaintById = async (req, res) => {
+export async function getComplaintById(req, res){
   try {
     const complaint = await Complaint.findById(req.params.id);
 
@@ -40,21 +40,50 @@ export const getComplaintById = async (req, res) => {
 };
 
 /**
+ * Get logged-in user's services
+ */
+export async function getMyComplaints(req, res) {
+  try {
+    const complaint = await Complaint.find().sort({ createdAt: -1 });
+    res.status(200).json(complaint);
+  } catch (error) {
+    console.error("Error in getMyComplaints:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+/**
  * ------------------------------------------------
  * Create New Complaint (Student Submit)
  * ------------------------------------------------
  */
-export const createComplaint = async (req, res) => {
+export async function createComplaint(req, res){
   try {
-    const { studentId, studentEmail, ticketCategory, description } = req.body;
+    const { studentId, studentEmail, accodamicYear, ticketCategory, description } = req.body;
 
-    if (!studentId || !studentEmail || !ticketCategory || !description) {
+    const regex1 = /^IT\d{8}$/;
+    const regex2 = /.+@.+\..+/
+
+    if (!regex1.test(studentId)) {
+      return res.status(400).json({
+        message: "Invalid Student ID. Format must be IT followed by 8 digits (e.g., IT12345678)"
+      });
+    }
+
+    if (!regex2.test(studentEmail)) {
+      return res.status(400).json({
+        message: "Invalid Student Email. Format must be student@domain.lk "
+      });
+    }
+
+    if (!studentId || !studentEmail || !accodamicYear || !ticketCategory || !description) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const complaint = new Complaint({
       studentId,
       studentEmail,
+      accodamicYear,
       ticketCategory,
       description,
     });
@@ -73,16 +102,32 @@ export const createComplaint = async (req, res) => {
  * Update Complaint (Edit Details)
  * ------------------------------------------------
  */
-export const updateComplaint = async (req, res) => {
+export async function updateComplaint(req, res){
   try {
-    const { studentId, studentEmail, ticketCategory, description, status } =
+    const { studentId, studentEmail, accodamicYear, ticketCategory, description, status } =
       req.body;
+
+    const regex1 = /^IT\d{8}$/;
+    const regex2 = /.+@.+\..+/
+
+    if (!regex1.test(studentId)) {
+      return res.status(400).json({
+        message: "Invalid Student ID. Format must be IT followed by 8 digits (e.g., IT12345678)"
+      });
+    }
+
+    if (!regex2.test(studentEmail)) {
+      return res.status(400).json({
+        message: "Invalid Student Email. Format must be student@domain.lk "
+      });
+    }
 
     const updatedComplaint = await Complaint.findByIdAndUpdate(
       req.params.id,
       {
         studentId,
         studentEmail,
+        accodamicYear,
         ticketCategory,
         description,
       },
@@ -105,7 +150,7 @@ export const updateComplaint = async (req, res) => {
  * Delete Complaint
  * ------------------------------------------------
  */
-export const deleteComplaint = async (req, res) => {
+export async function deleteComplaint(req, res){
   try {
     const deletedComplaint = await Complaint.findByIdAndDelete(req.params.id);
 
