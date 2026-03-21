@@ -9,7 +9,7 @@ dotenv.config();
  * Get All Complaints (Admin / Lecturer Dashboard)
  * ------------------------------------------------
  */
-export async function getAllComplaints(req, res){
+export const getAllComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find().sort({ createdAt: -1 });
     res.status(200).json(complaints);
@@ -24,7 +24,7 @@ export async function getAllComplaints(req, res){
  * Get Complaint By ID
  * ------------------------------------------------
  */
-export async function getComplaintById(req, res){
+export const getComplaintById = async (req, res) => {
   try {
     const complaint = await Complaint.findById(req.params.id);
 
@@ -42,22 +42,22 @@ export async function getComplaintById(req, res){
 /**
  * Get logged-in user's services
  */
-export async function getMyComplaints(req, res) {
+export const getMyComplaints = async (req, res) => {
   try {
-    const complaint = await Complaint.find().sort({ createdAt: -1 });
-    res.status(200).json(complaint);
+    const complaints = await Complaint.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json(complaints);
   } catch (error) {
-    console.error("Error in getMyComplaints:", error);
+    console.error("Error in getMyTickets:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-};
+}
 
 /**
  * ------------------------------------------------
  * Create New Complaint (Student Submit)
  * ------------------------------------------------
  */
-export async function createComplaint(req, res){
+export const createComplaint = async (req, res) => {
   try {
     const { studentId, studentEmail, accodamicYear, ticketCategory, description } = req.body;
 
@@ -102,7 +102,7 @@ export async function createComplaint(req, res){
  * Update Complaint (Edit Details)
  * ------------------------------------------------
  */
-export async function updateComplaint(req, res){
+export const updateComplaint = async (req, res) => {
   try {
     const { studentId, studentEmail, accodamicYear, ticketCategory, description, status } =
       req.body;
@@ -150,7 +150,7 @@ export async function updateComplaint(req, res){
  * Delete Complaint
  * ------------------------------------------------
  */
-export async function deleteComplaint(req, res){
+export const deleteComplaint = async (req, res) => {
   try {
     const deletedComplaint = await Complaint.findByIdAndDelete(req.params.id);
 
@@ -179,7 +179,7 @@ const transporter = nodemailer.createTransport({
 /**
  * Admin reply to complaint and send email
  */
-export async function replyToComplaint(req, res) {
+export const replyToComplaint = async (req, res) => {
   try {
     const { replyMessage } = req.body;
 

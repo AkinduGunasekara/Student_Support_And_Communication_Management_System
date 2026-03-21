@@ -20,7 +20,7 @@ function gkTicketView() {
     }
 
     try {
-      const res = await axios.get("http://localhost:5001/api/tickets/my", {
+      const res = await axios.get("http://localhost:5001/api/tickets/getall", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTickets(res.data);
