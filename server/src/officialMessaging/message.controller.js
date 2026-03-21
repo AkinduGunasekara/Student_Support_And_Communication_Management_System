@@ -1,5 +1,6 @@
 import Message from "./message.model.js";
 import User from "../models/user.model.js";
+import mongoose from "mongoose";
 
 // Student: create a new question
 export const createMessage = async (req, res) => {
@@ -259,16 +260,20 @@ export const getPublicMessages = async (req, res) => {
 };
 
 
-
+// Delete message
 export const deleteMessage = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid message ID" });
+    }
+
     const message = await Message.findById(req.params.id);
 
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // Student can delete only their own message
+    // Student: can delete only own message and only before answer
     if (req.user.role === "student") {
       if (String(message.studentId) !== String(req.user._id)) {
         return res.status(403).json({
@@ -276,7 +281,6 @@ export const deleteMessage = async (req, res) => {
         });
       }
 
-      // Optional: prevent deleting answered messages
       if (message.status === "ANSWERED") {
         return res.status(400).json({
           message: "Cannot delete answered messages",
@@ -284,6 +288,19 @@ export const deleteMessage = async (req, res) => {
       }
     }
 
+    // Lecturer: can delete only messages assigned to them
+    if (req.user.role === "lecturer") {
+      if (
+        !message.lecturerId ||
+        String(message.lecturerId) !== String(req.user._id)
+      ) {
+        return res.status(403).json({
+          message: "Forbidden: You can delete only messages assigned to you",
+        });
+      }
+    }
+
+    // Admin: can delete any message
     await message.deleteOne();
 
     return res.json({ message: "Message deleted successfully" });
