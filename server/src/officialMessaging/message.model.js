@@ -8,6 +8,34 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
 
+    studentRegistrationId: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 50,
+    },
+
+    studentEmail: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      maxlength: 150,
+    },
+
+    academicYear: {
+      type: Number,
+      min: 1,
+      max: 6,
+      default: null,
+    },
+
+    semester: {
+      type: Number,
+      enum: [1, 2],
+      required: true,
+    },
+
     lecturerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -84,6 +112,7 @@ messageSchema.index({ studentId: 1, createdAt: -1 });
 messageSchema.index({ lecturerId: 1, createdAt: -1 });
 messageSchema.index({ isPublic: 1, status: 1 });
 messageSchema.index({ faculty: 1, course: 1 });
+messageSchema.index({ studentRegistrationId: 1 });
 
 const Message = mongoose.model("Message", messageSchema);
 

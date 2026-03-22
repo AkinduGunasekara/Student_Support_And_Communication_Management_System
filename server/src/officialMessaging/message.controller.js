@@ -5,17 +5,39 @@ import mongoose from "mongoose";
 // Student: create a new question
 export const createMessage = async (req, res) => {
   try {
-    const { lecturerId, faculty, course, subject, question } = req.body;
+    const {
+      lecturerId,
+      faculty,
+      course,
+      subject,
+      question,
+      studentRegistrationId,
+      studentEmail,
+      academicYear,
+      semester,
+    } = req.body;
 
-    if (!subject || !question) {
-      return res
-        .status(400)
-        .json({ message: "Subject and question are required" });
+    if (
+      !subject ||
+      !question ||
+      !studentRegistrationId ||
+      !(studentEmail || req.user.email) ||
+      !academicYear ||
+      !semester
+    ) {
+      return res.status(400).json({
+        message:
+          "Subject, question, studentRegistrationId, studentEmail, academicYear and semester are required",
+      });
     }
 
     let assignedLecturer = null;
 
     if (lecturerId) {
+      if (!mongoose.Types.ObjectId.isValid(lecturerId)) {
+        return res.status(400).json({ message: "Invalid lecturer ID" });
+      }
+
       const lecturer = await User.findById(lecturerId);
 
       if (!lecturer) {
@@ -35,6 +57,10 @@ export const createMessage = async (req, res) => {
 
     const message = await Message.create({
       studentId: req.user._id,
+      studentRegistrationId,
+      studentEmail: studentEmail || req.user.email || "",
+      academicYear: academicYear || req.user.year || null,
+      semester,
       lecturerId: assignedLecturer,
       faculty: faculty || "",
       course: course || "",
@@ -72,15 +98,13 @@ export const getAllMessages = async (req, res) => {
 
     if (req.user.role === "admin") {
       messages = await Message.find()
-        .populate("studentId", "name email role")
+        .populate("studentId", "name email role year department course")
         .populate("lecturerId", "name email role")
         .populate("answeredBy", "name email role")
         .sort({ createdAt: -1 });
     } else {
-      messages = await Message.find({
-        $or: [{ lecturerId: req.user._id }, { lecturerId: null }],
-      })
-        .populate("studentId", "name email role")
+      messages = await Message.find({ lecturerId: req.user._id })
+        .populate("studentId", "name email role year department course")
         .populate("lecturerId", "name email role")
         .populate("answeredBy", "name email role")
         .sort({ createdAt: -1 });
@@ -96,8 +120,12 @@ export const getAllMessages = async (req, res) => {
 // Lecturer/Admin: get single message by id
 export const getMessageById = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid message ID" });
+    }
+
     const message = await Message.findById(req.params.id)
-      .populate("studentId", "name email role")
+      .populate("studentId", "name email role year department course")
       .populate("lecturerId", "name email role")
       .populate("answeredBy", "name email role");
 
@@ -127,6 +155,10 @@ export const answerMessage = async (req, res) => {
 
     if (!answer) {
       return res.status(400).json({ message: "Answer is required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid message ID" });
     }
 
     const message = await Message.findById(req.params.id);
@@ -173,6 +205,10 @@ export const updateVisibility = async (req, res) => {
       return res.status(400).json({ message: "isPublic must be true or false" });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid message ID" });
+    }
+
     const message = await Message.findById(req.params.id);
 
     if (!message) {
@@ -202,6 +238,10 @@ export const updateVisibility = async (req, res) => {
 // Student: mark notification as seen
 export const markAsNotified = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid message ID" });
+    }
+
     const message = await Message.findById(req.params.id);
 
     if (!message) {
@@ -245,6 +285,8 @@ export const getPublicMessages = async (req, res) => {
         { subject: { $regex: search, $options: "i" } },
         { question: { $regex: search, $options: "i" } },
         { answer: { $regex: search, $options: "i" } },
+        { studentRegistrationId: { $regex: search, $options: "i" } },
+        { studentEmail: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -258,7 +300,6 @@ export const getPublicMessages = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Delete message
 export const deleteMessage = async (req, res) => {
