@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema(
         department: String,
         course: String,
         year: Number,
+        canCreateEvents: {
+         type: Boolean,
+            default: false
+        },
         isActive: {
             type: Boolean,
             default: true,

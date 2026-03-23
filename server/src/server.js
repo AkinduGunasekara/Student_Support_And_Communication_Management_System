@@ -6,7 +6,7 @@ import cors from "cors";
 import authRouter from "./userManagement/auth.routes.js";
 import userRouter from "./userManagement/user.routes.js";
 import ticketRouter from "./ticketRaising/ticket.routes.js";
-
+import eventRoutes from "./event/event.routes.js";
 
 // import sn_expenseRoutes from "./routes/sn_expenseRoutes.js";
 // import usersRoutes from "./routes/vd_usersRoutes.js";
@@ -47,6 +47,8 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/tickets", ticketRouter);
+app.use("/api/events", eventRoutes);
+
 
 app.listen(PORT, () => {
     console.log("Server started on port:", PORT);
