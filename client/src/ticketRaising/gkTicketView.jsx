@@ -1,22 +1,28 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { FaEdit, FaTrash, FaPlus, FaClock, FaTools, FaTicketAlt } from "react-icons/fa";
+import { XCircle } from "lucide-react";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import GkTicketCreate from "./gkTicketCreate.jsx";
+import GkTicketUpdate from "./gkTicketUpdate.jsx";
+import GkTicketDelete from "./gkTicketDelete.jsx";
 
 function GkTicketView() {
-  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [modalType, setModalType] = useState(null); // 'update' or 'delete'
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const [searchCategory, setSearchCategory] = useState("");
 
   // Fetch all tickets
   const fetchTickets = async () => {
+    setLoading(true);
     const token = localStorage.getItem("authToken");
     if (!token) {
       toast.error("You are not logged in. Please login first.");
-      navigate("/login");
       return;
     }
     try {
@@ -32,7 +38,9 @@ function GkTicketView() {
     }
   };
 
-  useEffect(() => { fetchTickets(); }, []);
+  useEffect(() => {
+    fetchTickets();
+  }, []);
 
   // Filter tickets
   const filteredTickets = tickets.filter(t =>
@@ -41,10 +49,30 @@ function GkTicketView() {
 
   // Count tickets by status
   const pendingCount = tickets.filter(t => t.status === "Pending").length;
-  const inProgressCount = tickets.filter(t => t.status === "Processing").length;
+  const inProgressCount = tickets.filter(t => t.status === "Resolved").length;
+
+  // Open update modal
+  const handleEdit = (ticket) => {
+    if (ticket.status === "Pending") {
+      setSelectedTicket(ticket);
+      setModalType("update");
+    } else {
+      toast.error("Cannot edit resolved ticket");
+    }
+  };
+
+  // Open delete modal
+  const handleDelete = (ticket) => {
+    if (ticket.status === "Pending") {
+      setSelectedTicket(ticket);
+      setModalType("delete");
+    } else {
+      toast.error("Cannot delete resolved ticket");
+    }
+  };
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10">
+    <main className="font-sens-serif max-w-7xl mx-auto px-6 py-10">
       {/* Header Section */}
       <section className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
@@ -56,8 +84,8 @@ function GkTicketView() {
           </p>
         </div>
         <button
-          onClick={() => navigate("/raise-ticket")}
-          className="bg-blue-600 text-white font-bold px-5 py-3 rounded-xl flex items-center gap-3 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+          onClick={() => setShowCreateModal(true)}
+          className="bg-blue-600 text-white font-bold px-5 py-3 rounded-xl flex items-center gap-3 shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
         >
           <FaPlus /> Raise New Ticket
         </button>
@@ -87,7 +115,7 @@ function GkTicketView() {
             placeholder="Filter by ticket category..."
             value={searchCategory}
             onChange={(e) => setSearchCategory(e.target.value)}
-            className="w-full bg-white border-none rounded-lg py-2.5 pl-10 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-outline"
+            className="w-full bg-gray-50 border-none rounded-lg py-2.5 pl-10 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-outline"
           />
         </div>
       </section>
@@ -100,7 +128,6 @@ function GkTicketView() {
           <p className="text-center text-gray-600 py-10">No tickets found.</p>
         ) : (
           <div className="overflow-x-auto rounded-xl shadow border border-gray-200">
-            {/* --- KEEP YOUR TABLE AS IS --- */}
             <table className="min-w-full text-sm text-left">
               <thead className="bg-gray-100 text-gray-700">
                 <tr>
@@ -109,14 +136,14 @@ function GkTicketView() {
                   <th className="p-3">Email</th>
                   <th className="p-3">Year</th>
                   <th className="p-3">Category</th>
-                  <th className="p-3">Description</th>
+                  <th className="p-3">Subject</th>
                   <th className="p-3">Status</th>
                   <th className="p-3 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {filteredTickets.map((ticket) => (
-                  <tr key={ticket._id} className="border-t hover:bg-blue-50 transition">
+                  <tr key={ticket._id} className="hover:bg-blue-50 transition">
                     <td className="p-3">{ticket.ticketId}</td>
                     <td className="p-3">{ticket.studentId}</td>
                     <td className="p-3">{ticket.studentEmail}</td>
@@ -127,8 +154,6 @@ function GkTicketView() {
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         ticket.status === "Pending"
                           ? "text-yellow-700 bg-yellow-100"
-                          : ticket.status === "Processing"
-                          ? "text-green-700 bg-green-100"
                           : "text-green-700 bg-green-100"
                       }`}>
                         {ticket.status || "Pending"}
@@ -137,21 +162,13 @@ function GkTicketView() {
                     <td className="p-3">
                       <div className="flex gap-2 justify-center">
                         <button
-                          onClick={() =>
-                            ticket.status === "Pending"
-                              ? navigate(`/update-ticket/${ticket._id}`)
-                              : toast.error("Can not edit")
-                          }
+                          onClick={() => handleEdit(ticket)}
                           className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
                         >
                           <FaEdit /> Edit
                         </button>
                         <button
-                          onClick={() =>
-                            ticket.status === "Pending"
-                              ? navigate(`/delete-ticket/${ticket._id}`)
-                              : toast.error("Can not delete")
-                          }
+                          onClick={() => handleDelete(ticket)}
                           className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs"
                         >
                           <FaTrash /> Delete
@@ -164,6 +181,7 @@ function GkTicketView() {
             </table>
           </div>
         )}
+
         {/* Pagination */}
         <div className="p-4 bg-surface-container-low flex justify-between items-center">
           <span className="text-xs font-bold text-on-surface-variant">
@@ -171,17 +189,75 @@ function GkTicketView() {
           </span>
           <div className="flex gap-2">
             <button className="p-2 hover:bg-white rounded-lg transition-colors cursor-pointer">
-              <span className="material-symbols-outlined text-sm"> <MdChevronLeft /></span>
+              <MdChevronLeft />
             </button>
             <button className="px-3 py-1 bg-white shadow-sm rounded-lg text-xs font-bold cursor-pointer">1</button>
             <button className="px-3 py-1 hover:bg-white rounded-lg text-xs font-bold cursor-pointer">2</button>
             <button className="px-3 py-1 hover:bg-white rounded-lg text-xs font-bold cursor-pointer">3</button>
             <button className="p-2 hover:bg-white rounded-lg transition-colors cursor-pointer">
-              <span className="material-symbols-outlined text-sm"> <MdChevronRight /> </span>
+              <MdChevronRight />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Create Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 relative">
+            <button
+              onClick={() => setShowCreateModal(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-600"
+            >
+              <XCircle size={24} />
+            </button>
+
+            <GkTicketCreate
+              closeModal={() => setShowCreateModal(false)}
+              refreshTickets={fetchTickets}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Update/Delete Modal */}
+      {selectedTicket && modalType === "update" && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 relative">
+            <button
+              onClick={() => { setModalType(null); setSelectedTicket(null); }}
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-600"
+            >
+              <XCircle size={24} />
+            </button>
+
+            <GkTicketUpdate
+              ticketId={selectedTicket._id}
+              closeModal={() => { setModalType(null); setSelectedTicket(null); }}
+              refreshTickets={fetchTickets}
+            />
+          </div>
+        </div>
+      )}
+
+      {selectedTicket && modalType === "delete" && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 relative">
+            <button
+              onClick={() => { setModalType(null); setSelectedTicket(null); }}
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-600"
+            >
+              <XCircle size={24} />
+            </button>
+
+            <GkTicketDelete
+              ticketId={selectedTicket._id}
+              closeModal={() => { setModalType(null); setSelectedTicket(null); }}
+              refreshTickets={fetchTickets}
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 }

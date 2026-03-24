@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useParams, useNavigate } from "react-router-dom";
 
-function gkTicketUpdate() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
+function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
@@ -18,20 +14,22 @@ function gkTicketUpdate() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Fetch existing ticket data
+  // Fetch ticket data by ID
   useEffect(() => {
+    if (!ticketId) return;
+
     const fetchTicket = async () => {
       const token = localStorage.getItem("authToken");
       if (!token) {
         toast.error("Please login first.");
-        navigate("/login");
         return;
       }
 
       try {
-        const res = await axios.get(`http://localhost:5001/api/tickets/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `http://localhost:5001/api/tickets/${ticketId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         setFormData(res.data);
       } catch (err) {
         console.error("Error fetching ticket:", err);
@@ -40,38 +38,36 @@ function gkTicketUpdate() {
     };
 
     fetchTicket();
-  }, [id, navigate]);
+  }, [ticketId]);
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Student ID validation
+    // Validation
     if (name === "studentId") {
       const regex = /^IT\d{8}$/;
-      if (!regex.test(value)) {
-        setErrors({ ...errors, studentId: "Invalide Student ID" });
-      } else {
-        setErrors({ ...errors, studentId: "" });
-      }
+      setErrors((prev) => ({
+        ...prev,
+        studentId: regex.test(value) ? "" : "Invalid Student ID",
+      }));
     }
-
-    // Email validation
     if (name === "studentEmail") {
       const regex = /.+@.+\..+/;
-      if (!regex.test(value)) {
-        setErrors({ ...errors, studentEmail: "Invalid Student email" });
-      } else {
-        setErrors({ ...errors, studentEmail: "" });
-      }
+      setErrors((prev) => ({
+        ...prev,
+        studentEmail: regex.test(value) ? "" : "Invalid Student Email",
+      }));
     }
 
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check for empty fields
+    // Check required fields
     const requiredFields = [
       "studentId",
       "studentEmail",
@@ -79,13 +75,14 @@ function gkTicketUpdate() {
       "ticketCategory",
       "description",
     ];
+
     for (const field of requiredFields) {
       if (!formData[field]) {
         return toast.error("All fields are required!");
       }
     }
 
-    // Check for validation errors
+    // Check validation errors
     if (errors.studentId || errors.studentEmail) {
       return toast.error("Please fix validation errors before submitting!");
     }
@@ -95,17 +92,18 @@ function gkTicketUpdate() {
     const token = localStorage.getItem("authToken");
     if (!token) {
       toast.error("Unauthorized. Please login again.");
-      navigate("/login");
       return;
     }
 
     try {
-      await axios.put(`http://localhost:5001/api/tickets/${id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      await axios.put(
+        `http://localhost:5001/api/tickets/${ticketId}`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       toast.success("Ticket updated successfully!", { position: "top-center" });
-      navigate("/view-ticket");
+      refreshTickets(); // Auto-refresh the ticket list
+      closeModal(); // Close modal
     } catch (err) {
       console.error("Error updating ticket:", err);
       toast.error(err.response?.data?.message || "Failed to update ticket");
@@ -115,9 +113,9 @@ function gkTicketUpdate() {
   };
 
   return (
-    <div className="mt-0 bg-white rounded-2xl shadow-xl w-full max-w-4xl mx-auto overflow-hidden border border-gray-100 font-sans">
+    <div className="mt-0 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 text-white">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-3 text-white">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           📝 Update Ticket
         </h2>
@@ -209,4 +207,4 @@ function gkTicketUpdate() {
   );
 }
 
-export default gkTicketUpdate;
+export default GkTicketUpdate;

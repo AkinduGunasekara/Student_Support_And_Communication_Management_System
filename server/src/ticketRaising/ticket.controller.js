@@ -199,7 +199,7 @@ export const replyToComplaint = async (req, res) => {
       req.params.id,
       {
         replyMessage,
-        status: "Processing",
+        status: "Resolved",
       },
       { returnDocument: "after" } // replaces deprecated `new: true`
     );
