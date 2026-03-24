@@ -2,17 +2,51 @@ import express from "express";
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/jwt.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
+import {
+  COURSES,
+  COURSE_BY_DEPARTMENT,
+  DEPARTMENTS,
+  USER_ROLES,
+} from "../models/user.model.js";
 
 const router = express.Router();
+const NAME_REGEX = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 
 //Student registration
 router.post("/register", async (req, res) => {
     try{
-        const { name, email, password, department, course, year } = req.body;
+  const { name, email, password, role = "student", department, course, year } = req.body;
+  const numericYear = Number(year);
 
         if (!name || !email || !password){
             return res.status(400).json({ message: "Name, email and password are required" });
         }
+
+    if (!NAME_REGEX.test(String(name).trim())) {
+      return res.status(400).json({ message: "Name can contain only alphabetic letters and spaces" });
+    }
+
+    if (!["student", "lecturer"].includes(role) || !USER_ROLES.includes(role)) {
+      return res.status(400).json({ message: "Role must be student or lecturer" });
+    }
+
+    if (!department || !DEPARTMENTS.includes(department)) {
+      return res.status(400).json({ message: "Please select a valid department" });
+    }
+
+    if (role === "student") {
+      if (!course || !COURSES.includes(course)) {
+        return res.status(400).json({ message: "Please select a valid course" });
+      }
+
+      if (COURSE_BY_DEPARTMENT[department] !== course) {
+        return res.status(400).json({ message: "Invalid course for selected department" });
+      }
+
+      if (!Number.isInteger(numericYear) || numericYear < 1 || numericYear > 4) {
+        return res.status(400).json({ message: "Please select a valid year between 1 and 4" });
+      }
+    }
         
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -25,9 +59,9 @@ router.post("/register", async (req, res) => {
             email,
             password,
             department,
-            course,
-            year,
-            role: "student",
+            course: role === "student" ? course : undefined,
+            year: role === "student" ? numericYear : undefined,
+            role,
 
         });
 
