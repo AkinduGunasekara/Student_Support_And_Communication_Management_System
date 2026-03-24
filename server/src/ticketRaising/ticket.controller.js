@@ -169,10 +169,15 @@ export const deleteComplaint = async (req, res) => {
  * --- Nodemailer Setup ---
  */
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,           // SSL port
+  secure: true,        // use SSL
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER, // your Gmail
+    pass: process.env.EMAIL_PASS, // Gmail App Password
+  },
+  tls: {
+    rejectUnauthorized: false, // ignore self-signed certs (dev only)
   },
 });
 
@@ -189,16 +194,15 @@ export const replyToComplaint = async (req, res) => {
       });
     }
 
-    // Find complaint by ID
+    // Find complaint by ID and update
     const complaint = await Complaint.findByIdAndUpdate(
       req.params.id,
       {
         replyMessage,
-        status: "Processing",
+        status: "Resolved",
       },
-      {new: true}
+      { returnDocument: "after" } // replaces deprecated `new: true`
     );
-
 
     if (!complaint) {
       return res.status(404).json({
@@ -236,15 +240,16 @@ export const replyToComplaint = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Reply sent successfully and complaint updated",
       complaint,
     });
 
   } catch (error) {
     console.error("Error replying to complaint:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
+      error: error.message,
     });
   }
-}
+};

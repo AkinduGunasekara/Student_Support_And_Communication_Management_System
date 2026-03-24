@@ -1,29 +1,27 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-function gkTicketDelete() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
+function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch ticket details
+  // Fetch ticket details by ID
   useEffect(() => {
+    if (!ticketId) return;
+
     const fetchTicket = async () => {
       const token = localStorage.getItem("authToken");
       if (!token) {
         toast.error("You are not logged in. Please login first.");
-        navigate("/login");
         return;
       }
 
       try {
-        const res = await axios.get(`http://localhost:5001/api/tickets/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `http://localhost:5001/api/tickets/${ticketId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         setTicket(res.data);
       } catch (err) {
         console.error("Error fetching ticket:", err);
@@ -34,7 +32,7 @@ function gkTicketDelete() {
     };
 
     fetchTicket();
-  }, [id, navigate]);
+  }, [ticketId]);
 
   // Handle ticket deletion
   const handleDelete = async () => {
@@ -43,17 +41,20 @@ function gkTicketDelete() {
     const token = localStorage.getItem("authToken");
     if (!token) {
       toast.error("Unauthorized. Please login again.");
-      navigate("/login");
       return;
     }
 
     try {
-      await axios.delete(`http://localhost:5001/api/tickets/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      await axios.delete(
+        `http://localhost:5001/api/tickets/${ticketId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       toast.success("Ticket deleted successfully!", { position: "top-center" });
-      navigate("/view-ticket");
+
+      // Refresh parent ticket list if available
+      if (refreshTickets) refreshTickets();
+      // Close modal
+      if (closeModal) closeModal();
     } catch (err) {
       console.error("Error deleting ticket:", err);
       toast.error(err.response?.data?.message || "Failed to delete ticket");
@@ -69,8 +70,8 @@ function gkTicketDelete() {
   }
 
   return (
-    <div className="mt-5 bg-white rounded-2xl shadow-xl w-full max-w-4xl mx-auto overflow-hidden border border-gray-100 font-sans">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
+    <div className="mt-5 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           🗑️ Delete Ticket
         </h2>
@@ -143,7 +144,7 @@ function gkTicketDelete() {
             Yes, Delete
           </button>
           <button
-            onClick={() => navigate("/view-ticket")}
+            onClick={closeModal}
             className="w-1/2 bg-gradient-to-r from-gray-400 to-gray-500 text-white py-3 rounded-xl font-semibold hover:from-gray-500 hover:to-gray-600 shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-[1.02]"
           >
             Cancel
@@ -154,4 +155,4 @@ function gkTicketDelete() {
   );
 }
 
-export default gkTicketDelete;
+export default GkTicketDelete;
