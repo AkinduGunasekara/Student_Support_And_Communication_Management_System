@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 
@@ -377,12 +377,164 @@ const RegisterPage = () => {
   );
 };
 
-const StudentDashboard = () => (
-  <div className="min-h-screen bg-slate-50 p-6">
-    <h1 className="text-2xl font-bold mb-4">Student Dashboard</h1>
-    <p>Here you will show tickets, messages, and events for students.</p>
-  </div>
-);
+const StudentDashboard = () => {
+  const { token } = useAuth();
+  const [ticketId, setTicketId] = useState("");
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(5);
+  const [feedbackList, setFeedbackList] = useState([]);
+  const [loadingFeedback, setLoadingFeedback] = useState(true);
+
+  const fetchMyFeedback = async () => {
+    if (!token) return;
+
+    setLoadingFeedback(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/feedback/my`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.message || "Failed to load feedback");
+        return;
+      }
+
+      const data = await response.json();
+      setFeedbackList(data);
+    } catch (error) {
+      console.error("Get feedback error:", error);
+      alert("Something went wrong while loading feedback.");
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyFeedback();
+  }, [token]);
+
+  const handleSubmitFeedback = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ticketId,
+          comment,
+          rating,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.message || "Failed to submit feedback");
+        return;
+      }
+
+      alert("Feedback submitted successfully");
+      setTicketId("");
+      setComment("");
+      setRating(5);
+      fetchMyFeedback();
+    } catch (error) {
+      console.error("Submit feedback error:", error);
+      alert("Something went wrong while submitting feedback.");
+    }
+  };
+
+  const renderStars = (value) => "*".repeat(value) + "-".repeat(5 - value);
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-6">
+      <h1 className="text-2xl font-bold mb-4">Student Dashboard</h1>
+      <p className="mb-6">Here you will show tickets, messages, and events for students.</p>
+
+      <section className="bg-white shadow rounded-xl p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Submit Feedback</h2>
+        <p className="text-sm text-slate-600 mb-4">
+          Submit feedback for a ticket response using a 1 to 5 star rating.
+        </p>
+
+        <form onSubmit={handleSubmitFeedback} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Ticket ID</label>
+            <input
+              type="text"
+              value={ticketId}
+              onChange={(event) => setTicketId(event.target.value)}
+              placeholder="Example: t001"
+              required
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Star Rating</label>
+            <select
+              value={rating}
+              onChange={(event) => setRating(Number(event.target.value))}
+              required
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={4}>4</option>
+              <option value={5}>5</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Comment</label>
+            <textarea
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              required
+              rows={4}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Write your feedback"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Submit Feedback
+          </button>
+        </form>
+      </section>
+
+      <section className="bg-white shadow rounded-xl p-6">
+        <h2 className="text-xl font-semibold mb-4">My Feedback</h2>
+
+        {loadingFeedback ? (
+          <p>Loading feedback...</p>
+        ) : feedbackList.length === 0 ? (
+          <p className="text-slate-600">No feedback submitted yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {feedbackList.map((item) => (
+              <div key={item._id} className="border border-slate-200 rounded-lg p-4">
+                <p className="font-medium text-slate-800">Ticket: {item.ticketId}</p>
+                <p className="text-sm text-slate-600">Rating: {item.rating}/5 ({renderStars(item.rating)})</p>
+                <p className="mt-2 text-slate-700">{item.comment}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+};
 
 const LecturerDashboard = () => (
   <div className="min-h-screen bg-slate-50 p-6">
