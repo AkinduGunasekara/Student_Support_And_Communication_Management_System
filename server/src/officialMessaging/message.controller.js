@@ -45,11 +45,15 @@ export const createMessage = async (req, res) => {
       }
 
       if (lecturer.role !== "lecturer") {
-        return res.status(400).json({ message: "Selected user is not a lecturer" });
+        return res
+          .status(400)
+          .json({ message: "Selected user is not a lecturer" });
       }
 
       if (!lecturer.isActive) {
-        return res.status(400).json({ message: "Selected lecturer is inactive" });
+        return res
+          .status(400)
+          .json({ message: "Selected lecturer is inactive" });
       }
 
       assignedLecturer = lecturer._id;
@@ -103,7 +107,9 @@ export const getAllMessages = async (req, res) => {
         .populate("answeredBy", "name email role")
         .sort({ createdAt: -1 });
     } else {
-      messages = await Message.find({ lecturerId: req.user._id })
+      messages = await Message.find({
+        $or: [{ lecturerId: req.user._id }, { lecturerId: null }],
+      })
         .populate("studentId", "name email role year department course")
         .populate("lecturerId", "name email role")
         .populate("answeredBy", "name email role")
@@ -136,9 +142,12 @@ export const getMessageById = async (req, res) => {
     if (
       req.user.role === "lecturer" &&
       message.lecturerId &&
-      String(message.lecturerId._id || message.lecturerId) !== String(req.user._id)
+      String(message.lecturerId._id || message.lecturerId) !==
+        String(req.user._id)
     ) {
-      return res.status(403).json({ message: "Forbidden: Insufficient permissions" });
+      return res
+        .status(403)
+        .json({ message: "Forbidden: Insufficient permissions" });
     }
 
     return res.json(message);
@@ -202,33 +211,39 @@ export const updateVisibility = async (req, res) => {
     const { isPublic } = req.body;
 
     if (typeof isPublic !== "boolean") {
-      return res.status(400).json({ message: "isPublic must be true or false" });
+      return res
+        .status(400)
+        .json({ message: "isPublic must be true or false" });
     }
 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: "Invalid message ID" });
     }
 
-    const message = await Message.findById(req.params.id);
+    const existingMessage = await Message.findById(req.params.id);
 
-    if (!message) {
+    if (!existingMessage) {
       return res.status(404).json({ message: "Message not found" });
     }
 
     if (
       req.user.role === "lecturer" &&
-      message.lecturerId &&
-      String(message.lecturerId) !== String(req.user._id)
+      existingMessage.lecturerId &&
+      String(existingMessage.lecturerId) !== String(req.user._id)
     ) {
       return res.status(403).json({
-        message: "Forbidden: You can update visibility only for your own messages",
+        message:
+          "Forbidden: You can update visibility only for your own messages",
       });
     }
 
-    message.isPublic = isPublic;
-    await message.save();
+    const updatedMessage = await Message.findByIdAndUpdate(
+      req.params.id,
+      { $set: { isPublic } },
+      { returnDocument: "after" }
+    );
 
-    return res.json(message);
+    return res.json(updatedMessage);
   } catch (error) {
     console.error("Update visibility error:", error);
     return res.status(500).json({ message: "Server error" });
@@ -242,20 +257,27 @@ export const markAsNotified = async (req, res) => {
       return res.status(400).json({ message: "Invalid message ID" });
     }
 
-    const message = await Message.findById(req.params.id);
+    const updatedMessage = await Message.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        studentId: req.user._id,
+      },
+      {
+        $set: { studentNotified: true },
+      },
+      {
+        returnDocument: "after",
+      }
+    );
 
-    if (!message) {
+    if (!updatedMessage) {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    if (String(message.studentId) !== String(req.user._id)) {
-      return res.status(403).json({ message: "Forbidden: Insufficient permissions" });
-    }
-
-    message.studentNotified = true;
-    await message.save();
-
-    return res.json(message);
+    return res.json({
+      message: "Notification marked as seen",
+      data: updatedMessage,
+    });
   } catch (error) {
     console.error("Mark notified error:", error);
     return res.status(500).json({ message: "Server error" });
@@ -285,8 +307,6 @@ export const getPublicMessages = async (req, res) => {
         { subject: { $regex: search, $options: "i" } },
         { question: { $regex: search, $options: "i" } },
         { answer: { $regex: search, $options: "i" } },
-        { studentRegistrationId: { $regex: search, $options: "i" } },
-        { studentEmail: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -332,7 +352,7 @@ export const deleteMessage = async (req, res) => {
     // Lecturer: can delete only messages assigned to them
     if (req.user.role === "lecturer") {
       if (
-        !message.lecturerId ||
+        message.lecturerId &&
         String(message.lecturerId) !== String(req.user._id)
       ) {
         return res.status(403).json({
@@ -341,7 +361,6 @@ export const deleteMessage = async (req, res) => {
       }
     }
 
-    // Admin: can delete any message
     await message.deleteOne();
 
     return res.json({ message: "Message deleted successfully" });

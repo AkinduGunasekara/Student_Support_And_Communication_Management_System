@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
+import { Toaster } from "sonner";
 import { useAuth } from "./AuthContext.jsx";
+
+import StudentAskQuestion from "./officialMesseging/pages/StudentAskQuestion";
+import StudentMyMessages from "./officialMesseging/pages/StudentMyMessages";
+import OfficialLecturerDashboard from "./officialMesseging/pages/LecturerDashboard";
+import PublicFAQ from "./officialMesseging/pages/PublicFAQ";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
@@ -30,7 +42,11 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="p-6 text-center">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <div className="text-lg font-medium">Loading...</div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -42,6 +58,96 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
   }
 
   return children;
+};
+
+const AppLayout = ({ children }) => {
+  const { user, logout } = useAuth();
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white">
+      <nav className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="text-xl md:text-2xl font-bold tracking-tight">
+            Student Support Portal
+          </Link>
+
+          <div className="flex items-center gap-3 md:gap-5 flex-wrap">
+            <Link
+              to="/public-faq"
+              className="text-slate-300 hover:text-white transition"
+            >
+              Public FAQ
+            </Link>
+
+            {user?.role === "student" && (
+              <>
+                <Link
+                  to="/student/dashboard"
+                  className="text-slate-300 hover:text-white transition"
+                >
+                  Student Dashboard
+                </Link>
+                <Link
+                  to="/student/ask-question"
+                  className="text-slate-300 hover:text-white transition"
+                >
+                  Ask Question
+                </Link>
+                <Link
+                  to="/student/my-messages"
+                  className="text-slate-300 hover:text-white transition"
+                >
+                  My Messages
+                </Link>
+              </>
+            )}
+
+            {user?.role === "lecturer" && (
+              <Link
+                to="/lecturer/dashboard"
+                className="text-slate-300 hover:text-white transition"
+              >
+                Lecturer Dashboard
+              </Link>
+            )}
+
+            {user?.role === "admin" && (
+              <>
+                <Link
+                  to="/admin/dashboard"
+                  className="text-slate-300 hover:text-white transition"
+                >
+                  Admin Dashboard
+                </Link>
+                <Link
+                  to="/lecturer/dashboard"
+                  className="text-slate-300 hover:text-white transition"
+                >
+                  Official Messaging
+                </Link>
+              </>
+            )}
+
+            {user && (
+              <>
+                <span className="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm capitalize">
+                  {user.role}
+                </span>
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white transition"
+                >
+                  Logout
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <main>{children}</main>
+    </div>
+  );
 };
 
 const LoginPage = () => {
@@ -88,49 +194,61 @@ const LoginPage = () => {
   };
 
   if (user) {
-    if (user.role === "student") return <Navigate to="/student/dashboard" replace />;
-    if (user.role === "lecturer") return <Navigate to="/lecturer/dashboard" replace />;
+    if (user.role === "student")
+      return <Navigate to="/student/dashboard" replace />;
+    if (user.role === "lecturer")
+      return <Navigate to="/lecturer/dashboard" replace />;
     if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-semibold text-slate-800 mb-6 text-center">
-          Student Support Portal Login
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 shadow-2xl rounded-3xl p-8">
+        <h1 className="text-3xl font-bold text-white mb-2 text-center">
+          Welcome Back
         </h1>
+        <p className="text-slate-400 text-center mb-6">
+          Login to access the Student Support Portal
+        </p>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Email
             </label>
             <input
               type="email"
               name="email"
               required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Password
             </label>
             <input
               type="password"
               name="password"
               required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
           </div>
+
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full rounded-xl bg-cyan-500 text-slate-950 font-semibold py-3 hover:bg-cyan-400 transition"
           >
             Login
           </button>
-          <p className="text-sm text-slate-600 text-center">
+
+          <p className="text-sm text-slate-400 text-center">
             Don&apos;t have an account?{" "}
-            <Link to="/register" className="text-blue-600 hover:underline font-medium">
+            <Link
+              to="/register"
+              className="text-cyan-400 hover:underline font-medium"
+            >
               Register
             </Link>
           </p>
@@ -206,6 +324,8 @@ const RegisterPage = () => {
         navigate("/student/dashboard");
       } else if (data.user.role === "lecturer") {
         navigate("/lecturer/dashboard");
+      } else if (data.user.role === "admin") {
+        navigate("/admin/dashboard");
       } else {
         navigate("/");
       }
@@ -216,20 +336,26 @@ const RegisterPage = () => {
   };
 
   if (user) {
-    if (user.role === "student") return <Navigate to="/student/dashboard" replace />;
-    if (user.role === "lecturer") return <Navigate to="/lecturer/dashboard" replace />;
+    if (user.role === "student")
+      return <Navigate to="/student/dashboard" replace />;
+    if (user.role === "lecturer")
+      return <Navigate to="/lecturer/dashboard" replace />;
     if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-semibold text-slate-800 mb-6 text-center">
-          Create Your Account
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 shadow-2xl rounded-3xl p-8">
+        <h1 className="text-3xl font-bold text-white mb-2 text-center">
+          Create Account
         </h1>
+        <p className="text-slate-400 text-center mb-6">
+          Register to access the portal
+        </p>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Name
             </label>
             <input
@@ -238,22 +364,24 @@ const RegisterPage = () => {
               required
               pattern="[A-Za-z]+(\s[A-Za-z]+)*"
               title="Name can contain only alphabetic letters and spaces"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Email
             </label>
             <input
               type="email"
               name="email"
               required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Password
             </label>
             <input
@@ -261,11 +389,12 @@ const RegisterPage = () => {
               name="password"
               minLength={6}
               required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Role
             </label>
             <select
@@ -279,14 +408,15 @@ const RegisterPage = () => {
                   setSelectedCourse("");
                 }
               }}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
               <option value="student">Student</option>
               <option value="lecturer">Lecturer</option>
             </select>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-1">
               Department
             </label>
             <select
@@ -296,12 +426,13 @@ const RegisterPage = () => {
               onChange={(event) => {
                 const nextDepartment = event.target.value;
                 setSelectedDepartment(nextDepartment);
-                const nextAllowedCourse = COURSE_BY_DEPARTMENT[nextDepartment] || "";
+                const nextAllowedCourse =
+                  COURSE_BY_DEPARTMENT[nextDepartment] || "";
                 if (selectedCourse && selectedCourse !== nextAllowedCourse) {
                   setSelectedCourse("");
                 }
               }}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
               <option value="" disabled>
                 Select department
@@ -313,10 +444,11 @@ const RegisterPage = () => {
               ))}
             </select>
           </div>
+
           {selectedRole === "student" && (
             <>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-300 mb-1">
                   Course
                 </label>
                 <select
@@ -325,10 +457,12 @@ const RegisterPage = () => {
                   value={selectedCourse}
                   onChange={(event) => setSelectedCourse(event.target.value)}
                   disabled={!selectedDepartment}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
                   <option value="" disabled>
-                    {selectedDepartment ? "Select course" : "Select department first"}
+                    {selectedDepartment
+                      ? "Select course"
+                      : "Select department first"}
                   </option>
                   {allowedCourseOptions.map((courseOption) => (
                     <option key={courseOption} value={courseOption}>
@@ -337,15 +471,16 @@ const RegisterPage = () => {
                   ))}
                 </select>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-300 mb-1">
                   Year
                 </label>
                 <select
                   name="year"
                   required
                   defaultValue=""
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
                   <option value="" disabled>
                     Select year
@@ -359,15 +494,20 @@ const RegisterPage = () => {
               </div>
             </>
           )}
+
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full rounded-xl bg-cyan-500 text-slate-950 font-semibold py-3 hover:bg-cyan-400 transition"
           >
             Register
           </button>
-          <p className="text-sm text-slate-600 text-center">
+
+          <p className="text-sm text-slate-400 text-center">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-600 hover:underline font-medium">
+            <Link
+              to="/login"
+              className="text-cyan-400 hover:underline font-medium"
+            >
               Login
             </Link>
           </p>
@@ -378,7 +518,7 @@ const RegisterPage = () => {
 };
 
 const StudentDashboard = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [ticketId, setTicketId] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
@@ -450,142 +590,261 @@ const StudentDashboard = () => {
     }
   };
 
-  const renderStars = (value) => "*".repeat(value) + "-".repeat(5 - value);
+  const renderStars = (value) => "★".repeat(value) + "☆".repeat(5 - value);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <h1 className="text-2xl font-bold mb-4">Student Dashboard</h1>
-      <p className="mb-6">Here you will show tickets, messages, and events for students.</p>
+    <AppLayout>
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-3xl p-8 shadow-2xl mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            Student Dashboard
+          </h1>
+          <p className="text-white/90">
+            Welcome {user?.name || "Student"} — manage feedback and access
+            official messaging.
+          </p>
+        </div>
 
-      <section className="bg-white shadow rounded-xl p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Submit Feedback</h2>
-        <p className="text-sm text-slate-600 mb-4">
-          Submit feedback for a ticket response using a 1 to 5 star rating.
-        </p>
-
-        <form onSubmit={handleSubmitFeedback} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Ticket ID</label>
-            <input
-              type="text"
-              value={ticketId}
-              onChange={(event) => setTicketId(event.target.value)}
-              placeholder="Example: t001"
-              required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Star Rating</label>
-            <select
-              value={rating}
-              onChange={(event) => setRating(Number(event.target.value))}
-              required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Comment</label>
-            <textarea
-              value={comment}
-              onChange={(event) => setComment(event.target.value)}
-              required
-              rows={4}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Write your feedback"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          <Link
+            to="/student/ask-question"
+            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-cyan-400 transition"
           >
-            Submit Feedback
-          </button>
-        </form>
-      </section>
+            <h2 className="text-xl font-semibold mb-2">Ask Official Question</h2>
+            <p className="text-slate-400">
+              Send academic or official questions to lecturers.
+            </p>
+          </Link>
 
-      <section className="bg-white shadow rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4">My Feedback</h2>
+          <Link
+            to="/student/my-messages"
+            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-emerald-400 transition"
+          >
+            <h2 className="text-xl font-semibold mb-2">My Messages</h2>
+            <p className="text-slate-400">
+              View answers, status, and recent official communication.
+            </p>
+          </Link>
 
-        {loadingFeedback ? (
-          <p>Loading feedback...</p>
-        ) : feedbackList.length === 0 ? (
-          <p className="text-slate-600">No feedback submitted yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {feedbackList.map((item) => (
-              <div key={item._id} className="border border-slate-200 rounded-lg p-4">
-                <p className="font-medium text-slate-800">Ticket: {item.ticketId}</p>
-                <p className="text-sm text-slate-600">Rating: {item.rating}/5 ({renderStars(item.rating)})</p>
-                <p className="mt-2 text-slate-700">{item.comment}</p>
+          <Link
+            to="/public-faq"
+            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-purple-400 transition"
+          >
+            <h2 className="text-xl font-semibold mb-2">Public FAQ</h2>
+            <p className="text-slate-400">
+              Browse public answered questions from lecturers and admins.
+            </p>
+          </Link>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-6">
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+            <h2 className="text-2xl font-semibold mb-4">Submit Feedback</h2>
+            <p className="text-sm text-slate-400 mb-4">
+              Submit feedback for a resolved ticket response using a 1 to 5 star
+              rating.
+            </p>
+
+            <form onSubmit={handleSubmitFeedback} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">
+                  Ticket ID
+                </label>
+                <input
+                  type="text"
+                  value={ticketId}
+                  onChange={(event) => setTicketId(event.target.value)}
+                  placeholder="Example: t001"
+                  required
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
               </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">
+                  Star Rating
+                </label>
+                <select
+                  value={rating}
+                  onChange={(event) => setRating(Number(event.target.value))}
+                  required
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                >
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">
+                  Comment
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(event) => setComment(event.target.value)}
+                  required
+                  rows={4}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  placeholder="Write your feedback"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="rounded-xl bg-cyan-500 text-slate-950 font-semibold py-3 px-5 hover:bg-cyan-400 transition"
+              >
+                Submit Feedback
+              </button>
+            </form>
+          </section>
+
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+            <h2 className="text-2xl font-semibold mb-4">My Feedback</h2>
+
+            {loadingFeedback ? (
+              <p className="text-slate-400">Loading feedback...</p>
+            ) : feedbackList.length === 0 ? (
+              <p className="text-slate-400">No feedback submitted yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {feedbackList.map((item) => (
+                  <div
+                    key={item._id}
+                    className="border border-slate-700 rounded-2xl p-4 bg-slate-800"
+                  >
+                    <p className="font-medium text-white">Ticket: {item.ticketId}</p>
+                    <p className="text-sm text-slate-300 mt-1">
+                      Rating: {item.rating}/5 ({renderStars(item.rating)})
+                    </p>
+                    <p className="mt-2 text-slate-200">{item.comment}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+    </AppLayout>
   );
 };
 
-const LecturerDashboard = () => (
-  <div className="min-h-screen bg-slate-50 p-6">
-    <h1 className="text-2xl font-bold mb-4">Lecturer Dashboard</h1>
-    <p>Here you will show student messages, announcements, and tickets.</p>
-  </div>
-);
+const AdminDashboard = () => {
+  const { user } = useAuth();
 
-const AdminDashboard = () => (
-  <div className="min-h-screen bg-slate-50 p-6">
-    <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-    <p>Here you will show user management, tickets overview, and feedback.</p>
-  </div>
-);
+  return (
+    <AppLayout>
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-8 shadow-2xl mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            Admin Dashboard
+          </h1>
+          <p className="text-white/90">
+            Welcome {user?.name || "Admin"} — oversee users, feedback, and
+            official communication.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 className="text-xl font-semibold mb-2">User Management</h2>
+            <p className="text-slate-400">Manage users and access control.</p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 className="text-xl font-semibold mb-2">Feedback Overview</h2>
+            <p className="text-slate-400">Monitor student feedback and ratings.</p>
+          </div>
+
+          <Link
+            to="/lecturer/dashboard"
+            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-emerald-400 transition"
+          >
+            <h2 className="text-xl font-semibold mb-2">Official Messaging</h2>
+            <p className="text-slate-400">
+              Review and manage official Q&A content.
+            </p>
+          </Link>
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+    <>
+      <Toaster position="top-right" richColors />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-      <Route
-        path="/student/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <StudentDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/lecturer/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={["lecturer"]}>
-            <LecturerDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/student/ask-question"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <StudentAskQuestion />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/admin/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/student/my-messages"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <StudentMyMessages />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route
+          path="/lecturer/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["lecturer", "admin"]}>
+              <AppLayout>
+                <OfficialLecturerDashboard />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/public-faq"
+          element={
+            <AppLayout>
+              <PublicFAQ />
+            </AppLayout>
+          }
+        />
+
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </>
   );
 }
 

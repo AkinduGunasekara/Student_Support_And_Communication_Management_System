@@ -1,10 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getPublicMessages } from "../services/messageService";
 import { toast } from "sonner";
 
+const COURSE_OPTIONS = {
+  Computing: ["IT", "SE", "Cyber Security", "Data Science"],
+  Engineering: [
+    "Civil Engineering",
+    "Mechanical Engineering",
+    "Electrical Engineering",
+  ],
+  Business: ["Business Management", "Accounting", "Marketing"],
+};
+
 export default function PublicFAQ() {
   const [messages, setMessages] = useState([]);
-  const [filteredMessages, setFilteredMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
@@ -15,8 +24,7 @@ export default function PublicFAQ() {
     try {
       setLoading(true);
       const res = await getPublicMessages();
-      setMessages(res.data);
-      setFilteredMessages(res.data);
+      setMessages(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       const message =
         error?.response?.data?.message || "Failed to load public FAQ";
@@ -30,7 +38,14 @@ export default function PublicFAQ() {
     loadPublicMessages();
   }, []);
 
-  useEffect(() => {
+  const availableCourses = useMemo(() => {
+    if (!faculty) {
+      return Object.values(COURSE_OPTIONS).flat();
+    }
+    return COURSE_OPTIONS[faculty] || [];
+  }, [faculty]);
+
+  const filteredMessages = useMemo(() => {
     let result = [...messages];
 
     if (search.trim()) {
@@ -39,9 +54,7 @@ export default function PublicFAQ() {
         (msg) =>
           msg.subject?.toLowerCase().includes(searchValue) ||
           msg.question?.toLowerCase().includes(searchValue) ||
-          msg.answer?.toLowerCase().includes(searchValue) ||
-          msg.studentRegistrationId?.toLowerCase().includes(searchValue) ||
-          msg.studentEmail?.toLowerCase().includes(searchValue)
+          msg.answer?.toLowerCase().includes(searchValue)
       );
     }
 
@@ -53,19 +66,44 @@ export default function PublicFAQ() {
       result = result.filter((msg) => msg.course === course);
     }
 
-    setFilteredMessages(result);
-  }, [search, faculty, course, messages]);
+    return result;
+  }, [messages, search, faculty, course]);
+
+  const totalFaq = messages.length;
+  const totalFiltered = filteredMessages.length;
+  const facultyCount = [...new Set(messages.map((msg) => msg.faculty).filter(Boolean))].length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-slate-50 px-4 py-6 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 p-6 text-white shadow-lg">
+        <div className="mb-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 text-white shadow-lg">
           <p className="text-sm font-medium text-blue-100">Official Messaging</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight">Public FAQ</h1>
           <p className="mt-2 max-w-2xl text-sm text-blue-100">
             Browse officially answered public questions by faculty, course, and
             keyword.
           </p>
+        </div>
+
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Total Public FAQs</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">{totalFaq}</h2>
+          </div>
+
+          <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Filtered Results</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">
+              {totalFiltered}
+            </h2>
+          </div>
+
+          <div className="rounded-3xl border border-purple-100 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Faculties Covered</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">
+              {facultyCount}
+            </h2>
+          </div>
         </div>
 
         <div className="mb-6 rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
@@ -89,7 +127,10 @@ export default function PublicFAQ() {
               </label>
               <select
                 value={faculty}
-                onChange={(e) => setFaculty(e.target.value)}
+                onChange={(e) => {
+                  setFaculty(e.target.value);
+                  setCourse("");
+                }}
                 className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
               >
                 <option value="">All Faculties</option>
@@ -109,9 +150,11 @@ export default function PublicFAQ() {
                 className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
               >
                 <option value="">All Courses</option>
-                <option value="IT">IT</option>
-                <option value="SE">SE</option>
-                <option value="Cyber Security">Cyber Security</option>
+                {availableCourses.map((courseOption) => (
+                  <option key={courseOption} value={courseOption}>
+                    {courseOption}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -142,7 +185,7 @@ export default function PublicFAQ() {
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-wrap items-center gap-3">
                         <h2 className="text-lg font-semibold text-slate-900">
-                          {msg.subject}
+                          {msg.subject || "Untitled Subject"}
                         </h2>
                         <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
                           FAQ
@@ -151,14 +194,15 @@ export default function PublicFAQ() {
 
                       <p className="text-sm text-slate-500">
                         {msg.faculty || "-"} • {msg.course || "-"} • Year{" "}
-                        {msg.academicYear || "-"} • Semester {msg.semester || "-"}
+                        {msg.academicYear || "-"} • Semester{" "}
+                        {msg.semester || "-"}
                       </p>
 
                       <div className="rounded-2xl bg-slate-50 p-4">
                         <p className="text-sm font-semibold text-slate-700">
                           Question
                         </p>
-                        <p className="mt-1 text-sm text-slate-600">
+                        <p className="mt-1 whitespace-pre-line text-sm text-slate-600">
                           {msg.question}
                         </p>
                       </div>
@@ -167,7 +211,7 @@ export default function PublicFAQ() {
                         <p className="text-sm font-semibold text-blue-700">
                           Official Answer
                         </p>
-                        <p className="mt-1 text-sm text-slate-700">
+                        <p className="mt-1 whitespace-pre-line text-sm text-slate-700">
                           {msg.answer}
                         </p>
                       </div>
@@ -178,10 +222,12 @@ export default function PublicFAQ() {
                         <span className="font-semibold">Answered By:</span>{" "}
                         {msg.answeredBy?.name || "Lecturer"}
                       </p>
+
                       <p className="mt-2">
                         <span className="font-semibold">Lecturer Email:</span>{" "}
                         {msg.answeredBy?.email || "-"}
                       </p>
+
                       <p className="mt-2">
                         <span className="font-semibold">Answered At:</span>{" "}
                         {msg.answeredAt

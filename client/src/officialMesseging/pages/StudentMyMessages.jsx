@@ -1,7 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../AuthContext";
-import { deleteMessage, getMyMessages, markAsNotified } from "../services/messageService";
+import {
+  deleteMessage,
+  getMyMessages,
+  markAsNotified,
+} from "../services/messageService";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 export default function StudentMyMessages() {
   const { token } = useAuth();
@@ -9,12 +14,13 @@ export default function StudentMyMessages() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [markingId, setMarkingId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   const loadMessages = async () => {
     try {
       setLoading(true);
       const res = await getMyMessages(token);
-      setMessages(res.data);
+      setMessages(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       const message =
         error?.response?.data?.message || "Failed to load messages";
@@ -31,6 +37,12 @@ export default function StudentMyMessages() {
   }, [token]);
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this message?"
+    );
+
+    if (!confirmed) return;
+
     try {
       setDeletingId(id);
       await deleteMessage(id, token);
@@ -69,16 +81,26 @@ export default function StudentMyMessages() {
       case "ANSWERED":
         return "bg-emerald-100 text-emerald-700 border border-emerald-200";
       case "CLOSED":
-        return "bg-slate-100 text-slate-700 border border-slate-200";
+        return "bg-slate-200 text-slate-700 border border-slate-300";
+      case "OPEN":
       default:
         return "bg-blue-100 text-blue-700 border border-blue-200";
     }
   };
 
+  const filteredMessages = useMemo(() => {
+    if (statusFilter === "ALL") return messages;
+    return messages.filter((msg) => msg.status === statusFilter);
+  }, [messages, statusFilter]);
+
+  const answeredCount = messages.filter((msg) => msg.status === "ANSWERED").length;
+  const openCount = messages.filter((msg) => msg.status === "OPEN").length;
+  const unreadCount = messages.filter((msg) => !msg.studentNotified).length;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-slate-50 px-4 py-6 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 p-6 text-white shadow-lg">
+        <div className="mb-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 text-white shadow-lg">
           <p className="text-sm font-medium text-blue-100">
             Student Support & Communication System
           </p>
@@ -87,27 +109,85 @@ export default function StudentMyMessages() {
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-blue-100">
             View your submitted questions, official replies, visibility status,
-            and notifications.
+            and notification updates in one place.
           </p>
         </div>
 
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Open Messages</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">{openCount}</h2>
+          </div>
+
+          <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Answered Messages</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">
+              {answeredCount}
+            </h2>
+          </div>
+
+          <div className="rounded-3xl border border-amber-100 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Unread Updates</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">
+              {unreadCount}
+            </h2>
+          </div>
+        </div>
+
         <div className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm md:p-8">
+          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">
+                Submitted Questions
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Track status, read lecturer replies, and manage open requests.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              >
+                <option value="ALL">All Status</option>
+                <option value="OPEN">Open</option>
+                <option value="ANSWERED">Answered</option>
+                <option value="CLOSED">Closed</option>
+              </select>
+
+              <Link
+                to="/student/ask-question"
+                className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                Ask New Question
+              </Link>
+            </div>
+          </div>
+
           {loading ? (
             <div className="py-16 text-center text-slate-500">
               Loading messages...
             </div>
-          ) : messages.length === 0 ? (
+          ) : filteredMessages.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 text-center">
               <p className="text-lg font-semibold text-slate-700">
                 No messages found
               </p>
               <p className="mt-2 text-sm text-slate-500">
-                You haven’t sent any questions yet.
+                You haven&apos;t sent any questions for this filter yet.
               </p>
+              <Link
+                to="/student/ask-question"
+                className="mt-5 inline-flex rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                Send Your First Question
+              </Link>
             </div>
           ) : (
             <div className="space-y-5">
-              {messages.map((msg) => (
+              {filteredMessages.map((msg) => (
                 <div
                   key={msg._id}
                   className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
@@ -116,8 +196,9 @@ export default function StudentMyMessages() {
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-wrap items-center gap-3">
                         <h2 className="text-lg font-semibold text-slate-900">
-                          {msg.subject}
+                          {msg.subject || "Untitled Subject"}
                         </h2>
+
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(
                             msg.status
@@ -125,6 +206,7 @@ export default function StudentMyMessages() {
                         >
                           {msg.status}
                         </span>
+
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-semibold ${
                             msg.studentNotified
@@ -134,6 +216,7 @@ export default function StudentMyMessages() {
                         >
                           {msg.studentNotified ? "Seen" : "Unread"}
                         </span>
+
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-semibold ${
                             msg.isPublic
@@ -154,7 +237,7 @@ export default function StudentMyMessages() {
                         <p className="text-sm font-semibold text-slate-700">
                           Question
                         </p>
-                        <p className="mt-1 text-sm text-slate-600">
+                        <p className="mt-1 whitespace-pre-line text-sm text-slate-600">
                           {msg.question}
                         </p>
                       </div>
@@ -164,7 +247,7 @@ export default function StudentMyMessages() {
                           <p className="text-sm font-semibold text-blue-700">
                             Official Reply
                           </p>
-                          <p className="mt-1 text-sm text-slate-700">
+                          <p className="mt-1 whitespace-pre-line text-sm text-slate-700">
                             {msg.answer}
                           </p>
                         </div>
@@ -182,20 +265,30 @@ export default function StudentMyMessages() {
                         <span className="font-semibold">Student ID:</span>{" "}
                         {msg.studentRegistrationId || "-"}
                       </p>
-                      <p className="mt-2">
+
+                      <p className="mt-2 break-all">
                         <span className="font-semibold">Email:</span>{" "}
                         {msg.studentEmail || "-"}
                       </p>
+
                       <p className="mt-2">
                         <span className="font-semibold">Lecturer:</span>{" "}
                         {msg.lecturerId?.name || "Assigned lecturer"}
                       </p>
+
                       <p className="mt-2">
                         <span className="font-semibold">Created:</span>{" "}
                         {msg.createdAt
                           ? new Date(msg.createdAt).toLocaleString()
                           : "-"}
                       </p>
+
+                      {msg.answeredAt && (
+                        <p className="mt-2">
+                          <span className="font-semibold">Answered:</span>{" "}
+                          {new Date(msg.answeredAt).toLocaleString()}
+                        </p>
+                      )}
 
                       <div className="mt-4 flex flex-col gap-2">
                         {msg.status === "ANSWERED" && !msg.studentNotified && (
