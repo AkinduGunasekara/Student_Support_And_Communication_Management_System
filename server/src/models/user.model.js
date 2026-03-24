@@ -2,6 +2,21 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export const USER_ROLES = ["student", "lecturer", "admin"];
+export const DEPARTMENTS = [
+    "Information Technology",
+    "Software Engineering",
+    "Data Science",
+    "Computer System Networks",
+    "Business Management",
+];
+export const COURSES = ["IT", "SE", "DS", "CSN", "BM"];
+export const COURSE_BY_DEPARTMENT = {
+    "Information Technology": "IT",
+    "Software Engineering": "SE",
+    "Data Science": "DS",
+    "Computer System Networks": "CSN",
+    "Business Management": "BM",
+};
 
 const userSchema = new mongoose.Schema(
     {
@@ -9,6 +24,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
+            match: [/^[A-Za-z]+(?:\s[A-Za-z]+)*$/, "Name can contain only alphabetic letters and spaces"],
         },
         email: {
             type: String,
@@ -31,9 +47,19 @@ const userSchema = new mongoose.Schema(
             default: "student",
             required: true,
         },
-        department: String,
-        course: String,
-        year: Number,
+        department: {
+            type: String,
+            enum: DEPARTMENTS,
+        },
+        course: {
+            type: String,
+            enum: COURSES,
+        },
+        year: {
+            type: Number,
+            min: 1,
+            max: 4,
+        },
         isActive: {
             type: Boolean,
             default: true,
