@@ -2,20 +2,22 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export const USER_ROLES = ["student", "lecturer", "admin"];
-export const DEPARTMENTS = [
+export const FACULTIES = ["Computing", "Engineering", "Business"];
+export const COURSES = [
     "Information Technology",
     "Software Engineering",
-    "Data Science",
-    "Computer System Networks",
+    "Cyber Security",
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "Electrical Engineering",
     "Business Management",
+    "Accounting",
+    "Marketing",
 ];
-export const COURSES = ["IT", "SE", "DS", "CSN", "BM"];
-export const COURSE_BY_DEPARTMENT = {
-    "Information Technology": "IT",
-    "Software Engineering": "SE",
-    "Data Science": "DS",
-    "Computer System Networks": "CSN",
-    "Business Management": "BM",
+export const COURSE_BY_FACULTY = {
+    Computing: ["Information Technology", "Software Engineering", "Cyber Security"],
+    Engineering: ["Mechanical Engineering", "Civil Engineering", "Electrical Engineering"],
+    Business: ["Business Management", "Accounting", "Marketing"],
 };
 
 const userSchema = new mongoose.Schema(
@@ -47,9 +49,9 @@ const userSchema = new mongoose.Schema(
             default: "student",
             required: true,
         },
-        department: {
+        faculty: {
             type: String,
-            enum: DEPARTMENTS,
+            enum: FACULTIES,
         },
         course: {
             type: String,
