@@ -123,6 +123,44 @@ router.post("/login", async (req, res) => {
       return res.status(500).json({ message: "Server error" });
     }
   });
+
+  // Get active lecturers by faculty and course
+  router.get("/lecturers", authMiddleware, async (req, res) => {
+    try {
+      const { faculty, course } = req.query;
+
+      if (!faculty || !course) {
+        return res
+          .status(400)
+          .json({ message: "faculty and course query parameters are required" });
+      }
+
+      if (!FACULTIES.includes(faculty)) {
+        return res.status(400).json({ message: "Please select a valid faculty" });
+      }
+
+      if (!COURSES.includes(course)) {
+        return res.status(400).json({ message: "Please select a valid course" });
+      }
+
+      const allowedCourses = COURSE_BY_FACULTY[faculty] || [];
+      if (!allowedCourses.includes(course)) {
+        return res.status(400).json({ message: "Invalid course for selected faculty" });
+      }
+
+      const lecturers = await User.find({
+        role: "lecturer",
+        isActive: true,
+        faculty,
+        course,
+      }).select("_id name email faculty course");
+
+      return res.json(lecturers);
+    } catch (error) {
+      console.error("Get lecturers error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
   
   // Current user
   router.get("/me", authMiddleware, (req, res) => {
