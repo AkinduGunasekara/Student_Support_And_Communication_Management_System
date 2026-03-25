@@ -17,23 +17,19 @@ import PublicFAQ from "./officialMesseging/pages/PublicFAQ";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
-const DEPARTMENT_OPTIONS = [
-  "Information Technology",
-  "Software Engineering",
-  "Data Science",
-  "Computer System Networks",
-  "Business Management",
-];
+const FACULTY_OPTIONS = ["Computing", "Engineering", "Business"];
 
-const COURSE_OPTIONS = ["IT", "SE", "DS", "CSN", "BM"];
-
-const COURSE_BY_DEPARTMENT = {
-  "Information Technology": "IT",
-  "Software Engineering": "SE",
-  "Data Science": "DS",
-  "Computer System Networks": "CSN",
-  "Business Management": "BM",
+const COURSE_BY_FACULTY = {
+  Computing: ["Information Technology", "Software Engineering", "Cyber Security"],
+  Engineering: [
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "Electrical Engineering",
+  ],
+  Business: ["Business Management", "Accounting", "Marketing"],
 };
+
+const COURSE_OPTIONS = Object.values(COURSE_BY_FACULTY).flat();
 
 const YEAR_OPTIONS = [1, 2, 3, 4];
 const NAME_REGEX = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
@@ -262,11 +258,11 @@ const RegisterPage = () => {
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState("student");
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedFaculty, setSelectedFaculty] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
 
-  const allowedCourseOptions = selectedDepartment
-    ? [COURSE_BY_DEPARTMENT[selectedDepartment]].filter(Boolean)
+  const allowedCourseOptions = selectedFaculty
+    ? COURSE_BY_FACULTY[selectedFaculty] || []
     : COURSE_OPTIONS;
 
   const handleSubmit = async (event) => {
@@ -277,7 +273,7 @@ const RegisterPage = () => {
     const email = formData.get("email");
     const password = formData.get("password");
     const role = formData.get("role");
-    const department = formData.get("department");
+    const faculty = formData.get("faculty");
     const course = formData.get("course");
     const year = formData.get("year");
 
@@ -286,10 +282,10 @@ const RegisterPage = () => {
       return;
     }
 
-    if (role === "student") {
-      const validCourse = COURSE_BY_DEPARTMENT[department];
-      if (!validCourse || course !== validCourse) {
-        alert("Invalid course for selected department");
+    if (["student", "lecturer"].includes(role)) {
+      const validCourses = COURSE_BY_FACULTY[faculty] || [];
+      if (!validCourses.includes(course)) {
+        alert("Invalid course for selected faculty");
         return;
       }
     }
@@ -305,8 +301,8 @@ const RegisterPage = () => {
           email,
           password,
           role,
-          department,
-          course: role === "student" ? course : undefined,
+          faculty,
+          course: ["student", "lecturer"].includes(role) ? course : undefined,
           year: role === "student" ? Number(year) : undefined,
         }),
       });
@@ -404,9 +400,6 @@ const RegisterPage = () => {
               onChange={(event) => {
                 const nextRole = event.target.value;
                 setSelectedRole(nextRole);
-                if (nextRole !== "student") {
-                  setSelectedCourse("");
-                }
               }}
               className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
@@ -417,35 +410,34 @@ const RegisterPage = () => {
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Department
+              Faculty
             </label>
             <select
-              name="department"
+              name="faculty"
               required
-              value={selectedDepartment}
+              value={selectedFaculty}
               onChange={(event) => {
-                const nextDepartment = event.target.value;
-                setSelectedDepartment(nextDepartment);
-                const nextAllowedCourse =
-                  COURSE_BY_DEPARTMENT[nextDepartment] || "";
-                if (selectedCourse && selectedCourse !== nextAllowedCourse) {
+                const nextFaculty = event.target.value;
+                setSelectedFaculty(nextFaculty);
+                const nextAllowedCourses = COURSE_BY_FACULTY[nextFaculty] || [];
+                if (selectedCourse && !nextAllowedCourses.includes(selectedCourse)) {
                   setSelectedCourse("");
                 }
               }}
               className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
               <option value="" disabled>
-                Select department
+                Select faculty
               </option>
-              {DEPARTMENT_OPTIONS.map((departmentOption) => (
-                <option key={departmentOption} value={departmentOption}>
-                  {departmentOption}
+              {FACULTY_OPTIONS.map((facultyOption) => (
+                <option key={facultyOption} value={facultyOption}>
+                  {facultyOption}
                 </option>
               ))}
             </select>
           </div>
 
-          {selectedRole === "student" && (
+          {["student", "lecturer"].includes(selectedRole) && (
             <>
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">
@@ -456,13 +448,11 @@ const RegisterPage = () => {
                   required
                   value={selectedCourse}
                   onChange={(event) => setSelectedCourse(event.target.value)}
-                  disabled={!selectedDepartment}
+                  disabled={!selectedFaculty}
                   className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
                   <option value="" disabled>
-                    {selectedDepartment
-                      ? "Select course"
-                      : "Select department first"}
+                    {selectedFaculty ? "Select course" : "Select faculty first"}
                   </option>
                   {allowedCourseOptions.map((courseOption) => (
                     <option key={courseOption} value={courseOption}>
@@ -471,7 +461,11 @@ const RegisterPage = () => {
                   ))}
                 </select>
               </div>
+            </>
+          )}
 
+          {selectedRole === "student" && (
+            <>
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">
                   Year

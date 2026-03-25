@@ -44,7 +44,7 @@ router.patch(
     requireRole("admin"),
     async (req, res) => {
       try {
-        const { role, isActive, department, course, year } = req.body;
+        const { role, isActive, faculty, course, year } = req.body;
         const update = {};
   
         if (role) {
@@ -58,7 +58,7 @@ router.patch(
           update.isActive = isActive;
         }
   
-        if (department !== undefined) update.department = department;
+        if (faculty !== undefined) update.faculty = faculty;
         if (course !== undefined) update.course = course;
         if (year !== undefined) update.year = year;
   

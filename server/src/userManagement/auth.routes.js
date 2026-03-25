@@ -4,8 +4,8 @@ import { generateToken } from "../utils/jwt.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import {
   COURSES,
-  COURSE_BY_DEPARTMENT,
-  DEPARTMENTS,
+  COURSE_BY_FACULTY,
+  FACULTIES,
   USER_ROLES,
 } from "../models/user.model.js";
 
@@ -15,7 +15,7 @@ const NAME_REGEX = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 //Student registration
 router.post("/register", async (req, res) => {
     try{
-  const { name, email, password, role = "student", department, course, year } = req.body;
+  const { name, email, password, role = "student", faculty, course, year } = req.body;
   const numericYear = Number(year);
 
         if (!name || !email || !password){
@@ -30,17 +30,18 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Role must be student or lecturer" });
     }
 
-    if (!department || !DEPARTMENTS.includes(department)) {
-      return res.status(400).json({ message: "Please select a valid department" });
+    if (!faculty || !FACULTIES.includes(faculty)) {
+      return res.status(400).json({ message: "Please select a valid faculty" });
     }
 
-    if (role === "student") {
+    if (["student", "lecturer"].includes(role)) {
       if (!course || !COURSES.includes(course)) {
         return res.status(400).json({ message: "Please select a valid course" });
       }
 
-      if (COURSE_BY_DEPARTMENT[department] !== course) {
-        return res.status(400).json({ message: "Invalid course for selected department" });
+      const allowedCourses = COURSE_BY_FACULTY[faculty] || [];
+      if (!allowedCourses.includes(course)) {
+        return res.status(400).json({ message: "Invalid course for selected faculty" });
       }
 
       if (!Number.isInteger(numericYear) || numericYear < 1 || numericYear > 4) {
@@ -58,8 +59,8 @@ router.post("/register", async (req, res) => {
             name,
             email,
             password,
-            department,
-            course: role === "student" ? course : undefined,
+            faculty,
+            course: ["student", "lecturer"].includes(role) ? course : undefined,
             year: role === "student" ? numericYear : undefined,
             role,
 
@@ -127,7 +128,7 @@ router.post("/login", async (req, res) => {
       name: req.user.name,
       email: req.user.email,
       role: req.user.role,
-      department: req.user.department,
+      faculty: req.user.faculty,
       course: req.user.course,
       year: req.user.year,
     });
