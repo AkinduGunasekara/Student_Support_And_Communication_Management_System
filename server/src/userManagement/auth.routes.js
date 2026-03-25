@@ -174,5 +174,16 @@ router.post("/login", async (req, res) => {
       year: req.user.year,
     });
   });
+
+  // Delete current user account permanently
+  router.delete("/me", authMiddleware, async (req, res) => {
+    try {
+      await User.findByIdAndDelete(req.user._id);
+      return res.json({ message: "Account deleted permanently" });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
   
   export default router;

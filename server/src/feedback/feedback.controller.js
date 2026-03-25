@@ -14,12 +14,24 @@ export const createFeedback = async (req, res) => {
 			return res.status(400).json({ message: "Rating must be an integer between 1 and 5" });
 		}
 
-		const ticket = await Ticket.findOne({ ticketId: String(ticketId).trim() });
+		const normalizedTicketId = String(ticketId).trim().replace(/^#/, "");
+		const escapedTicketId = normalizedTicketId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+		const ticket = await Ticket.findOne({
+			ticketId: { $regex: `^${escapedTicketId}$`, $options: "i" },
+		});
 		if (!ticket) {
 			return res.status(404).json({ message: "Ticket not found" });
 		}
 
-		if (String(ticket.studentId) !== String(req.user._id)) {
+		const ticketStudentId = String(ticket.studentId || "");
+		const userId = String(req.user._id || "");
+		const userEmail = String(req.user.email || "").toLowerCase();
+		const ticketStudentEmail = String(ticket.studentEmail || "").toLowerCase();
+
+		const isOwnTicket = ticketStudentId === userId || ticketStudentEmail === userEmail;
+
+		if (!isOwnTicket) {
 			return res.status(403).json({ message: "You can only submit feedback for your own ticket" });
 		}
 

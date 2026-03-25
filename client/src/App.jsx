@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 
@@ -21,6 +21,34 @@ const COURSE_OPTIONS = Object.values(COURSE_BY_FACULTY).flat();
 
 const YEAR_OPTIONS = [1, 2, 3, 4];
 const NAME_REGEX = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+
+const STUDENT_SIDEBAR_ITEMS = [
+  { label: "Dashboard" },
+  { label: "Raise Ticket" },
+  { label: "My Tickets" },
+  { label: "Events" },
+  { label: "Messages" },
+  { label: "Feedback" },
+];
+
+const LECTURER_SIDEBAR_ITEMS = [
+  { label: "Dashboard" },
+  { label: "View Tickets" },
+  { label: "Messages" },
+  { label: "Announcements" },
+  { label: "Events" },
+  { label: "Feedback" },
+];
+
+const ADMIN_SIDEBAR_ITEMS = [
+  { label: "Dashboard" },
+  { label: "Manage Users" },
+  { label: "Manage Tickets" },
+  { label: "Reply to Tickets" },
+  { label: "Manage Events" },
+  { label: "View Feedback" },
+  { label: "Reports" },
+];
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
   const { user, loading } = useAuth();
@@ -386,6 +414,7 @@ const PortalLayout = ({
   children,
   showSearch = false,
   primaryAction,
+  profilePath,
 }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -430,7 +459,12 @@ const PortalLayout = ({
         <div className="border-t border-slate-800 p-4">
           <button
             type="button"
-            className="mb-2 w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-slate-200 transition hover:bg-slate-900"
+            onClick={() => profilePath && navigate(profilePath)}
+            className={`mb-2 w-full rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
+              activeItem === "Profile"
+                ? "bg-blue-700 text-white"
+                : "text-slate-200 hover:bg-slate-900"
+            }`}
           >
             Profile
           </button>
@@ -511,31 +545,161 @@ const SectionCard = ({ title, action, children }) => (
 );
 
 const StudentDashboard = () => {
-  const { user } = useAuth();
+  const { user, token, logout } = useAuth();
+  const navigate = useNavigate();
+  const [myFeedback, setMyFeedback] = useState([]);
+  const [myTickets, setMyTickets] = useState([]);
+  const [isFeedbackLoading, setIsFeedbackLoading] = useState(true);
+  const [isTicketLoading, setIsTicketLoading] = useState(true);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackForm, setFeedbackForm] = useState({
+    ticketId: "",
+    rating: "5",
+    comment: "",
+  });
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      if (!token) {
+        setIsFeedbackLoading(false);
+        setIsTicketLoading(false);
+        return;
+      }
+
+      try {
+        const [feedbackResponse, ticketResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/feedback/my`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch(`${API_BASE_URL}/api/tickets`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ]);
+
+        if (!feedbackResponse.ok) {
+          if (feedbackResponse.status === 401) {
+            logout();
+            navigate("/login", { replace: true });
+            return;
+          }
+
+          const errorData = await feedbackResponse.json();
+          throw new Error(errorData.message || "Failed to load feedback");
+        }
+
+        const feedbackData = await feedbackResponse.json();
+        setMyFeedback(Array.isArray(feedbackData) ? feedbackData : []);
+
+        if (ticketResponse.ok) {
+          const ticketData = await ticketResponse.json();
+          const ownTickets = Array.isArray(ticketData)
+            ? ticketData.filter(
+                (ticket) =>
+                  String(ticket.studentId || "") === String(user?.id || "") ||
+                  String(ticket.studentEmail || "").toLowerCase() ===
+                    String(user?.email || "").toLowerCase()
+              )
+            : [];
+          setMyTickets(ownTickets);
+        }
+      } catch (error) {
+        console.error("Load student dashboard data error:", error);
+        alert(error.message || "Unable to load dashboard data");
+      } finally {
+        setIsFeedbackLoading(false);
+        setIsTicketLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [token, logout, navigate, user?.email, user?.id]);
+
+  const handleFeedbackSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!token) {
+      return;
+    }
+
+    const ticketId = feedbackForm.ticketId.trim();
+    const comment = feedbackForm.comment.trim();
+
+    if (!ticketId || !comment) {
+      alert("Ticket ID and comment are required");
+      return;
+    }
+
+    setIsSubmittingFeedback(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+        method: "POST",
+          headers: {
+          "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        body: JSON.stringify({
+          ticketId,
+          rating: Number(feedbackForm.rating),
+          comment,
+        }),
+        });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          logout();
+          navigate("/login", { replace: true });
+          return;
+        }
+        throw new Error(data.message || "Failed to submit feedback");
+      }
+
+      setFeedbackForm({ ticketId: "", rating: "5", comment: "" });
+      setMyFeedback((prev) => [data, ...prev]);
+      alert("Feedback submitted successfully");
+    } catch (error) {
+      console.error("Create feedback error:", error);
+      alert(error.message || "Unable to submit feedback");
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
+  const averageRating =
+    myFeedback.length > 0
+      ? (
+          myFeedback.reduce((sum, item) => sum + Number(item.rating || 0), 0) /
+          myFeedback.length
+        ).toFixed(1)
+      : "0.0";
 
   return (
     <PortalLayout
       portalName="EduPortal"
       portalSubtitle="Student Dashboard"
-      sidebarItems={[
-        { label: "Dashboard" },
-        { label: "Raise Ticket" },
-        { label: "My Tickets" },
-        { label: "Events" },
-        { label: "Messages" },
-        { label: "Feedback" },
-      ]}
+      sidebarItems={STUDENT_SIDEBAR_ITEMS}
       activeItem="Dashboard"
       headerTitle="Dashboard Overview"
       headerSubtitle="Track your support requests and university events"
       userName={user?.name || "Student User"}
       userMeta={user?.course || "Student"}
       primaryAction="+  Raise New Ticket"
+      profilePath="/student/profile"
     >
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard label="Total Tickets" value="12" />
         <MetricCard label="Open Tickets" value="4" />
-        <MetricCard label="Upcoming Events" value="3" />
+        <MetricCard
+          label="My Feedback"
+          value={String(myFeedback.length)}
+          accent={`${averageRating}/5 avg rating`}
+        />
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[2fr,1fr]">
@@ -591,6 +755,98 @@ const StudentDashboard = () => {
           </div>
         </SectionCard>
       </div>
+
+      <div className="mt-5 grid gap-5 xl:grid-cols-[1fr,1fr]">
+        <SectionCard title="Submit Feedback">
+          <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">Ticket ID</label>
+              <input
+                type="text"
+                list="my-ticket-options"
+                required
+                value={feedbackForm.ticketId}
+                onChange={(event) =>
+                  setFeedbackForm((prev) => ({ ...prev, ticketId: event.target.value }))
+                }
+                placeholder="e.g. t001"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <datalist id="my-ticket-options">
+                {myTickets.map((ticket) => (
+                  <option key={ticket._id} value={ticket.ticketId} />
+                ))}
+              </datalist>
+              <p className="mt-1 text-xs text-slate-500">
+                {isTicketLoading
+                  ? "Loading your tickets..."
+                  : myTickets.length > 0
+                    ? `Choose a valid ticket ID from your tickets (e.g. ${myTickets[0].ticketId}).`
+                    : "No tickets found for your account yet. Raise a ticket first, then submit feedback."}
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">Rating</label>
+              <select
+                value={feedbackForm.rating}
+                onChange={(event) =>
+                  setFeedbackForm((prev) => ({ ...prev, rating: event.target.value }))
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Good</option>
+                <option value="3">3 - Average</option>
+                <option value="2">2 - Poor</option>
+                <option value="1">1 - Very Poor</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">Comment</label>
+              <textarea
+                required
+                rows={4}
+                value={feedbackForm.comment}
+                onChange={(event) =>
+                  setFeedbackForm((prev) => ({ ...prev, comment: event.target.value }))
+                }
+                placeholder="Share your feedback about support received"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmittingFeedback}
+              className="rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-blue-400"
+            >
+              {isSubmittingFeedback ? "Submitting..." : "Submit Feedback"}
+            </button>
+          </form>
+        </SectionCard>
+
+        <SectionCard title="My Recent Feedback">
+          {isFeedbackLoading ? (
+            <p className="text-sm text-slate-600">Loading feedback...</p>
+          ) : myFeedback.length === 0 ? (
+            <p className="text-sm text-slate-600">No feedback submitted yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {myFeedback.slice(0, 5).map((item) => (
+                <article key={item._id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-slate-800">Ticket: {item.ticketId}</p>
+                    <p className="text-xs font-semibold text-amber-600">{"★".repeat(Number(item.rating || 0))}</p>
+                  </div>
+                  <p className="mt-1 text-sm text-slate-600">{item.comment}</p>
+                </article>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+      </div>
     </PortalLayout>
   );
 };
@@ -602,18 +858,12 @@ const LecturerDashboard = () => {
     <PortalLayout
       portalName="UniPortal"
       portalSubtitle="Lecturer Dashboard"
-      sidebarItems={[
-        { label: "Dashboard" },
-        { label: "View Tickets" },
-        { label: "Messages" },
-        { label: "Announcements" },
-        { label: "Events" },
-        { label: "Feedback" },
-      ]}
+      sidebarItems={LECTURER_SIDEBAR_ITEMS}
       activeItem="Dashboard"
       headerTitle="Dashboard Overview"
       userName={user?.name || "Lecturer User"}
       userMeta="Senior Lecturer"
+      profilePath="/lecturer/profile"
     >
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard label="Total Student Messages" value="128" />
@@ -669,21 +919,14 @@ const AdminDashboard = () => {
     <PortalLayout
       portalName="UniAdmin"
       portalSubtitle="Management Portal"
-      sidebarItems={[
-        { label: "Dashboard" },
-        { label: "Manage Users" },
-        { label: "Manage Tickets" },
-        { label: "Reply to Tickets" },
-        { label: "Manage Events" },
-        { label: "View Feedback" },
-        { label: "Reports" },
-      ]}
+      sidebarItems={ADMIN_SIDEBAR_ITEMS}
       activeItem="Dashboard"
       headerTitle="Admin Overview"
       headerSubtitle="Welcome back. Here is what is happening today."
       userName={user?.name || "Admin User"}
       userMeta="Super Admin"
       showSearch
+      profilePath="/admin/profile"
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total Users" value="12,450" accent="+12.5%" />
@@ -769,6 +1012,177 @@ const AdminDashboard = () => {
   );
 };
 
+const ProfilePage = ({ role }) => {
+  const { user, token, logout } = useAuth();
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            logout();
+            navigate("/login", { replace: true });
+            return;
+          }
+
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to load profile");
+        }
+
+        const data = await response.json();
+        setProfile(data);
+      } catch (error) {
+        console.error("Get profile error:", error);
+        alert(error.message || "Unable to load profile details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [token, logout, navigate]);
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "This will permanently delete your account from the database. This action cannot be undone. Continue?"
+    );
+
+    if (!confirmed || !token) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete account");
+      }
+
+      logout();
+      alert("Your account has been permanently deleted.");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      alert(error.message || "Unable to delete account");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const profileConfigByRole = {
+    student: {
+      portalName: "EduPortal",
+      portalSubtitle: "Student Dashboard",
+      userMetaFallback: "Student",
+      sidebarItems: STUDENT_SIDEBAR_ITEMS,
+      profilePath: "/student/profile",
+    },
+    lecturer: {
+      portalName: "UniPortal",
+      portalSubtitle: "Lecturer Dashboard",
+      userMetaFallback: "Lecturer",
+      sidebarItems: LECTURER_SIDEBAR_ITEMS,
+      profilePath: "/lecturer/profile",
+    },
+    admin: {
+      portalName: "UniAdmin",
+      portalSubtitle: "Management Portal",
+      userMetaFallback: "Admin",
+      sidebarItems: ADMIN_SIDEBAR_ITEMS,
+      profilePath: "/admin/profile",
+    },
+  };
+
+  const config = profileConfigByRole[role] || profileConfigByRole.student;
+
+  return (
+    <PortalLayout
+      portalName={config.portalName}
+      portalSubtitle={config.portalSubtitle}
+      sidebarItems={config.sidebarItems}
+      activeItem="Profile"
+      headerTitle="My Profile"
+      headerSubtitle="View your account details and manage your account"
+      userName={user?.name || "Portal User"}
+      userMeta={user?.role || config.userMetaFallback}
+      profilePath={config.profilePath}
+    >
+      <SectionCard title="Account Details">
+        {loading ? (
+          <p className="text-slate-600">Loading profile details...</p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Name</p>
+              <p className="mt-1 text-base font-semibold text-slate-900">{profile?.name || "-"}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Email</p>
+              <p className="mt-1 break-all text-base font-semibold text-slate-900">{profile?.email || "-"}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Role</p>
+              <p className="mt-1 text-base font-semibold capitalize text-slate-900">{profile?.role || "-"}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Faculty</p>
+              <p className="mt-1 text-base font-semibold text-slate-900">{profile?.faculty || "-"}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Course</p>
+              <p className="mt-1 text-base font-semibold text-slate-900">{profile?.course || "-"}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Year</p>
+              <p className="mt-1 text-base font-semibold text-slate-900">{profile?.year || "-"}</p>
+            </div>
+          </div>
+        )}
+      </SectionCard>
+
+      <div className="mt-5">
+        <SectionCard title="Danger Zone">
+          <p className="mb-4 text-sm text-slate-600">
+            Deleting your account is permanent and removes your user record from the database.
+          </p>
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            disabled={deleting}
+            className="rounded-xl border border-red-400/50 bg-red-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-red-300"
+          >
+            {deleting ? "Deleting account..." : "Delete Account Permanently"}
+          </button>
+        </SectionCard>
+      </div>
+    </PortalLayout>
+  );
+};
+
 function App() {
   return (
     <Routes>
@@ -785,6 +1199,15 @@ function App() {
       />
 
       <Route
+        path="/student/profile"
+        element={
+          <ProtectedRoute allowedRoles={["student"]}>
+            <ProfilePage role="student" />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/lecturer/dashboard"
         element={
           <ProtectedRoute allowedRoles={["lecturer"]}>
@@ -794,10 +1217,28 @@ function App() {
       />
 
       <Route
+        path="/lecturer/profile"
+        element={
+          <ProtectedRoute allowedRoles={["lecturer"]}>
+            <ProfilePage role="lecturer" />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/admin/dashboard"
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/profile"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <ProfilePage role="admin" />
           </ProtectedRoute>
         }
       />
