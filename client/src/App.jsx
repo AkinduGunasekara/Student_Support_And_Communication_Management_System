@@ -20,7 +20,11 @@ const API_BASE_URL =
 const FACULTY_OPTIONS = ["Computing", "Engineering", "Business"];
 
 const COURSE_BY_FACULTY = {
-  Computing: ["Information Technology", "Software Engineering", "Cyber Security"],
+  Computing: [
+    "Information Technology",
+    "Software Engineering",
+    "Cyber Security",
+  ],
   Engineering: [
     "Mechanical Engineering",
     "Civil Engineering",
@@ -438,55 +442,51 @@ const RegisterPage = () => {
           </div>
 
           {["student", "lecturer"].includes(selectedRole) && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Course
-                </label>
-                <select
-                  name="course"
-                  required
-                  value={selectedCourse}
-                  onChange={(event) => setSelectedCourse(event.target.value)}
-                  disabled={!selectedFaculty}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="" disabled>
-                    {selectedFaculty ? "Select course" : "Select faculty first"}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">
+                Course
+              </label>
+              <select
+                name="course"
+                required
+                value={selectedCourse}
+                onChange={(event) => setSelectedCourse(event.target.value)}
+                disabled={!selectedFaculty}
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              >
+                <option value="" disabled>
+                  {selectedFaculty ? "Select course" : "Select faculty first"}
+                </option>
+                {allowedCourseOptions.map((courseOption) => (
+                  <option key={courseOption} value={courseOption}>
+                    {courseOption}
                   </option>
-                  {allowedCourseOptions.map((courseOption) => (
-                    <option key={courseOption} value={courseOption}>
-                      {courseOption}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </>
+                ))}
+              </select>
+            </div>
           )}
 
           {selectedRole === "student" && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Year
-                </label>
-                <select
-                  name="year"
-                  required
-                  defaultValue=""
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="" disabled>
-                    Select year
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">
+                Year
+              </label>
+              <select
+                name="year"
+                required
+                defaultValue=""
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              >
+                <option value="" disabled>
+                  Select year
+                </option>
+                {YEAR_OPTIONS.map((yearOption) => (
+                  <option key={yearOption} value={yearOption}>
+                    {yearOption}
                   </option>
-                  {YEAR_OPTIONS.map((yearOption) => (
-                    <option key={yearOption} value={yearOption}>
-                      {yearOption}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </>
+                ))}
+              </select>
+            </div>
           )}
 
           <button
