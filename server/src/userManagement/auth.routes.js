@@ -44,6 +44,9 @@ router.post("/register", async (req, res) => {
         return res.status(400).json({ message: "Invalid course for selected faculty" });
       }
 
+    }
+
+    if (role === "student") {
       if (!Number.isInteger(numericYear) || numericYear < 1 || numericYear > 4) {
         return res.status(400).json({ message: "Please select a valid year between 1 and 4" });
       }
