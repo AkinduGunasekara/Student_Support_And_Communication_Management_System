@@ -11,44 +11,98 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
     description: "",
   });
 
+  const [errors, setErrors] = useState({
+    studentId: "",
+    studentEmail: "",
+  });
+
   const [loading, setLoading] = useState(false);
 
+  // ✅ Updated handleChange with validation
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    let error = "";
+
+    // ✅ Restrict invalid typing for Student ID (allow partial typing)
+    if (name === "studentId") {
+      const typingRegex = /^IT\d{0,8}$/;
+      if (!typingRegex.test(value)) return;
+
+      const regex = /^IT\d{8}$/;
+      if (!regex.test(value)) {
+        error = "Invalide Student ID(Format: IT12345678)";
+      }
+    }
+
+    // ✅ Email validation
+    if (name === "studentEmail") {
+      const regex = /.+@.+\..+/;
+      if (!regex.test(value)) {
+        error = "Invalid Student Email(format: student@my.sliit.lk)";
+      }
+    }
+
+    // Set form data
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
+    }));
+
+    // Set errors
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
     }));
   };
 
+  // ✅ Submit handler with final validation
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const regex1 = /^IT\d{8}$/;
-    const regex2 = /.+@.+\..+/;
+    const idValid = /^IT\d{8}$/.test(formData.studentId);
+    const emailValid = /.+@.+\..+/.test(formData.studentEmail);
 
-    if (!regex1.test(formData.studentId)) return toast.error("Invalid Student ID");
-    if (!regex2.test(formData.studentEmail)) return toast.error("Invalid Student Email");
-    if (!formData.studentId || !formData.studentEmail || !formData.accodamicYear || !formData.ticketCategory || !formData.description)
+    if (
+      !formData.studentId ||
+      !formData.studentEmail ||
+      !formData.accodamicYear ||
+      !formData.ticketCategory ||
+      !formData.description
+    ) {
       return toast.error("All fields are required");
+    }
+
+    if (!idValid) {
+      return toast.error("Invalid Student ID (Format: IT12345678)");
+    }
+
+    if (!emailValid) {
+      return toast.error("Invalid Email Address");
+    }
 
     setLoading(true);
     try {
       await axios.post("http://localhost:5001/api/tickets/create", formData);
-      toast.success("Ticket submitted successfully!", { position: "top-center" });
 
-      // Refresh parent ticket list
+      toast.success("Ticket submitted successfully!", {
+        position: "top-center",
+      });
+
       refreshTickets && refreshTickets();
-
-      // Close the modal
       closeModal && closeModal();
 
-      // Reset form
       setFormData({
         studentId: "",
         studentEmail: "",
         accodamicYear: "",
         ticketCategory: "",
         description: "",
+      });
+
+      setErrors({
+        studentId: "",
+        studentEmail: "",
       });
     } catch (err) {
       toast.error(err.response?.data?.message || "Error submitting ticket");
@@ -80,6 +134,11 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
               placeholder="IT12345678"
               className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
             />
+            {errors.studentId && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.studentId}
+              </p>
+            )}
           </div>
 
           <div>
@@ -92,6 +151,11 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
               placeholder="student@my.sliit.lk"
               className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
             />
+            {errors.studentEmail && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.studentEmail}
+              </p>
+            )}
           </div>
         </div>
 
@@ -102,6 +166,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
             name="accodamicYear"
             value={formData.accodamicYear}
             onChange={handleChange}
+            placeholder="Accodamic Year"
             className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
           />
         </div>
@@ -114,11 +179,11 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
             onChange={handleChange}
             className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">Select Category</option>
-            <option value="Registration">Course Registration</option>
-            <option value="Hostel">Hostel</option>
-            <option value="Library">Library</option>
-            <option value="Exam">Exam</option>
+            <option value="">Select category</option>
+            <option value="Academic">Academic</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Technical Issues">Technical Issues</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
