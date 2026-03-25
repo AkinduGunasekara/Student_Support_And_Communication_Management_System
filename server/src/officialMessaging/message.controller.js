@@ -23,40 +23,49 @@ export const createMessage = async (req, res) => {
       !studentRegistrationId ||
       !(studentEmail || req.user.email) ||
       !academicYear ||
-      !semester
+      !semester ||
+      !faculty ||
+      !course ||
+      !lecturerId
     ) {
       return res.status(400).json({
         message:
-          "Subject, question, studentRegistrationId, studentEmail, academicYear and semester are required",
+          "Subject, question, studentRegistrationId, studentEmail, academicYear, semester, faculty, course and lecturerId are required",
       });
     }
 
-    let assignedLecturer = null;
+    if (!mongoose.Types.ObjectId.isValid(lecturerId)) {
+      return res.status(400).json({ message: "Invalid lecturer ID" });
+    }
 
-    if (lecturerId) {
-      if (!mongoose.Types.ObjectId.isValid(lecturerId)) {
-        return res.status(400).json({ message: "Invalid lecturer ID" });
-      }
+    const lecturer = await User.findById(lecturerId);
 
-      const lecturer = await User.findById(lecturerId);
+    if (!lecturer) {
+      return res.status(404).json({ message: "Lecturer not found" });
+    }
 
-      if (!lecturer) {
-        return res.status(404).json({ message: "Lecturer not found" });
-      }
+    if (lecturer.role !== "lecturer") {
+      return res
+        .status(400)
+        .json({ message: "Selected user is not a lecturer" });
+    }
 
-      if (lecturer.role !== "lecturer") {
-        return res
-          .status(400)
-          .json({ message: "Selected user is not a lecturer" });
-      }
+    if (!lecturer.isActive) {
+      return res
+        .status(400)
+        .json({ message: "Selected lecturer is inactive" });
+    }
 
-      if (!lecturer.isActive) {
-        return res
-          .status(400)
-          .json({ message: "Selected lecturer is inactive" });
-      }
+    if (lecturer.faculty !== faculty) {
+      return res.status(400).json({
+        message: "Selected lecturer does not match the selected faculty",
+      });
+    }
 
-      assignedLecturer = lecturer._id;
+    if (lecturer.course !== course) {
+      return res.status(400).json({
+        message: "Selected lecturer does not match the selected course",
+      });
     }
 
     const message = await Message.create({
@@ -65,9 +74,9 @@ export const createMessage = async (req, res) => {
       studentEmail: studentEmail || req.user.email || "",
       academicYear: academicYear || req.user.year || null,
       semester,
-      lecturerId: assignedLecturer,
-      faculty: faculty || "",
-      course: course || "",
+      lecturerId: lecturer._id,
+      faculty,
+      course,
       subject,
       question,
       studentNotified: false,
@@ -84,8 +93,8 @@ export const createMessage = async (req, res) => {
 export const getMyMessages = async (req, res) => {
   try {
     const messages = await Message.find({ studentId: req.user._id })
-      .populate("lecturerId", "name email role")
-      .populate("answeredBy", "name email role")
+      .populate("lecturerId", "name email role faculty course")
+      .populate("answeredBy", "name email role faculty course")
       .sort({ createdAt: -1 });
 
     return res.json(messages);
@@ -102,17 +111,17 @@ export const getAllMessages = async (req, res) => {
 
     if (req.user.role === "admin") {
       messages = await Message.find()
-        .populate("studentId", "name email role year department course")
-        .populate("lecturerId", "name email role")
-        .populate("answeredBy", "name email role")
+        .populate("studentId", "name email role year faculty course")
+        .populate("lecturerId", "name email role faculty course")
+        .populate("answeredBy", "name email role faculty course")
         .sort({ createdAt: -1 });
     } else {
       messages = await Message.find({
         $or: [{ lecturerId: req.user._id }, { lecturerId: null }],
       })
-        .populate("studentId", "name email role year department course")
-        .populate("lecturerId", "name email role")
-        .populate("answeredBy", "name email role")
+        .populate("studentId", "name email role year faculty course")
+        .populate("lecturerId", "name email role faculty course")
+        .populate("answeredBy", "name email role faculty course")
         .sort({ createdAt: -1 });
     }
 
@@ -131,9 +140,9 @@ export const getMessageById = async (req, res) => {
     }
 
     const message = await Message.findById(req.params.id)
-      .populate("studentId", "name email role year department course")
-      .populate("lecturerId", "name email role")
-      .populate("answeredBy", "name email role");
+      .populate("studentId", "name email role year faculty course")
+      .populate("lecturerId", "name email role faculty course")
+      .populate("answeredBy", "name email role faculty course");
 
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
@@ -311,7 +320,7 @@ export const getPublicMessages = async (req, res) => {
     }
 
     const messages = await Message.find(filter)
-      .populate("answeredBy", "name email role")
+      .populate("answeredBy", "name email role faculty course")
       .sort({ updatedAt: -1 });
 
     return res.json(messages);

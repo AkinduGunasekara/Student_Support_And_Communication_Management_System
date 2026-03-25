@@ -60,14 +60,7 @@ export default function LecturerDashboard() {
     try {
       setAnsweringId(id);
 
-      const res = await answerMessage(
-        id,
-        {
-          answer,
-        },
-        token
-      );
-
+      const res = await answerMessage(id, { answer }, token);
       const updated = res.data?.message || res.data;
 
       setMessages((prev) =>
@@ -76,9 +69,11 @@ export default function LecturerDashboard() {
             ? {
                 ...msg,
                 ...updated,
-                answer,
-                status: "ANSWERED",
+                answer: updated?.answer || answer,
+                status: updated?.status || "ANSWERED",
                 answeredAt: updated?.answeredAt || new Date().toISOString(),
+                answeredBy: updated?.answeredBy || msg.answeredBy,
+                lecturerId: updated?.lecturerId || msg.lecturerId,
                 studentNotified: false,
               }
             : msg
@@ -104,12 +99,7 @@ export default function LecturerDashboard() {
     try {
       setVisibilityId(id);
 
-      const res = await updateVisibility(
-        id,
-        { isPublic: !currentValue },
-        token
-      );
-
+      const res = await updateVisibility(id, { isPublic: !currentValue }, token);
       const updated = res.data?.message || res.data;
 
       setMessages((prev) =>
@@ -157,7 +147,9 @@ export default function LecturerDashboard() {
           msg.question?.toLowerCase().includes(q) ||
           msg.studentRegistrationId?.toLowerCase().includes(q) ||
           msg.studentEmail?.toLowerCase().includes(q) ||
-          msg.course?.toLowerCase().includes(q)
+          msg.course?.toLowerCase().includes(q) ||
+          msg.studentId?.name?.toLowerCase().includes(q) ||
+          msg.lecturerId?.name?.toLowerCase().includes(q)
       );
     }
 

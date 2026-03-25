@@ -1,23 +1,25 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "../../AuthContext.jsx";
+import { getLecturersByFacultyAndCourse } from "../services/messageService";
 
-const FACULTY_OPTIONS = [
-  "Computing",
-  "Engineering",
-  "Business",
-];
+const FACULTY_OPTIONS = ["Computing", "Engineering", "Business"];
 
 const COURSE_OPTIONS = {
-  Computing: ["IT", "SE", "Cyber Security", "Data Science"],
+  Computing: [
+    "Information Technology",
+    "Software Engineering",
+    "Cyber Security",
+  ],
   Engineering: [
-    "Civil Engineering",
     "Mechanical Engineering",
+    "Civil Engineering",
     "Electrical Engineering",
   ],
   Business: ["Business Management", "Accounting", "Marketing"],
 };
 
-const REG_ID_REGEX = /^.{10}$/;
+const REG_ID_REGEX = /^[A-Za-z0-9]{10}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/;
 
 export default function QuestionForm({
@@ -26,6 +28,8 @@ export default function QuestionForm({
   loading = false,
   submitLabel = "Submit Question",
 }) {
+  const { token } = useAuth();
+
   const [formData, setFormData] = useState({
     studentRegistrationId: initialValues.studentRegistrationId || "",
     studentEmail: initialValues.studentEmail || "",
@@ -33,15 +37,46 @@ export default function QuestionForm({
     semester: initialValues.semester || "",
     faculty: initialValues.faculty || "",
     course: initialValues.course || "",
+    lecturerId: initialValues.lecturerId || "",
     subject: initialValues.subject || "",
     question: initialValues.question || "",
   });
 
+  const [lecturers, setLecturers] = useState([]);
+  const [lecturerLoading, setLecturerLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const availableCourses = useMemo(() => {
     return formData.faculty ? COURSE_OPTIONS[formData.faculty] || [] : [];
   }, [formData.faculty]);
+
+  useEffect(() => {
+    const fetchLecturers = async () => {
+      if (!formData.faculty || !formData.course || !token) {
+        setLecturers([]);
+        return;
+      }
+
+      try {
+        setLecturerLoading(true);
+        const res = await getLecturersByFacultyAndCourse(
+          formData.faculty,
+          formData.course,
+          token
+        );
+        setLecturers(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        const message =
+          error?.response?.data?.message || "Failed to load lecturers";
+        toast.error(message);
+        setLecturers([]);
+      } finally {
+        setLecturerLoading(false);
+      }
+    };
+
+    fetchLecturers();
+  }, [formData.faculty, formData.course, token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,12 +86,29 @@ export default function QuestionForm({
         ...prev,
         faculty: value,
         course: "",
+        lecturerId: "",
       }));
 
       setErrors((prev) => ({
         ...prev,
         faculty: "",
         course: "",
+        lecturerId: "",
+      }));
+      return;
+    }
+
+    if (name === "course") {
+      setFormData((prev) => ({
+        ...prev,
+        course: value,
+        lecturerId: "",
+      }));
+
+      setErrors((prev) => ({
+        ...prev,
+        course: "",
+        lecturerId: "",
       }));
       return;
     }
@@ -84,7 +136,7 @@ export default function QuestionForm({
       newErrors.studentRegistrationId = "Student Registration ID is required";
     } else if (!REG_ID_REGEX.test(regId)) {
       newErrors.studentRegistrationId =
-        "Registration ID format is invalid. Example: IT12345678";
+        "Student Registration ID must contain exactly 10 letters/numbers";
     }
 
     if (!email) {
@@ -111,6 +163,10 @@ export default function QuestionForm({
 
     if (!formData.course) {
       newErrors.course = "Course is required";
+    }
+
+    if (!formData.lecturerId) {
+      newErrors.lecturerId = "Please select a lecturer";
     }
 
     if (!subject) {
@@ -149,6 +205,7 @@ export default function QuestionForm({
       semester: Number(formData.semester),
       faculty: formData.faculty,
       course: formData.course,
+      lecturerId: formData.lecturerId,
       subject: formData.subject.trim(),
       question: formData.question.trim(),
     };
@@ -163,10 +220,12 @@ export default function QuestionForm({
         semester: "",
         faculty: "",
         course: "",
+        lecturerId: "",
         subject: "",
         question: "",
       });
 
+      setLecturers([]);
       setErrors({});
     } catch (error) {
       // parent handles api error toast
@@ -205,6 +264,7 @@ export default function QuestionForm({
               value={formData.studentRegistrationId}
               onChange={handleChange}
               placeholder="Example: IT12345678"
+              maxLength={10}
               className={inputClass("studentRegistrationId")}
             />
             {errors.studentRegistrationId && (
@@ -323,6 +383,35 @@ export default function QuestionForm({
               <p className="mt-2 text-xs text-red-600">{errors.course}</p>
             )}
           </div>
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-slate-700">
+            Lecturer
+          </label>
+          <select
+            name="lecturerId"
+            value={formData.lecturerId}
+            onChange={handleChange}
+            disabled={!formData.faculty || !formData.course || lecturerLoading}
+            className={`${inputClass("lecturerId")} disabled:cursor-not-allowed disabled:bg-slate-100`}
+          >
+            <option value="">
+              {lecturerLoading
+                ? "Loading lecturers..."
+                : lecturers.length > 0
+                ? "Select lecturer"
+                : "No lecturers available"}
+            </option>
+            {lecturers.map((lecturer) => (
+              <option key={lecturer._id} value={lecturer._id}>
+                {lecturer.name} ({lecturer.email})
+              </option>
+            ))}
+          </select>
+          {errors.lecturerId && (
+            <p className="mt-2 text-xs text-red-600">{errors.lecturerId}</p>
+          )}
         </div>
 
         <div>
