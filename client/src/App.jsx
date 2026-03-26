@@ -8,10 +8,10 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 
-import StudentAskQuestion from "./officialMesseging/pages/StudentAskQuestion";
-import StudentMyMessages from "./officialMesseging/pages/StudentMyMessages";
-import OfficialLecturerDashboard from "./officialMesseging/pages/LecturerDashboard";
-import PublicFAQ from "./officialMesseging/pages/PublicFAQ";
+import StudentAskQuestion from "./officialMessaging/pages/StudentAskQuestion";
+import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages";
+import OfficialLecturerDashboard from "./officialMessaging/pages/LecturerDashboard";
+import PublicFAQ from "./officialMessaging/pages/PublicFAQ";
 
 import gkAdminViewTicket from "./ticketRaising/gkAdminViewTicket";
 import gkTicketCreate from "./ticketRaising/gkTicketCreate";

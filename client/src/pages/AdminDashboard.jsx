@@ -163,12 +163,10 @@ export const AdminDashboard = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-8 shadow-2xl mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Admin Dashboard
-          </h1>
-          <p className="text-white/90">
+      <div className="ui-page">
+        <div className="ui-card mb-8 bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
+          <p className="text-blue-200">
             Welcome {user?.name || "Admin"} — oversee users, feedback, and
             official communication.
           </p>
@@ -180,7 +178,7 @@ export const AdminDashboard = () => {
 
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">User Management</h2>
+            <h2 className="text-2xl font-bold text-slate-900">User Management</h2>
             <button
               onClick={() => {
                 setShowUserForm(!showUserForm);
@@ -188,57 +186,49 @@ export const AdminDashboard = () => {
                 setSelectedRole("");
                 setSelectedFaculty("");
               }}
-              className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-2 px-4 rounded-lg transition"
+              className="btn-primary py-2 px-4"
             >
               {showUserForm ? "Cancel" : "+ Add User"}
             </button>
           </div>
 
           {showUserForm && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
-              <h3 className="text-xl font-bold mb-4">Add New User</h3>
+            <div className="ui-card p-6 mb-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">Add New User</h3>
               <form ref={formRef} onSubmit={handleAddUser} className="space-y-4 grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Name
-                  </label>
+                  <label className="ui-label">Name</label>
                   <input
                     type="text"
                     name="name"
                     required
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="ui-input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Email
-                  </label>
+                  <label className="ui-label">Email</label>
                   <input
                     type="email"
                     name="email"
                     required
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="ui-input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Password
-                  </label>
+                  <label className="ui-label">Password</label>
                   <input
                     type="password"
                     name="password"
                     minLength={6}
                     required
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="ui-input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Role
-                  </label>
+                  <label className="ui-label">Role</label>
                   <select
                     name="role"
                     required
@@ -247,7 +237,7 @@ export const AdminDashboard = () => {
                       setSelectedRole(e.target.value);
                       setSelectedFaculty("");
                     }}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="ui-select"
                   >
                     <option value="">Select role</option>
                     <option value="student">Student</option>
@@ -256,15 +246,13 @@ export const AdminDashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Faculty
-                  </label>
+                  <label className="ui-label">Faculty</label>
                   <select
                     name="faculty"
                     required
                     value={selectedFaculty}
                     onChange={(e) => setSelectedFaculty(e.target.value)}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="ui-select"
                   >
                     <option value="">Select faculty</option>
                     {FACULTY_OPTIONS.map((opt) => (
@@ -276,14 +264,12 @@ export const AdminDashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Course
-                  </label>
+                  <label className="ui-label">Course</label>
                   <select
                     name="course"
                     required
                     disabled={!selectedFaculty}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50"
+                    className="ui-select disabled:opacity-50"
                   >
                     <option value="">
                       {selectedFaculty ? "Select course" : "Select faculty first"}
@@ -299,13 +285,11 @@ export const AdminDashboard = () => {
                 {selectedRole === "student" && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">
-                        Year
-                      </label>
+                      <label className="ui-label">Year</label>
                       <select
                         name="year"
                         required
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        className="ui-select"
                       >
                         <option value="">Select year</option>
                         {YEAR_OPTIONS.map((opt) => (
@@ -317,14 +301,12 @@ export const AdminDashboard = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">
-                        Student ID
-                      </label>
+                      <label className="ui-label">Student ID</label>
                       <input
                         type="text"
                         name="studentId"
                         required
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        className="ui-input"
                         placeholder="e.g., STU001"
                       />
                     </div>
@@ -333,7 +315,7 @@ export const AdminDashboard = () => {
 
                 <button
                   type="submit"
-                  className="md:col-span-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2 rounded-lg transition"
+                  className="btn-primary md:col-span-2 py-2"
                 >
                   Create User
                 </button>
@@ -342,11 +324,11 @@ export const AdminDashboard = () => {
           )}
 
           {loading ? (
-            <div className="text-center text-slate-400">Loading users...</div>
+            <div className="text-center text-slate-600">Loading users...</div>
           ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900">
-              <table className="w-full text-sm">
-                <thead className="border-b border-slate-800 bg-slate-800">
+            <div className="ui-table-wrap">
+              <table className="ui-table">
+                <thead>
                   <tr>
                     <th className="px-6 py-3 text-left font-semibold">Name</th>
                     <th className="px-6 py-3 text-left font-semibold">Email</th>
@@ -357,20 +339,20 @@ export const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {users.map((u) => (
-                    <tr key={u._id} className="border-b border-slate-800 hover:bg-slate-800/50 transition">
+                    <tr key={u._id} className="hover:bg-slate-50 transition">
                       <td className="px-6 py-3">{u.name}</td>
                       <td className="px-6 py-3">{u.email}</td>
                       <td className="px-6 py-3 capitalize">
-                        <span className="px-2 py-1 bg-slate-700 rounded text-xs">
+                        <span className="ui-badge bg-blue-100 text-blue-700">
                           {u.role}
                         </span>
                       </td>
                       <td className="px-6 py-3">
                         <span
-                          className={`px-2 py-1 rounded text-xs ${
+                          className={`ui-badge ${
                             u.isActive
-                              ? "bg-green-900/30 text-green-300"
-                              : "bg-red-900/30 text-red-300"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-red-100 text-red-700"
                           }`}
                         >
                           {u.isActive ? "Active" : "Inactive"}
@@ -379,13 +361,13 @@ export const AdminDashboard = () => {
                       <td className="px-6 py-3 space-x-2">
                         <button
                           onClick={() => handleToggleStatus(u._id, u.isActive)}
-                          className="text-sm px-2 py-1 rounded bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 transition"
+                          className="btn-secondary text-sm px-2 py-1"
                         >
                           {u.isActive ? "Deactivate" : "Activate"}
                         </button>
                         <button
                           onClick={() => handleDeleteUser(u._id)}
-                          className="text-sm px-2 py-1 rounded bg-red-900/30 hover:bg-red-900/50 text-red-300 transition"
+                          className="rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-sm text-red-700 transition hover:bg-red-100"
                         >
                           Delete
                         </button>
@@ -395,7 +377,7 @@ export const AdminDashboard = () => {
                 </tbody>
               </table>
               {users.length === 0 && (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-slate-600">
                   No users found
                 </div>
               )}
@@ -404,17 +386,17 @@ export const AdminDashboard = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 className="text-xl font-semibold mb-2">Feedback Overview</h2>
-            <p className="text-slate-400">Monitor student feedback and ratings.</p>
+          <div className="ui-card p-6">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Feedback Overview</h2>
+            <p className="text-slate-600">Monitor student feedback and ratings.</p>
           </div>
 
           <Link
             to="/lecturer/dashboard"
-            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-emerald-400 transition"
+            className="ui-card p-6 transition hover:-translate-y-0.5"
           >
-            <h2 className="text-xl font-semibold mb-2">Official Messaging</h2>
-            <p className="text-slate-400">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Official Messaging</h2>
+            <p className="text-slate-600">
               Review and manage official Q&A content.
             </p>
           </Link>
@@ -423,3 +405,5 @@ export const AdminDashboard = () => {
     </AppLayout>
   );
 };
+
+

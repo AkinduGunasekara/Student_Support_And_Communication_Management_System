@@ -46,6 +46,21 @@ export const UserProfile = () => {
     fetchUserDetails();
   }, [token]);
 
+  useEffect(() => {
+    if (!showEditModal && !showPasswordModal && !showDeleteModal) return;
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setShowEditModal(false);
+        setShowPasswordModal(false);
+        setShowDeleteModal(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [showEditModal, showPasswordModal, showDeleteModal]);
+
   const fetchUserDetails = async () => {
     if (!token) return;
     try {
@@ -141,16 +156,16 @@ export const UserProfile = () => {
 
   if (loading) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-        <p className="text-slate-400">Loading profile...</p>
+      <div className="ui-card p-8">
+        <p className="text-slate-500">Loading profile...</p>
       </div>
     );
   }
 
   if (!userDetails) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-        <p className="text-slate-400">Unable to load profile</p>
+      <div className="ui-card p-8">
+        <p className="text-slate-500">Unable to load profile</p>
       </div>
     );
   }
@@ -164,31 +179,31 @@ export const UserProfile = () => {
     return (
       <div className="space-y-6">
         {successMessage && (
-          <div className="bg-emerald-900 border border-emerald-700 text-emerald-200 rounded-2xl p-4">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-700">
             {successMessage}
           </div>
         )}
 
         {errorMessage && (
-          <div className="bg-red-900 border border-red-700 text-red-200 rounded-2xl p-4">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
             {errorMessage}
           </div>
         )}
 
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-          <h2 className="text-2xl font-semibold mb-6">Admin Settings</h2>
-          <p className="text-slate-400 mb-6">Manage your account security below.</p>
+        <div className="ui-card p-8">
+          <h2 className="mb-6 text-2xl font-semibold text-slate-900">Admin Settings</h2>
+          <p className="mb-6 text-slate-500">Manage your account security below.</p>
 
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="px-6 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-medium transition"
+              className="rounded-xl bg-amber-600 px-6 py-2 font-medium text-white transition hover:bg-amber-500"
             >
               Change Password
             </button>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="px-6 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-medium transition"
+              className="rounded-xl bg-red-600 px-6 py-2 font-medium text-white transition hover:bg-red-500"
             >
               Delete Account
             </button>
@@ -197,15 +212,30 @@ export const UserProfile = () => {
 
         {/* Change Password Modal */}
         {showPasswordModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-              <h3 className="text-xl font-semibold mb-4">Change Password</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+            <div
+              className="ui-card w-full max-w-md p-6"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="admin-password-modal-title"
+            >
+              <div className="mb-4 flex items-start justify-between">
+                <h3 id="admin-password-modal-title" className="text-xl font-semibold text-slate-900">
+                  Change Password
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                  className="rounded-md px-2 py-1 text-slate-500 transition hover:bg-slate-100"
+                  aria-label="Close change password dialog"
+                >
+                  x
+                </button>
+              </div>
 
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Current Password
-                  </label>
+                  <label className="ui-label">Current Password</label>
                   <input
                     type="password"
                     value={passwordData.currentPassword}
@@ -215,15 +245,13 @@ export const UserProfile = () => {
                         currentPassword: e.target.value,
                       })
                     }
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="ui-input"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    New Password
-                  </label>
+                  <label className="ui-label">New Password</label>
                   <input
                     type="password"
                     minLength={6}
@@ -235,16 +263,14 @@ export const UserProfile = () => {
                       })
                     }
                     placeholder="At least 6 characters"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="ui-input"
                     required
                   />
-                  <p className="text-xs text-slate-400 mt-1">Minimum 6 characters required</p>
+                  <p className="mt-1 text-xs text-slate-500">Minimum 6 characters required</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Confirm New Password
-                  </label>
+                  <label className="ui-label">Confirm New Password</label>
                   <input
                     type="password"
                     minLength={6}
@@ -255,15 +281,15 @@ export const UserProfile = () => {
                         confirmPassword: e.target.value,
                       })
                     }
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="ui-input"
                     required
                   />
                 </div>
 
-                <div className="flex gap-3 mt-6">
+                <div className="mt-6 flex gap-3">
                   <button
                     type="submit"
-                    className="flex-1 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-medium py-3 transition"
+                    className="flex-1 rounded-xl bg-amber-600 py-3 font-medium text-white transition hover:bg-amber-500"
                   >
                     Change Password
                   </button>
@@ -277,7 +303,8 @@ export const UserProfile = () => {
                         confirmPassword: "",
                       });
                     }}
-                    className="flex-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 transition"
+                    className="btn-secondary flex-1 py-3"
+                    aria-label="Cancel password update"
                   >
                     Cancel
                   </button>
@@ -289,12 +316,27 @@ export const UserProfile = () => {
 
         {/* Delete Account Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-900 border border-red-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-              <h3 className="text-xl font-semibold mb-4 text-red-400">
-                Delete Account
-              </h3>
-              <p className="text-slate-300 mb-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+            <div
+              className="ui-card w-full max-w-md border-red-200 p-6"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="admin-delete-modal-title"
+            >
+              <div className="mb-4 flex items-start justify-between">
+                <h3 id="admin-delete-modal-title" className="text-xl font-semibold text-red-700">
+                  Delete Account
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
+                  className="rounded-md px-2 py-1 text-slate-500 transition hover:bg-slate-100"
+                  aria-label="Close delete account dialog"
+                >
+                  x
+                </button>
+              </div>
+              <p className="mb-6 text-slate-600">
                 Are you sure you want to permanently delete your account? This
                 action cannot be undone and all your data will be lost.
               </p>
@@ -302,13 +344,14 @@ export const UserProfile = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleDeleteAccount}
-                  className="flex-1 rounded-xl bg-red-600 hover:bg-red-500 text-white font-medium py-3 transition"
+                  className="flex-1 rounded-xl bg-red-600 py-3 font-medium text-white transition hover:bg-red-500"
                 >
                   Delete Permanently
                 </button>
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 transition"
+                  className="btn-secondary flex-1 py-3"
+                  aria-label="Cancel account deletion"
                 >
                   Cancel
                 </button>
@@ -323,54 +366,54 @@ export const UserProfile = () => {
   return (
     <div className="space-y-6">
       {successMessage && (
-        <div className="bg-emerald-900 border border-emerald-700 text-emerald-200 rounded-2xl p-4">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-700">
           {successMessage}
         </div>
       )}
 
       {errorMessage && (
-        <div className="bg-red-900 border border-red-700 text-red-200 rounded-2xl p-4">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
           {errorMessage}
         </div>
       )}
 
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-        <h2 className="text-2xl font-semibold mb-6">My Profile</h2>
+      <div className="ui-card p-8">
+        <h2 className="mb-6 text-2xl font-semibold text-slate-900">My Profile</h2>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="mb-6 grid gap-6 md:grid-cols-2">
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Full Name
             </label>
-            <p className="text-lg font-medium text-white mt-1">
+            <p className="mt-1 text-lg font-medium text-slate-900">
               {userDetails.name}
             </p>
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Email Address
             </label>
-            <p className="text-lg font-medium text-white mt-1">
+            <p className="mt-1 text-lg font-medium text-slate-900">
               {userDetails.email}
             </p>
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Role
             </label>
-            <p className="text-lg font-medium text-white mt-1 capitalize">
+            <p className="mt-1 text-lg font-medium capitalize text-slate-900">
               {userDetails.role}
             </p>
           </div>
 
           {userDetails.studentId && (
             <div>
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Student ID
               </label>
-              <p className="text-lg font-medium text-white mt-1">
+              <p className="mt-1 text-lg font-medium text-slate-900">
                 {userDetails.studentId}
               </p>
             </div>
@@ -378,10 +421,10 @@ export const UserProfile = () => {
 
           {userDetails.faculty && (
             <div>
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Faculty
               </label>
-              <p className="text-lg font-medium text-white mt-1">
+              <p className="mt-1 text-lg font-medium text-slate-900">
                 {userDetails.faculty}
               </p>
             </div>
@@ -389,10 +432,10 @@ export const UserProfile = () => {
 
           {userDetails.course && (
             <div>
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Course
               </label>
-              <p className="text-lg font-medium text-white mt-1">
+              <p className="mt-1 text-lg font-medium text-slate-900">
                 {userDetails.course}
               </p>
             </div>
@@ -400,10 +443,10 @@ export const UserProfile = () => {
 
           {userDetails.year && (
             <div>
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Year
               </label>
-              <p className="text-lg font-medium text-white mt-1">
+              <p className="mt-1 text-lg font-medium text-slate-900">
                 Year {userDetails.year}
               </p>
             </div>
@@ -413,19 +456,19 @@ export const UserProfile = () => {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setShowEditModal(true)}
-            className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition"
+            className="btn-primary px-6 py-2"
           >
             Edit Profile
           </button>
           <button
             onClick={() => setShowPasswordModal(true)}
-            className="px-6 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-medium transition"
+            className="rounded-xl bg-amber-600 px-6 py-2 font-medium text-white transition hover:bg-amber-500"
           >
             Change Password
           </button>
           <button
             onClick={() => setShowDeleteModal(true)}
-            className="px-6 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-medium transition"
+            className="rounded-xl bg-red-600 px-6 py-2 font-medium text-white transition hover:bg-red-500"
           >
             Delete Account
           </button>
@@ -434,22 +477,37 @@ export const UserProfile = () => {
 
       {/* Edit Profile Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4">Edit Profile</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+          <div
+            className="ui-card w-full max-w-md p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-profile-modal-title"
+          >
+            <div className="mb-4 flex items-start justify-between">
+              <h3 id="edit-profile-modal-title" className="text-xl font-semibold text-slate-900">
+                Edit Profile
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                className="rounded-md px-2 py-1 text-slate-500 transition hover:bg-slate-100"
+                aria-label="Close edit profile dialog"
+              >
+                x
+              </button>
+            </div>
 
             <form onSubmit={handleEditProfile} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Full Name
-                </label>
+                <label className="ui-label">Full Name</label>
                 <input
                   type="text"
                   value={editFormData.name}
                   onChange={(e) =>
                     setEditFormData({ ...editFormData, name: e.target.value })
                   }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="ui-input"
                   required
                 />
               </div>
@@ -457,9 +515,7 @@ export const UserProfile = () => {
               {user?.role === "student" && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
-                      Student ID
-                    </label>
+                    <label className="ui-label">Student ID</label>
                     <input
                       type="text"
                       value={editFormData.studentId}
@@ -469,14 +525,12 @@ export const UserProfile = () => {
                           studentId: e.target.value,
                         })
                       }
-                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="ui-input"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
-                      Faculty
-                    </label>
+                    <label className="ui-label">Faculty</label>
                     <select
                       value={editFormData.faculty}
                       onChange={(e) => {
@@ -487,7 +541,7 @@ export const UserProfile = () => {
                         });
                         setSelectedFaculty(e.target.value);
                       }}
-                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="ui-select"
                     >
                       <option value="">Select Faculty</option>
                       {FACULTY_OPTIONS.map((faculty) => (
@@ -500,9 +554,7 @@ export const UserProfile = () => {
 
                   {allowedCourses.length > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">
-                        Course
-                      </label>
+                      <label className="ui-label">Course</label>
                       <select
                         value={editFormData.course}
                         onChange={(e) =>
@@ -511,7 +563,7 @@ export const UserProfile = () => {
                             course: e.target.value,
                           })
                         }
-                        className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="ui-select"
                       >
                         <option value="">Select Course</option>
                         {allowedCourses.map((course) => (
@@ -524,9 +576,7 @@ export const UserProfile = () => {
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
-                      Year
-                    </label>
+                    <label className="ui-label">Year</label>
                     <select
                       value={editFormData.year}
                       onChange={(e) =>
@@ -535,7 +585,7 @@ export const UserProfile = () => {
                           year: parseInt(e.target.value),
                         })
                       }
-                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="ui-select"
                     >
                       <option value="">Select Year</option>
                       {YEAR_OPTIONS.map((year) => (
@@ -551,9 +601,7 @@ export const UserProfile = () => {
               {(user?.role === "lecturer" || user?.role === "admin") && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">
-                      Faculty
-                    </label>
+                    <label className="ui-label">Faculty</label>
                     <select
                       value={editFormData.faculty}
                       onChange={(e) => {
@@ -564,7 +612,7 @@ export const UserProfile = () => {
                         });
                         setSelectedFaculty(e.target.value);
                       }}
-                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="ui-select"
                     >
                       <option value="">Select Faculty</option>
                       {FACULTY_OPTIONS.map((faculty) => (
@@ -577,9 +625,7 @@ export const UserProfile = () => {
 
                   {allowedCourses.length > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">
-                        Course
-                      </label>
+                      <label className="ui-label">Course</label>
                       <select
                         value={editFormData.course}
                         onChange={(e) =>
@@ -588,7 +634,7 @@ export const UserProfile = () => {
                             course: e.target.value,
                           })
                         }
-                        className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="ui-select"
                       >
                         <option value="">Select Course</option>
                         {allowedCourses.map((course) => (
@@ -602,17 +648,18 @@ export const UserProfile = () => {
                 </>
               )}
 
-              <div className="flex gap-3 mt-6">
+              <div className="mt-6 flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 transition"
+                  className="btn-primary flex-1 py-3"
                 >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 transition"
+                  className="btn-secondary flex-1 py-3"
+                  aria-label="Cancel profile edits"
                 >
                   Cancel
                 </button>
@@ -624,15 +671,30 @@ export const UserProfile = () => {
 
       {/* Change Password Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4">Change Password</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+          <div
+            className="ui-card w-full max-w-md p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="password-modal-title"
+          >
+            <div className="mb-4 flex items-start justify-between">
+              <h3 id="password-modal-title" className="text-xl font-semibold text-slate-900">
+                Change Password
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowPasswordModal(false)}
+                className="rounded-md px-2 py-1 text-slate-500 transition hover:bg-slate-100"
+                aria-label="Close change password dialog"
+              >
+                x
+              </button>
+            </div>
 
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Current Password
-                </label>
+                <label className="ui-label">Current Password</label>
                 <input
                   type="password"
                   value={passwordData.currentPassword}
@@ -642,15 +704,13 @@ export const UserProfile = () => {
                       currentPassword: e.target.value,
                     })
                   }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="ui-input"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  New Password
-                </label>
+                <label className="ui-label">New Password</label>
                 <input
                   type="password"
                   minLength={6}
@@ -662,16 +722,14 @@ export const UserProfile = () => {
                     })
                   }
                   placeholder="At least 6 characters"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="ui-input"
                   required
                 />
-                <p className="text-xs text-slate-400 mt-1">Minimum 6 characters required</p>
+                <p className="mt-1 text-xs text-slate-500">Minimum 6 characters required</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Confirm New Password
-                </label>
+                <label className="ui-label">Confirm New Password</label>
                 <input
                   type="password"
                   minLength={6}
@@ -682,15 +740,15 @@ export const UserProfile = () => {
                       confirmPassword: e.target.value,
                     })
                   }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="ui-input"
                   required
                 />
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="mt-6 flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-medium py-3 transition"
+                  className="flex-1 rounded-xl bg-amber-600 py-3 font-medium text-white transition hover:bg-amber-500"
                 >
                   Change Password
                 </button>
@@ -704,7 +762,8 @@ export const UserProfile = () => {
                       confirmPassword: "",
                     });
                   }}
-                  className="flex-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 transition"
+                  className="btn-secondary flex-1 py-3"
+                  aria-label="Cancel password update"
                 >
                   Cancel
                 </button>
@@ -716,12 +775,27 @@ export const UserProfile = () => {
 
       {/* Delete Account Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-red-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4 text-red-400">
-              Delete Account
-            </h3>
-            <p className="text-slate-300 mb-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+          <div
+            className="ui-card w-full max-w-md border-red-200 p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+          >
+            <div className="mb-4 flex items-start justify-between">
+              <h3 id="delete-modal-title" className="text-xl font-semibold text-red-700">
+                Delete Account
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="rounded-md px-2 py-1 text-slate-500 transition hover:bg-slate-100"
+                aria-label="Close delete account dialog"
+              >
+                x
+              </button>
+            </div>
+            <p className="mb-6 text-slate-600">
               Are you sure you want to permanently delete your account? This
               action cannot be undone and all your data will be lost.
             </p>
@@ -729,13 +803,14 @@ export const UserProfile = () => {
             <div className="flex gap-3">
               <button
                 onClick={handleDeleteAccount}
-                className="flex-1 rounded-xl bg-red-600 hover:bg-red-500 text-white font-medium py-3 transition"
+                className="flex-1 rounded-xl bg-red-600 py-3 font-medium text-white transition hover:bg-red-500"
               >
                 Delete Permanently
               </button>
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 transition"
+                className="btn-secondary flex-1 py-3"
+                aria-label="Cancel account deletion"
               >
                 Cancel
               </button>

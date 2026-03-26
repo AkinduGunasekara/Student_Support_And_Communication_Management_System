@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { AppLayout } from "../components/AppLayout";
 
 function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
   const [formData, setFormData] = useState({
@@ -113,97 +114,91 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
   };
 
   return (
-    <div className="mt-0 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
-      {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-3 text-white">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          📝 Update Ticket
-        </h2>
-        <p className="text-blue-100 text-sm mt-1">
-          Modify and resubmit your ticket below.
-        </p>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-5 p-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block font-semibold mb-2">Student ID*</label>
-            <input
-              type="text"
-              name="studentId"
-              value={formData.studentId}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
-              readOnly
-            />
-            {errors.studentId && (
-              <p className="text-red-600 text-sm mt-1">{errors.studentId}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-2">Student Email*</label>
-            <input
-              type="email"
-              name="studentEmail"
-              value={formData.studentEmail}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-            />
-            {errors.studentEmail && (
-              <p className="text-red-600 text-sm mt-1">{errors.studentEmail}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-2">Academic Year*</label>
-            <input
-              type="text"
-              name="accodamicYear"
-              value={formData.accodamicYear}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-2">Ticket Category*</label>
-            <select
-              name="ticketCategory"
-              value={formData.ticketCategory}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-            >
-              <option value="Select category">Select category</option>
-              <option value="Academic">Academic</option>
-              <option value="Complaint">Complaint</option>
-              <option value="Technical Issues">Technical Issues</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block font-semibold mb-2">Description*</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-              rows={4}
-            />
-          </div>
+    <AppLayout>
+      <div className="ui-page max-w-4xl">
+        <div className="ui-card bg-gradient-to-r from-blue-700 to-blue-600 p-5 text-white">
+          <h2 className="text-2xl font-bold">Update Ticket</h2>
+          <p className="mt-1 text-sm text-blue-200">Modify and resubmit your ticket below.</p>
         </div>
 
-        <button
-          type="submit"
-          className="w-full py-3 rounded-lg text-white transition-all bg-blue-600 hover:bg-blue-500 shadow-md hover:shadow-lg"
-          disabled={loading}
-        >
-          {loading ? "Updating..." : "Update Ticket"}
-        </button>
-      </form>
-    </div>
+        <div className="ui-card mt-4 p-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div>
+                <label className="ui-label">Student ID*</label>
+                <input
+                  type="text"
+                  name="studentId"
+                  value={formData.studentId}
+                  onChange={handleChange}
+                  className="ui-input cursor-not-allowed bg-slate-100"
+                  readOnly
+                />
+                {errors.studentId && <p className="mt-1 text-sm text-red-600">{errors.studentId}</p>}
+              </div>
+
+              <div>
+                <label className="ui-label">Student Email*</label>
+                <input
+                  type="email"
+                  name="studentEmail"
+                  value={formData.studentEmail}
+                  onChange={handleChange}
+                  className="ui-input"
+                />
+                {errors.studentEmail && <p className="mt-1 text-sm text-red-600">{errors.studentEmail}</p>}
+              </div>
+
+              <div>
+                <label className="ui-label">Academic Year*</label>
+                <input
+                  type="text"
+                  name="accodamicYear"
+                  value={formData.accodamicYear}
+                  onChange={handleChange}
+                  className="ui-input"
+                />
+              </div>
+
+              <div>
+                <label className="ui-label">Ticket Category*</label>
+                <select
+                  name="ticketCategory"
+                  value={formData.ticketCategory}
+                  onChange={handleChange}
+                  className="ui-select"
+                >
+                  <option value="Select category">Select category</option>
+                  <option value="Academic">Academic</option>
+                  <option value="Complaint">Complaint</option>
+                  <option value="Technical Issues">Technical Issues</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="ui-label">Description*</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="ui-textarea"
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary w-full py-3 disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={loading}
+            >
+              {loading ? "Updating..." : "Update Ticket"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </AppLayout>
   );
 }
 
