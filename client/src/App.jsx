@@ -13,11 +13,12 @@ import StudentMyMessages from "./officialMesseging/pages/StudentMyMessages";
 import OfficialLecturerDashboard from "./officialMesseging/pages/LecturerDashboard";
 import PublicFAQ from "./officialMesseging/pages/PublicFAQ";
 
-import gkAdminViewTicket from "./ticketRaising/gkAdminViewTicket";
-import gkTicketCreate from "./ticketRaising/gkTicketCreate";
-import gkTicketUpdate from "./ticketRaising/gkTicketUpdate";
-import gkStudentViewTickets from "./ticketRaising/gkStudentViewTickets";
-import gkLectureViewTicket from "./ticketRaising/gkLectureViewTicket";
+import GkAdminViewTicket from "./ticketRaising/gkAdminViewTicket.jsx";
+import GkTicketCreate from "./ticketRaising/gkTicketCreate.jsx";
+import GkTicketUpdate from "./ticketRaising/gkTicketUpdate.jsx";
+import GkStudentViewTickets from "./ticketRaising/gkTicketsView.jsx";
+import GkTicketDelete from "./ticketRaising/gkTicketDelete.jsx";
+//import gkLectureViewTicket from "./ticketRaising/gkLectureViewTicket";
 
 export default function App() {
   return (
@@ -57,9 +58,9 @@ export default function App() {
         <Route
           path="/student/view-tickets"
           element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <gkStudentViewTickets />
-            </ProtectedRoute>
+            // <ProtectedRoute allowedRoles={["student"]}>
+              <GkStudentViewTickets/>
+            // </ProtectedRoute>
           }
         />
 
@@ -72,14 +73,14 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/lecturer/view-ticket/:id"
           element={
             <ProtectedRoute allowedRoles={["lecturer"]}>
               <gkLectureViewTicket />
             </ProtectedRoute>
           }
-        />
+        /> */}
 
         {/* Admin Routes */}
         <Route
@@ -93,9 +94,9 @@ export default function App() {
         <Route
           path="/admin/view-tickets"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <gkAdminViewTicket />
-            </ProtectedRoute>
+            // <ProtectedRoute allowedRoles={["admin"]}>
+              <GkAdminViewTicket />
+            // </ProtectedRoute>
           }
         />
 
@@ -103,17 +104,25 @@ export default function App() {
         <Route
           path="/ticket/create"
           element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <gkTicketCreate />
-            </ProtectedRoute>
+            // <ProtectedRoute allowedRoles={["student"]}>
+              <GkTicketCreate />
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/ticket/update/:id"
           element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <gkTicketUpdate />
-            </ProtectedRoute>
+            // <ProtectedRoute allowedRoles={["student"]}>
+              <GkTicketUpdate />
+            // </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ticket/delete/:id"
+          element={
+            // <ProtectedRoute allowedRoles={["student"]}>
+              <GkTicketDelete />
+            // </ProtectedRoute>
           }
         />
       </Routes>

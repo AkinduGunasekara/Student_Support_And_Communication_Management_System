@@ -99,8 +99,10 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
       await axios.put(
         `http://localhost:5001/api/tickets/${ticketId}`,
         formData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+        { headers: { Authorization: `Bearer ${token}`,
+       "Content-Type": "multipart/form-data",
+     }});
+     
       toast.success("Ticket updated successfully!", { position: "top-center" });
       refreshTickets(); // Auto-refresh the ticket list
       closeModal(); // Close modal

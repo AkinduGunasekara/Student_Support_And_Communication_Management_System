@@ -83,11 +83,21 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5001/api/tickets/create", formData);
+      await axios.post(
+    "http://localhost:5001/api/tickets/create",
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 
-      toast.success("Ticket submitted successfully!", {
-        position: "top-center",
-      });
+  // ✅ Toast should be OUTSIDE axios config
+  toast.success("Ticket submitted successfully!", {
+    position: "top-center",
+  });
 
       refreshTickets && refreshTickets();
       closeModal && closeModal();
