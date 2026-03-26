@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
+import { UserProfile } from "../components/UserProfile";
 import { getMyFeedback, submitFeedback } from "../feedback/feedbackService";
 
 // Constants for star rating
@@ -66,6 +67,10 @@ export const StudentDashboard = () => {
             Welcome {user?.name || "Student"} — manage feedback and access
             official messaging.
           </p>
+        </div>
+
+        <div id="profile-section" className="mb-8">
+          <UserProfile />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 mb-8">

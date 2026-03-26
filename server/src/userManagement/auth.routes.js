@@ -22,6 +22,10 @@ router.post("/register", async (req, res) => {
             return res.status(400).json({ message: "Name, email and password are required" });
         }
 
+    if (String(password).length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
+
     if (!NAME_REGEX.test(String(name).trim())) {
       return res.status(400).json({ message: "Name can contain only alphabetic letters and spaces" });
     }

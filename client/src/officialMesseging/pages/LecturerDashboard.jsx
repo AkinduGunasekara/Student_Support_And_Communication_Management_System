@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../../AuthContext.jsx";
+import { AppLayout } from "../../components/AppLayout";
+import { UserProfile } from "../../components/UserProfile";
 import {
   answerMessage,
   getLecturerMessages,
@@ -190,8 +192,9 @@ export default function LecturerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50 px-4 py-6 md:px-8">
-      <div className="mx-auto max-w-7xl">
+    <AppLayout>
+      <div className="bg-gradient-to-b from-slate-50 via-white to-blue-50 px-4 py-6 md:px-8">
+        <div className="mx-auto max-w-7xl">
         <div className="mb-6 rounded-3xl bg-gradient-to-r from-purple-700 via-indigo-600 to-blue-600 p-6 text-white shadow-lg">
           <p className="text-sm font-medium text-indigo-100">
             Official Messaging + FAQ Management
@@ -203,6 +206,10 @@ export default function LecturerDashboard() {
             Welcome {user?.name || "Lecturer"} — review student questions,
             submit official replies, and manage FAQ publishing from one page.
           </p>
+        </div>
+
+        <div id="profile-section" className="mb-6 bg-slate-950 rounded-3xl p-6">
+          <UserProfile />
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
@@ -485,6 +492,7 @@ export default function LecturerDashboard() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

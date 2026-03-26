@@ -158,8 +158,11 @@ export const RegisterPage = () => {
               name="password"
               minLength={6}
               required
+              title="Password must be at least 6 characters"
+              placeholder="At least 6 characters"
               className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
+            <p className="text-xs text-slate-400 mt-1">Minimum 6 characters required</p>
           </div>
 
           <div>

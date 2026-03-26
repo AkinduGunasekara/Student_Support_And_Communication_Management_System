@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
+import { UserProfile } from "../components/UserProfile";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
@@ -171,6 +172,10 @@ export const AdminDashboard = () => {
             Welcome {user?.name || "Admin"} — oversee users, feedback, and
             official communication.
           </p>
+        </div>
+
+        <div id="profile-section" className="mb-8">
+          <UserProfile />
         </div>
 
         <div className="mb-8">
