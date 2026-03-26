@@ -134,6 +134,80 @@ router.post("/login", async (req, res) => {
     }
   });
 
+  // Update current user profile (limited fields)
+  router.patch("/me", authMiddleware, async (req, res) => {
+    try {
+      const { name, faculty, course, year, studentId } = req.body;
+
+      const update = {};
+      if (name !== undefined) update.name = name;
+      if (faculty !== undefined) update.faculty = faculty;
+      if (course !== undefined) update.course = course;
+      if (year !== undefined) update.year = year;
+
+      // Allow studentId update only for students
+      if (studentId !== undefined && req.user.role === "student") {
+        update.studentId = studentId;
+      }
+
+      const updated = await User.findByIdAndUpdate(req.user._id, update, {
+        new: true,
+        runValidators: true,
+      }).select("-password");
+
+      return res.json({
+        id: updated._id,
+        name: updated.name,
+        email: updated.email,
+        role: updated.role,
+        studentId: updated.studentId,
+        faculty: updated.faculty,
+        course: updated.course,
+        year: updated.year,
+      });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Change current user password
+  router.patch("/me/password", authMiddleware, async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res
+          .status(400)
+          .json({ message: "currentPassword and newPassword are required" });
+      }
+
+      if (String(newPassword).length < 6) {
+        return res
+          .status(400)
+          .json({ message: "New password must be at least 6 characters" });
+      }
+
+      const user = await User.findById(req.user._id).select("+password");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      user.password = newPassword;
+      // Avoid blocking password changes because of legacy missing profile fields.
+      await user.save({ validateBeforeSave: false });
+
+      return res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
+
   // Get active lecturers by faculty and course
   router.get("/lecturers", authMiddleware, async (req, res) => {
     try {
@@ -179,6 +253,7 @@ router.post("/login", async (req, res) => {
       name: req.user.name,
       email: req.user.email,
       role: req.user.role,
+      studentId: req.user.studentId,
       faculty: req.user.faculty,
       course: req.user.course,
       year: req.user.year,

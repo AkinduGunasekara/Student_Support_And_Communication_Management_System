@@ -23,31 +23,34 @@ const YEAR_OPTIONS = [1, 2, 3, 4];
 const NAME_REGEX = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 
 const STUDENT_SIDEBAR_ITEMS = [
-  { label: "Dashboard" },
-  { label: "Raise Ticket" },
-  { label: "My Tickets" },
-  { label: "Events" },
-  { label: "Messages" },
-  { label: "Feedback" },
+  { label: "Dashboard", path: "/student/dashboard" },
+  { label: "Profile", path: "/student/profile" },
+  { label: "Raise Ticket", path: "/student/dashboard" },
+  { label: "My Tickets", path: "/student/dashboard" },
+  { label: "Events", path: "/student/dashboard" },
+  { label: "Messages", path: "/student/dashboard" },
+  { label: "Feedback", path: "/student/dashboard" },
 ];
 
 const LECTURER_SIDEBAR_ITEMS = [
-  { label: "Dashboard" },
-  { label: "View Tickets" },
-  { label: "Messages" },
-  { label: "Announcements" },
-  { label: "Events" },
-  { label: "Feedback" },
+  { label: "Dashboard", path: "/lecturer/dashboard" },
+  { label: "Profile", path: "/lecturer/profile" },
+  { label: "View Tickets", path: "/lecturer/dashboard" },
+  { label: "Messages", path: "/lecturer/dashboard" },
+  { label: "Announcements", path: "/lecturer/dashboard" },
+  { label: "Events", path: "/lecturer/dashboard" },
+  { label: "Feedback", path: "/lecturer/dashboard" },
 ];
 
 const ADMIN_SIDEBAR_ITEMS = [
-  { label: "Dashboard" },
-  { label: "Manage Users" },
-  { label: "Manage Tickets" },
-  { label: "Reply to Tickets" },
-  { label: "Manage Events" },
-  { label: "View Feedback" },
-  { label: "Reports" },
+  { label: "Dashboard", path: "/admin/dashboard" },
+  { label: "Manage Users", path: "/admin/users" },
+  { label: "Profile", path: "/admin/profile" },
+  { label: "Manage Tickets", path: "/admin/dashboard" },
+  { label: "Reply to Tickets", path: "/admin/dashboard" },
+  { label: "Manage Events", path: "/admin/dashboard" },
+  { label: "View Feedback", path: "/admin/dashboard" },
+  { label: "Reports", path: "/admin/dashboard" },
 ];
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
@@ -461,6 +464,7 @@ const PortalLayout = ({
                 <li key={item.label}>
                   <button
                     type="button"
+                    onClick={() => item.path && navigate(item.path)}
                     className={`w-full rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
                       isActive
                         ? "bg-blue-700 text-white"
@@ -1031,12 +1035,387 @@ const AdminDashboard = () => {
   );
 };
 
+const AdminManageUsers = () => {
+  const { token, logout } = useAuth();
+  const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "student",
+    studentId: "",
+    faculty: "",
+    course: "",
+    year: "",
+    isActive: true,
+  });
+
+  const fetchUsers = async () => {
+    if (!token) return;
+    setLoadingUsers(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          logout();
+          navigate("/login", { replace: true });
+          return;
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to load users");
+      }
+
+      const data = await response.json();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Fetch users error:", error);
+      alert(error.message || "Unable to load users");
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  const handleCreateUser = async (event) => {
+    event.preventDefault();
+    if (!token) return;
+
+    if (!newUser.name || !newUser.email || !newUser.password || !newUser.role) {
+      alert("Name, email, password and role are required");
+      return;
+    }
+
+    if (newUser.role === "student" && !newUser.studentId.trim()) {
+      alert("Student ID is required for student accounts");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...newUser,
+          year: newUser.year ? Number(newUser.year) : undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create user");
+      }
+
+      setUsers((prev) => [data, ...prev]);
+      setNewUser({
+        name: "",
+        email: "",
+        password: "",
+        role: "student",
+        studentId: "",
+        faculty: "",
+        course: "",
+        year: "",
+        isActive: true,
+      });
+      alert("User created successfully");
+    } catch (error) {
+      console.error("Create user error:", error);
+      alert(error.message || "Unable to create user");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdateUser = async (userId, patch) => {
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(patch),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update user");
+      }
+
+      setUsers((prev) => prev.map((u) => (u._id === data._id ? data : u)));
+    } catch (error) {
+      console.error("Update user error:", error);
+      alert(error.message || "Unable to update user");
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!token) return;
+    const confirmed = window.confirm("Delete this user permanently?");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete user");
+      }
+
+      setUsers((prev) => prev.filter((u) => u._id !== userId));
+      alert("User deleted");
+    } catch (error) {
+      console.error("Delete user error:", error);
+      alert(error.message || "Unable to delete user");
+    }
+  };
+
+  return (
+    <PortalLayout
+      portalName="UniAdmin"
+      portalSubtitle="Management Portal"
+      sidebarItems={ADMIN_SIDEBAR_ITEMS}
+      activeItem="Manage Users"
+      headerTitle="Manage Users"
+      headerSubtitle="Create, update roles, activate/deactivate, and delete accounts"
+      userName="Admin"
+      userMeta="Super Admin"
+      showSearch
+      profilePath="/admin/profile"
+    >
+      <div className="grid gap-5 lg:grid-cols-[1fr,2fr]">
+        <SectionCard title="Add New User">
+          <form onSubmit={handleCreateUser} className="space-y-3 text-sm">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block font-medium text-slate-700">Name</label>
+                <input
+                  required
+                  value={newUser.name}
+                  onChange={(e) => setNewUser((p) => ({ ...p, name: e.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block font-medium text-slate-700">Email</label>
+                <input
+                  type="email"
+                  required
+                  value={newUser.email}
+                  onChange={(e) => setNewUser((p) => ({ ...p, email: e.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block font-medium text-slate-700">Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={newUser.password}
+                  onChange={(e) => setNewUser((p) => ({ ...p, password: e.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block font-medium text-slate-700">Role</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) =>
+                    setNewUser((p) => ({
+                      ...p,
+                      role: e.target.value,
+                    }))
+                  }
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                >
+                  <option value="student">Student</option>
+                  <option value="lecturer">Lecturer</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              {newUser.role === "student" && (
+                <div>
+                  <label className="mb-1 block font-medium text-slate-700">Student ID</label>
+                  <input
+                    required
+                    value={newUser.studentId}
+                    onChange={(e) =>
+                      setNewUser((p) => ({ ...p, studentId: e.target.value }))
+                    }
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="mb-1 block font-medium text-slate-700">Faculty</label>
+                <select
+                  value={newUser.faculty}
+                  onChange={(e) => setNewUser((p) => ({ ...p, faculty: e.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                >
+                  <option value="">Select faculty</option>
+                  {FACULTY_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block font-medium text-slate-700">Course</label>
+                <select
+                  value={newUser.course}
+                  onChange={(e) => setNewUser((p) => ({ ...p, course: e.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                >
+                  <option value="">Select course</option>
+                  {COURSE_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {newUser.role === "student" && (
+                <div>
+                  <label className="mb-1 block font-medium text-slate-700">Year</label>
+                  <select
+                    value={newUser.year}
+                    onChange={(e) => setNewUser((p) => ({ ...p, year: e.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  >
+                    <option value="">Select year</option>
+                    {YEAR_OPTIONS.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <input
+                  id="isActive"
+                  type="checkbox"
+                  checked={newUser.isActive}
+                  onChange={(e) => setNewUser((p) => ({ ...p, isActive: e.target.checked }))}
+                />
+                <label htmlFor="isActive" className="text-slate-700">
+                  Active
+                </label>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white disabled:bg-blue-400"
+            >
+              {saving ? "Saving..." : "Create User"}
+            </button>
+          </form>
+        </SectionCard>
+
+        <SectionCard title="User List">
+          {loadingUsers ? (
+            <p className="text-sm text-slate-600">Loading users...</p>
+          ) : users.length === 0 ? (
+            <p className="text-sm text-slate-600">No users found.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead className="text-xs uppercase tracking-[0.12em] text-slate-500">
+                  <tr>
+                    <th className="py-2">Name</th>
+                    <th className="py-2">Email</th>
+                    <th className="py-2">Role</th>
+                    <th className="py-2">Active</th>
+                    <th className="py-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {users.map((u) => (
+                    <tr key={u._id}>
+                      <td className="py-3 font-medium">{u.name}</td>
+                      <td className="py-3">{u.email}</td>
+                      <td className="py-3">
+                        <select
+                          value={u.role}
+                          onChange={(e) =>
+                            handleUpdateUser(u._id, { role: e.target.value })
+                          }
+                          className="rounded-lg border border-slate-200 bg-white px-2 py-1"
+                        >
+                          <option value="student">student</option>
+                          <option value="lecturer">lecturer</option>
+                          <option value="admin">admin</option>
+                        </select>
+                      </td>
+                      <td className="py-3">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(u.isActive)}
+                          onChange={(e) =>
+                            handleUpdateUser(u._id, { isActive: e.target.checked })
+                          }
+                        />
+                      </td>
+                      <td className="py-3 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteUser(u._id)}
+                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </SectionCard>
+      </div>
+    </PortalLayout>
+  );
+};
+
 const ProfilePage = ({ role }) => {
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -1112,6 +1491,49 @@ const ProfilePage = ({ role }) => {
     }
   };
 
+  const handlePasswordChange = async (event) => {
+    event.preventDefault();
+    if (!token) return;
+
+    if (passwordForm.newPassword.length < 6) {
+      alert("New password must be at least 6 characters");
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert("New password and confirm password do not match");
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me/password`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to change password");
+      }
+
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      alert("Password changed successfully");
+    } catch (error) {
+      console.error("Change password error:", error);
+      alert(error.message || "Unable to change password");
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const profileConfigByRole = {
     student: {
       portalName: "EduPortal",
@@ -1184,6 +1606,63 @@ const ProfilePage = ({ role }) => {
       </SectionCard>
 
       <div className="mt-5">
+        <SectionCard title="Change Password">
+          <form onSubmit={handlePasswordChange} className="grid gap-4 md:max-w-lg">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Current Password
+              </label>
+              <input
+                type="password"
+                required
+                value={passwordForm.currentPassword}
+                onChange={(e) =>
+                  setPasswordForm((p) => ({ ...p, currentPassword: e.target.value }))
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                New Password
+              </label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={passwordForm.newPassword}
+                onChange={(e) =>
+                  setPasswordForm((p) => ({ ...p, newPassword: e.target.value }))
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={passwordForm.confirmPassword}
+                onChange={(e) =>
+                  setPasswordForm((p) => ({ ...p, confirmPassword: e.target.value }))
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={changingPassword}
+              className="w-fit rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white disabled:bg-blue-400"
+            >
+              {changingPassword ? "Updating..." : "Update Password"}
+            </button>
+          </form>
+        </SectionCard>
+
+        <div className="mt-5" />
         <SectionCard title="Danger Zone">
           <p className="mb-4 text-sm text-slate-600">
             Deleting your account is permanent and removes your user record from the database.
@@ -1249,6 +1728,15 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminManageUsers />
           </ProtectedRoute>
         }
       />
