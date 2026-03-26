@@ -49,14 +49,14 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
       const regex = /^IT\d{8}$/;
       setErrors((prev) => ({
         ...prev,
-        studentId: regex.test(value) ? "" : "Invalid Student ID",
+        studentId: regex.test(value) ? "" : "Invalid Student ID(Format: IT12345678)",
       }));
     }
     if (name === "studentEmail") {
       const regex = /.+@.+\..+/;
       setErrors((prev) => ({
         ...prev,
-        studentEmail: regex.test(value) ? "" : "Invalid Student Email",
+        studentEmail: regex.test(value) ? "" : "Invalid Student Email(format: student@my.sliit.lk)",
       }));
     }
 
