@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -25,6 +25,9 @@ export default function App() {
     <AuthProvider>
       <Toaster position="top-right" richColors />
       <Routes>
+        {/* Root redirect to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
