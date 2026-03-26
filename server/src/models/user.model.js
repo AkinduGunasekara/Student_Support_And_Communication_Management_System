@@ -22,6 +22,16 @@ export const COURSE_BY_FACULTY = {
 
 const userSchema = new mongoose.Schema(
     {
+        studentId: {
+            type: String,
+            unique: true,
+            sparse: true,
+            trim: true,
+            match: [/^[A-Za-z]{2}\d{6,8}$/, "Please enter a valid Student ID"],
+            required: function () {
+                return this.role === "student";
+            },
+        },
         name: {
             type: String,
             required: true,
@@ -52,15 +62,24 @@ const userSchema = new mongoose.Schema(
         faculty: {
             type: String,
             enum: FACULTIES,
+            required: function () {
+                return this.role !== "admin";
+            },
         },
         course: {
             type: String,
             enum: COURSES,
+            required: function () {
+                return this.role !== "admin";
+            },
         },
         year: {
             type: Number,
             min: 1,
             max: 4,
+            required: function () {
+                return this.role === "student";
+            },
         },
         isActive: {
             type: Boolean,

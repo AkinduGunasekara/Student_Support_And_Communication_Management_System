@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../../AuthContext.jsx";
+import { AppLayout } from "../../components/AppLayout";
+import { UserProfile } from "../../components/UserProfile";
 import {
   answerMessage,
   getLecturerMessages,
@@ -190,9 +192,9 @@ export default function LecturerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50 px-4 py-6 md:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6 rounded-3xl bg-gradient-to-r from-purple-700 via-indigo-600 to-blue-600 p-6 text-white shadow-lg">
+    <AppLayout>
+      <div className="ui-page">
+        <div className="ui-card mb-6 bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white shadow-lg">
           <p className="text-sm font-medium text-indigo-100">
             Official Messaging + FAQ Management
           </p>
@@ -205,35 +207,39 @@ export default function LecturerDashboard() {
           </p>
         </div>
 
+        <div id="profile-section" className="mb-6">
+          <UserProfile />
+        </div>
+
         <div className="mb-6 grid gap-4 md:grid-cols-4">
-          <div className="rounded-3xl border border-amber-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Open Questions</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Open Questions</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">{openCount}</h2>
           </div>
 
-          <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Answered Questions</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Answered Questions</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {answeredCount}
             </h2>
           </div>
 
-          <div className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Published FAQs</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Published FAQs</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {publicCount}
             </h2>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Private Items</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Private Items</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {privateCount}
             </h2>
           </div>
         </div>
 
-        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="ui-card mb-6 p-6">
           <div className="grid gap-4 md:grid-cols-4">
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -244,7 +250,7 @@ export default function LecturerDashboard() {
                 placeholder="Search subject, student, course..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                className="ui-input"
               />
             </div>
 
@@ -255,7 +261,7 @@ export default function LecturerDashboard() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                className="ui-select"
               >
                 <option value="ALL">All Status</option>
                 <option value="OPEN">Open</option>
@@ -271,7 +277,7 @@ export default function LecturerDashboard() {
               <select
                 value={facultyFilter}
                 onChange={(e) => setFacultyFilter(e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                className="ui-select"
               >
                 <option value="ALL">All Faculties</option>
                 {facultyOptions.map((faculty) => (
@@ -289,7 +295,7 @@ export default function LecturerDashboard() {
               <select
                 value={faqFilter}
                 onChange={(e) => setFaqFilter(e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                className="ui-select"
               >
                 <option value="ALL">All Items</option>
                 <option value="PUBLIC">Published FAQ</option>
@@ -299,9 +305,9 @@ export default function LecturerDashboard() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="ui-card p-6">
           {loading ? (
-            <div className="py-16 text-center text-slate-500">
+            <div className="py-16 text-center text-slate-600">
               Loading messages...
             </div>
           ) : filteredMessages.length === 0 ? (
@@ -309,17 +315,14 @@ export default function LecturerDashboard() {
               <p className="text-lg font-semibold text-slate-700">
                 No messages found
               </p>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Try changing your search or filters.
               </p>
             </div>
           ) : (
             <div className="space-y-5">
               {filteredMessages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
-                >
+                <div key={msg._id} className="ui-card p-5 transition hover:shadow-md">
                   <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                     <div className="flex-1 space-y-4">
                       <div className="flex flex-wrap items-center gap-3">
@@ -356,12 +359,12 @@ export default function LecturerDashboard() {
                         </span>
                       </div>
 
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-600">
                         {msg.faculty || "-"} • {msg.course || "-"} • Year{" "}
                         {msg.academicYear || "-"} • Semester {msg.semester || "-"}
                       </p>
 
-                      <div className="rounded-2xl bg-slate-50 p-4">
+                      <div className="ui-card-soft p-4">
                         <p className="text-sm font-semibold text-slate-700">
                           Student Question
                         </p>
@@ -371,7 +374,7 @@ export default function LecturerDashboard() {
                       </div>
 
                       {msg.answer ? (
-                        <div className="rounded-2xl bg-blue-50 p-4">
+                        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
                           <p className="text-sm font-semibold text-blue-700">
                             Submitted Answer
                           </p>
@@ -380,7 +383,7 @@ export default function LecturerDashboard() {
                           </p>
                         </div>
                       ) : (
-                        <div className="rounded-2xl bg-amber-50 p-4">
+                        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                           <p className="text-sm font-medium text-amber-700">
                             This question is waiting for an official answer.
                           </p>
@@ -399,14 +402,14 @@ export default function LecturerDashboard() {
                             handleAnswerChange(msg._id, e.target.value)
                           }
                           placeholder="Type the official reply here..."
-                          className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                          className="ui-textarea"
                         />
 
                         <div className="mt-3 flex flex-wrap gap-3">
                           <button
                             onClick={() => handleAnswerSubmit(msg._id)}
                             disabled={answeringId === msg._id}
-                            className="rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="btn-primary rounded-2xl px-5 py-3 disabled:cursor-not-allowed disabled:opacity-70"
                           >
                             {answeringId === msg._id
                               ? "Submitting..."
@@ -438,7 +441,7 @@ export default function LecturerDashboard() {
                       </div>
                     </div>
 
-                    <div className="w-full rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 xl:max-w-sm">
+                    <div className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 xl:max-w-sm">
                       <p>
                         <span className="font-semibold">Student Name:</span>{" "}
                         {msg.studentId?.name || "-"}
@@ -485,6 +488,6 @@ export default function LecturerDashboard() {
           )}
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

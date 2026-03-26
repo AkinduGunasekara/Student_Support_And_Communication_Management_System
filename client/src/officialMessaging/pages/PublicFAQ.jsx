@@ -3,7 +3,11 @@ import { getPublicMessages } from "../services/messageService";
 import { toast } from "sonner";
 
 const COURSE_OPTIONS = {
-  Computing: ["IT", "SE", "Cyber Security", "Data Science"],
+  Computing: [
+    "Information Technology",
+    "Software Engineering",
+    "Cyber Security",
+  ],
   Engineering: [
     "Civil Engineering",
     "Mechanical Engineering",
@@ -76,7 +80,6 @@ export default function PublicFAQ() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
       <div className="mx-auto max-w-7xl">
-        {/* Header */}
         <div className="mb-6 overflow-hidden rounded-[30px] border border-blue-100 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200/60">
           <div className="px-6 py-8 md:px-8 md:py-10">
             <div className="inline-flex rounded-full bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide text-blue-50 backdrop-blur">
@@ -92,7 +95,6 @@ export default function PublicFAQ() {
           </div>
         </div>
 
-        {/* Stats */}
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-[26px] border border-blue-100 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
             <div className="flex items-start justify-between">
@@ -152,7 +154,6 @@ export default function PublicFAQ() {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="mb-6 rounded-[30px] border border-blue-100 bg-white p-6 shadow-sm md:p-8">
           <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
@@ -231,7 +232,6 @@ export default function PublicFAQ() {
           </div>
         </div>
 
-        {/* FAQ List */}
         <div className="mt-8">
           {loading ? (
             <div className="rounded-[30px] border border-blue-100 bg-white p-14 text-center shadow-sm">

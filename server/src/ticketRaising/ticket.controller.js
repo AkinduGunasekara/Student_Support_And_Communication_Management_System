@@ -52,6 +52,7 @@ export const createComplaint = async (req, res) => {
     }
 
     const complaint = new Complaint({
+      /*userId: req.user._id,*/
       studentId,
       studentEmail,
       ticketCategory,
