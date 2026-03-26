@@ -2,11 +2,9 @@ import express from "express";
 import {
   getAllComplaints,
   getComplaintById,
-  getMyComplaints,
   createComplaint,
   updateComplaint,
   deleteComplaint,
-  replyToComplaint,
 } from "../ticketRaising/ticket.controller.js";
 
 const router = express.Router();
@@ -16,9 +14,7 @@ const router = express.Router();
  * Get All Complaints
  * ----------------------------------------
  */
-router.get("/getall", getAllComplaints);
-
-router.put("/:id/reply", replyToComplaint)
+router.get("/", getAllComplaints);
 
 /**
  * ----------------------------------------
@@ -26,8 +22,6 @@ router.put("/:id/reply", replyToComplaint)
  * ----------------------------------------
  */
 router.get("/:id", getComplaintById);
-
-router.get("/my", getMyComplaints);
 
 /**
  * ----------------------------------------

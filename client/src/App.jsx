@@ -1,24 +1,107 @@
-import {Route, Routes } from "react-router";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { AuthProvider } from "./AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
-import GKTicketCreate from './ticketRaising/gkTicketCreate.jsx';
-import GKTicketView from './ticketRaising/gkTicketView.jsx';
-import GKTicketUpdate from './ticketRaising/gkTicketUpdate.jsx';
-import GKTicketDelete from './ticketRaising/gkTicketDelete.jsx';
-import GkAdminViewTicket from "./ticketRaising/gkAdminViewTicket.jsx";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { StudentDashboard } from "./pages/StudentDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
 
-const App = () =>{
-    return(
-        <div className="p-4">
-          <Routes>
-            <Route path="/raise-ticket" element={<GKTicketCreate />} />
-            <Route path="/view-ticket" element={<GKTicketView />} />
-            <Route path="/update-ticket/:id" element={<GKTicketUpdate />} />
-            <Route path="/delete-ticket/:id" element={<GKTicketDelete />} />
-            <Route path="/reply" element={<GkAdminViewTicket />} />
+import StudentAskQuestion from "./officialMesseging/pages/StudentAskQuestion";
+import StudentMyMessages from "./officialMesseging/pages/StudentMyMessages";
+import OfficialLecturerDashboard from "./officialMesseging/pages/LecturerDashboard";
+import PublicFAQ from "./officialMesseging/pages/PublicFAQ";
 
-          </Routes>
-        </div>
+import gkAdminViewTicket from "./ticketRaising/gkAdminViewTicket";
+import gkTicketCreate from "./ticketRaising/gkTicketCreate";
+import gkTicketUpdate from "./ticketRaising/gkTicketUpdate";
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Toaster position="top-right" richColors />
+      <Routes>
+        {/* Root redirect to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/public-faq" element={<PublicFAQ />} />
+
+        {/* Student Routes */}
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/ask-question"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentAskQuestion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/my-messages"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentMyMessages />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Lecturer Routes */}
+        <Route
+          path="/lecturer/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["lecturer", "admin"]}>
+              <OfficialLecturerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/view-tickets"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <gkAdminViewTicket />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ticket Routes */}
+        <Route
+          path="/ticket/create"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <gkTicketCreate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ticket/update/:id"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <gkTicketUpdate />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   );
-};
-
-export default App;
+}
