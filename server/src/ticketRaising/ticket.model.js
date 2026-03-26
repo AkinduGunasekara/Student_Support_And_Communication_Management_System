@@ -20,7 +20,7 @@ const ticketSchema = new mongoose.Schema(
     studentEmail: {
       type: String,
       required: true,
-      match: [/.+@.+\..+/, "Please enter a valid email address"],
+      // match: [/.+@.+\..+/, "Please enter a valid email address"],
     },
     ticketCategory: {
       type: String,
@@ -33,7 +33,7 @@ const ticketSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Completed", "Rejected"],
+      enum: ["Pending", "Resolved"],
       default: "Pending",
     },
   },

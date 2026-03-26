@@ -119,3 +119,65 @@ export const deleteComplaint = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const replyToComplaint = async (req, res) => {
+  try {
+    const { replyMessage } = req.body;
+
+    /* --- Nodemailer Setup --- */
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false, // dev only
+      },
+    });
+
+    // Find complaint by ID and update
+    const complaint = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      {
+        replyMessage,
+        status: "Resolved", // ✅ only one status
+      },
+      {
+        returnDocument: "after", // ✅ replaces deprecated new:true
+      }
+    );
+
+    if (!complaint) {
+      return res.status(404).json({
+        message: "Complaint not found",
+      });
+    }
+
+    // Mail options
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: complaint.email, // make sure your model has email field
+      subject: "Complaint Response",
+      text: replyMessage,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({
+      message: "Reply sent successfully and complaint updated",
+      complaint,
+    });
+
+  } catch (error) {
+    console.error("Error replying to complaint:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

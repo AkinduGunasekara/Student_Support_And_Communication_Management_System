@@ -5,6 +5,7 @@ import {
   createComplaint,
   updateComplaint,
   deleteComplaint,
+  replyToComplaint,
 } from "../ticketRaising/ticket.controller.js";
 
 const router = express.Router();
@@ -14,7 +15,8 @@ const router = express.Router();
  * Get All Complaints
  * ----------------------------------------
  */
-router.get("/", getAllComplaints);
+router.get("/getall", getAllComplaints);
+router.get("/reply", replyToComplaint);
 
 /**
  * ----------------------------------------

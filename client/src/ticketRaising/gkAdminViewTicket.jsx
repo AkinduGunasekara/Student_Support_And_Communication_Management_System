@@ -132,10 +132,6 @@ function gkAdminViewTicket() {
                         {ticket.studentEmail}
                       </td>
 
-                      <td className="px-6 py-4 text-gray-600">
-                        {ticket.accodamicYear}
-                      </td>
-
                       <td className="px-6 py-4">
                         <span className="text-blue-700 px-3 py-1 font-semibold">
                           {ticket.ticketCategory}

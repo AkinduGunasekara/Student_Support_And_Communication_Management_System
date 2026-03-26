@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
+import GkTicketView from "./ticketRaising/gkTicketView.jsx"
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
@@ -1706,12 +1707,22 @@ function App() {
       />
 
       <Route
-        path="/lecturer/dashboard"
+        path="/student/view-tickets"
         element={
-          <ProtectedRoute allowedRoles={["lecturer"]}>
-            <LecturerDashboard />
+          <ProtectedRoute allowedRoles={["student"]}>
+            <ProfilePage role="student" />
           </ProtectedRoute>
         }
+      />
+
+      <Route
+        path="/lecturer/dashboard"
+        element={<GkTicketView />}
+        // element={
+        //   <ProtectedRoute allowedRoles={["lecturer"]}>
+        //     <LecturerDashboard />
+        //   </ProtectedRoute>
+        // }
       />
 
       <Route
