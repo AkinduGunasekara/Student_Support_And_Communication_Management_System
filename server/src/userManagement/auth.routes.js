@@ -15,7 +15,7 @@ const NAME_REGEX = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 //Student registration
 router.post("/register", async (req, res) => {
     try{
-  const { name, email, password, role = "student", faculty, course, year } = req.body;
+  const { studentId, name, email, password, role = "student", faculty, course, year } = req.body;
   const numericYear = Number(year);
 
         if (!name || !email || !password){
@@ -47,6 +47,9 @@ router.post("/register", async (req, res) => {
     }
 
     if (role === "student") {
+      if (!studentId || !String(studentId).trim()) {
+        return res.status(400).json({ message: "Student ID is required for students" });
+      }
       if (!Number.isInteger(numericYear) || numericYear < 1 || numericYear > 4) {
         return res.status(400).json({ message: "Please select a valid year between 1 and 4" });
       }
@@ -59,6 +62,7 @@ router.post("/register", async (req, res) => {
         }
 
         const user = await User.create({
+            studentId: role === "student" ? String(studentId).trim() : undefined,
             name,
             email,
             password,
@@ -89,15 +93,20 @@ router.post("/register", async (req, res) => {
     // Login (all roles)
 router.post("/login", async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { identifier, password } = req.body;
   
-      if (!email || !password) {
+      if (!identifier || !password) {
         return res
           .status(400)
-          .json({ message: "Email and password are required" });
+          .json({ message: "Email/Student ID and password are required" });
       }
   
-      const user = await User.findOne({ email }).select("+password");
+      const identifierTrimmed = String(identifier).trim();
+      const query = identifierTrimmed.includes("@")
+        ? { email: identifierTrimmed.toLowerCase() }
+        : { studentId: identifierTrimmed };
+
+      const user = await User.findOne(query).select("+password");
       if (!user || !user.isActive) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -115,6 +124,7 @@ router.post("/login", async (req, res) => {
           id: user._id,
           name: user.name,
           email: user.email,
+          studentId: user.studentId,
           role: user.role,
         },
       });

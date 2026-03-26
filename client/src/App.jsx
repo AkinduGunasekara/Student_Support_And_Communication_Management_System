@@ -75,7 +75,7 @@ const LoginPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const email = formData.get("email");
+    const identifier = formData.get("identifier");
     const password = formData.get("password");
 
     try {
@@ -84,7 +84,7 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       });
 
       if (!response.ok) {
@@ -126,12 +126,13 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Email
+              Email or Student ID
             </label>
             <input
-              type="email"
-              name="email"
+              type="text"
+              name="identifier"
               required
+              placeholder="student1@example.com or IT22123456"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -179,6 +180,7 @@ const RegisterPage = () => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
+    const studentId = formData.get("studentId");
     const name = formData.get("name");
     const email = formData.get("email");
     const password = formData.get("password");
@@ -207,6 +209,7 @@ const RegisterPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          studentId: role === "student" ? studentId : undefined,
           name,
           email,
           password,
@@ -252,6 +255,22 @@ const RegisterPage = () => {
           Create Your Account
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {selectedRole === "student" && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Student ID
+              </label>
+              <input
+                type="text"
+                name="studentId"
+                required
+                pattern="[A-Za-z]{2}\d{6,8}"
+                title="Student ID must look like IT22123456"
+                placeholder="IT22123456"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Name
