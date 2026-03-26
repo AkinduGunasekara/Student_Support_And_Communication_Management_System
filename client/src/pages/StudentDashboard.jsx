@@ -80,6 +80,16 @@ export const StudentDashboard = () => {
           </Link>
 
           <Link
+            to="/student/view-tickets"
+            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-emerald-400 transition"
+          >
+            <h2 className="text-xl font-semibold mb-2">My Tickets</h2>
+            <p className="text-slate-400">
+              Track your ticket status, responses, and updates from support.
+            </p>
+          </Link>
+
+          <Link
             to="/student/my-messages"
             className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-emerald-400 transition"
           >
