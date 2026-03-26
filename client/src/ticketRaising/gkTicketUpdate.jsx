@@ -175,11 +175,11 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
               onChange={handleChange}
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
             >
-              <option value="">-- Select Category --</option>
-              <option value="Registration">Course Registration</option>
-              <option value="Hostel">Hostel</option>
-              <option value="Library">Library</option>
-              <option value="Exam">Exam</option>
+              <option value="Select category">Select category</option>
+              <option value="Academic">Academic</option>
+              <option value="Complaint">Complaint</option>
+              <option value="Technical Issues">Technical Issues</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
