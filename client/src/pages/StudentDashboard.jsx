@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
+import { getMyFeedback, submitFeedback } from "../feedback/feedbackService";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+// Constants for star rating
+const STAR_FILLED = "★";
+const STAR_EMPTY = "☆";
+const MAX_RATING = 5;
 
 export const StudentDashboard = () => {
   const { token, user } = useAuth();
@@ -19,23 +22,11 @@ export const StudentDashboard = () => {
 
     setLoadingFeedback(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/feedback/my`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.message || "Failed to load feedback");
-        return;
-      }
-
-      const data = await response.json();
-      setFeedbackList(data);
+      const response = await getMyFeedback(token);
+      setFeedbackList(response.data);
     } catch (error) {
       console.error("Get feedback error:", error);
-      alert("Something went wrong while loading feedback.");
+      alert(error?.response?.data?.message || "Something went wrong while loading feedback.");
     } finally {
       setLoadingFeedback(false);
     }
@@ -49,25 +40,7 @@ export const StudentDashboard = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/feedback`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ticketId,
-          comment,
-          rating,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.message || "Failed to submit feedback");
-        return;
-      }
-
+      await submitFeedback({ ticketId, comment, rating }, token);
       alert("Feedback submitted successfully");
       setTicketId("");
       setComment("");
@@ -75,11 +48,12 @@ export const StudentDashboard = () => {
       fetchMyFeedback();
     } catch (error) {
       console.error("Submit feedback error:", error);
-      alert("Something went wrong while submitting feedback.");
+      alert(error?.response?.data?.message || "Something went wrong while submitting feedback.");
     }
   };
 
-  const renderStars = (value) => "★".repeat(value) + "☆".repeat(5 - value);
+  const renderStars = (value) =>
+    STAR_FILLED.repeat(value) + STAR_EMPTY.repeat(MAX_RATING - value);
 
   return (
     <AppLayout>
