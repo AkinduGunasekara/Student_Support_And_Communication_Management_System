@@ -3,8 +3,20 @@ import Counter from "../config/counter.js"
 
 const ticketSchema = new mongoose.Schema(
   {
-    ticketId: { type: String, unique: true},
-    studentId: {type: String,required: true},
+    /* userId: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User", 
+      required: true }, */
+
+    ticketId: { 
+      type: String, 
+      unique: true},
+
+    studentId: {
+      type: String,
+      required: true
+      // match: [/^IT\d{8}$/, "Format must be IT followed by 8 digits"],
+    },
     studentEmail: {
       type: String,
       required: true,
