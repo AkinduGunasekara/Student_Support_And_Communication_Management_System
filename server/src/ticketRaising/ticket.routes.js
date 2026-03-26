@@ -2,6 +2,7 @@ import express from "express";
 import {
   getAllComplaints,
   getComplaintById,
+  getMyComplaints,
   createComplaint,
   updateComplaint,
   deleteComplaint,
@@ -16,7 +17,8 @@ const router = express.Router();
  * ----------------------------------------
  */
 router.get("/getall", getAllComplaints);
-router.get("/reply", replyToComplaint);
+
+router.put("/:id/reply", replyToComplaint)
 
 /**
  * ----------------------------------------
@@ -24,6 +26,8 @@ router.get("/reply", replyToComplaint);
  * ----------------------------------------
  */
 router.get("/:id", getComplaintById);
+
+router.get("/my", getMyComplaints);
 
 /**
  * ----------------------------------------
