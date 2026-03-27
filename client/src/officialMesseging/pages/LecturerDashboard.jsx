@@ -7,9 +7,7 @@ import {
   answerMessage,
   getLecturerMessages,
   updateVisibility,
-  deleteMessage,
 } from "../services/messageService";
-import { Trash2, AlertCircle, RefreshCw } from "lucide-react";
 
 export default function LecturerDashboard() {
   const { token, user } = useAuth();
@@ -18,8 +16,6 @@ export default function LecturerDashboard() {
   const [loading, setLoading] = useState(true);
   const [answeringId, setAnsweringId] = useState(null);
   const [visibilityId, setVisibilityId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -137,24 +133,6 @@ export default function LecturerDashboard() {
     }
   };
 
-  const handleDeleteMessage = async (id) => {
-    try {
-      setDeletingId(id);
-      await deleteMessage(id, token);
-
-      setMessages((prev) => prev.filter((msg) => msg._id !== id));
-      setDeleteConfirm(null);
-
-      toast.success("Message deleted successfully");
-    } catch (error) {
-      const message =
-        error?.response?.data?.message || "Failed to delete message";
-      toast.error(message);
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   const facultyOptions = useMemo(() => {
     const unique = new Set(messages.map((msg) => msg.faculty).filter(Boolean));
     return Array.from(unique);
@@ -234,26 +212,26 @@ export default function LecturerDashboard() {
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
-          <div className="ui-card p-5 border-l-4 border-l-amber-500">
+          <div className="ui-card p-5">
             <p className="text-sm text-slate-600">Open Questions</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">{openCount}</h2>
           </div>
 
-          <div className="ui-card p-5 border-l-4 border-l-emerald-500">
+          <div className="ui-card p-5">
             <p className="text-sm text-slate-600">Answered Questions</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {answeredCount}
             </h2>
           </div>
 
-          <div className="ui-card p-5 border-l-4 border-l-blue-500">
+          <div className="ui-card p-5">
             <p className="text-sm text-slate-600">Published FAQs</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {publicCount}
             </h2>
           </div>
 
-          <div className="ui-card p-5 border-l-4 border-l-slate-400">
+          <div className="ui-card p-5">
             <p className="text-sm text-slate-600">Private Items</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {privateCount}
@@ -344,37 +322,7 @@ export default function LecturerDashboard() {
           ) : (
             <div className="space-y-5">
               {filteredMessages.map((msg) => (
-                <div key={msg._id} className="ui-card p-5 transition hover:shadow-md relative">
-                  {/* Delete Confirmation Modal */}
-                  {deleteConfirm === msg._id && (
-                    <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center z-50">
-                      <div className="bg-white rounded-xl p-6 shadow-xl">
-                        <div className="flex items-center gap-3 mb-4">
-                          <AlertCircle className="w-6 h-6 text-red-600" />
-                          <h3 className="text-lg font-bold text-slate-900">Delete Message?</h3>
-                        </div>
-                        <p className="text-slate-600 mb-6">
-                          Are you sure you want to delete this message? This action cannot be undone.
-                        </p>
-                        <div className="flex gap-3 justify-end">
-                          <button
-                            onClick={() => setDeleteConfirm(null)}
-                            className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition font-medium"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => handleDeleteMessage(msg._id)}
-                            disabled={deletingId === msg._id}
-                            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-medium disabled:opacity-50"
-                          >
-                            {deletingId === msg._id ? "Deleting..." : "Delete"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
+                <div key={msg._id} className="ui-card p-5 transition hover:shadow-md">
                   <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                     <div className="flex-1 space-y-4">
                       <div className="flex flex-wrap items-center gap-3">
@@ -489,15 +437,6 @@ export default function LecturerDashboard() {
                                 : "Publish to FAQ"}
                             </button>
                           )}
-
-                          <button
-                            onClick={() => setDeleteConfirm(msg._id)}
-                            disabled={deletingId === msg._id}
-                            className="rounded-2xl px-5 py-3 text-sm font-semibold border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition disabled:cursor-not-allowed disabled:opacity-70 flex items-center gap-2"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            Delete
-                          </button>
                         </div>
                       </div>
                     </div>

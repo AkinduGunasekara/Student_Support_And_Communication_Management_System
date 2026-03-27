@@ -197,5 +197,3 @@ export const StudentDashboard = () => {
     </AppLayout>
   );
 };
-
-

@@ -1,4 +1,19 @@
 
+import { Route, Routes, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { AuthProvider } from "./AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+
+import { LoginPage } from "./pages/LoginPage.jsx";
+import { RegisterPage } from "./pages/RegisterPage.jsx";
+import { StudentDashboard } from "./pages/StudentDashboard.jsx";
+import { AdminDashboard } from "./pages/AdminDashboard.jsx";
+
+import StudentAskQuestion from "./officialMesseging/pages/StudentAskQuestion.jsx";
+import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages.jsx";
+import OfficialLecturerDashboard from "./officialMessaging/pages/LecturerDashboard.jsx";
+import PublicFAQ from "./officialMessaging/pages/PublicFAQ.jsx";
+
 import GkAdminViewTicket from "./ticketRaising/gkAdminViewTicket.jsx";
 import GkTicketView from "./ticketRaising/gkTicketView.jsx";
 import GkTicketCreate from "./ticketRaising/gkTicketCreate.jsx";
@@ -110,5 +125,4 @@ export default function App() {
       </Routes>
     </AuthProvider>
   );
-};
-
+}
