@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+// import { AppLayout } from "../components/AppLayout";
 
 function GkTicketCreate({ closeModal, refreshTickets }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
-    accodamicYear: "",
+    accadomicYear: "",
     faculty: "",
     ticketCategory: "",
     description: "",
@@ -67,7 +68,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
     if (
       !formData.studentId ||
       !formData.studentEmail ||
-      !formData.accodamicYear ||
+      !formData.accadomicYear ||
       !formData.faculty ||
       !formData.ticketCategory ||
       !formData.description
@@ -97,7 +98,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
       setFormData({
         studentId: "",
         studentEmail: "",
-        accodamicYear: "",
+        accadomicYear: "",
         faculty: "",
         ticketCategory: "",
         description: "",
@@ -115,122 +116,106 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
   };
 
   return (
-    <div className="mt-0 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
-      <div className="mb-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-3 text-white">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          🎫 Raise New Ticket
-        </h2>
-        <p className="text-blue-100 text-sm mt-1">
-          Submit your issue to the university support team.
-        </p>
+    
+      <div className="mt-0 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
+        <div className="ui-card mb-4 bg-gradient-to-r from-blue-700 to-blue-600 p-5 text-white">
+          <h2 className="text-2xl font-bold"> 🎫 Raise New Ticket</h2>
+          <p className="mt-1 text-sm text-blue-200">Submit your issue to the university support team.</p>
+        </div>
+
+        <div className="ui-card p-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div>
+                <label className="ui-label">Student ID*</label>
+                <input
+                  type="text"
+                  name="studentId"
+                  value={formData.studentId}
+                  onChange={handleChange}
+                  placeholder="IT12345678"
+                  className="ui-input"
+                />
+                {errors.studentId && <p className="mt-1 text-sm text-red-600">{errors.studentId}</p>}
+              </div>
+
+              <div>
+                <label className="ui-label">Student Email*</label>
+                <input
+                  type="text"
+                  name="studentEmail"
+                  value={formData.studentEmail}
+                  onChange={handleChange}
+                  placeholder="student@my.sliit.lk"
+                  className="ui-input"
+                />
+                {errors.studentEmail && <p className="mt-1 text-sm text-red-600">{errors.studentEmail}</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div>
+                <label className="ui-label">Academic Year*</label>
+                <input
+                  type="text"
+                  name="accadomicYear"
+                  value={formData.accadomicYear}
+                  onChange={handleChange}
+                  placeholder="Academic Year"
+                  className="ui-input"
+                />
+              </div>
+
+              <div>
+                <label className="ui-label">Faculty*</label>
+                <input
+                  type="text"
+                  name="faculty"
+                  value={formData.faculty}
+                  onChange={handleChange}
+                  className="ui-input"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="ui-label">Ticket Category*</label>
+              <select
+                name="ticketCategory"
+                value={formData.ticketCategory}
+                onChange={handleChange}
+                className="ui-select"
+              >
+                <option value="">Select category</option>
+                <option value="Academic">Academic</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Technical Issues">Technical Issues</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="ui-label">Description*</label>
+              <textarea
+                name="description"
+                rows="4"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Describe your issue..."
+                className="ui-textarea"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full py-3 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {loading ? "Submitting..." : "Submit Ticket"}
+            </button>
+          </form>
+        </div>
       </div>
-
-      <form onSubmit={handleSubmit} className="space-y-5 p-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="font-semibold text-gray-700">Student ID*</label>
-            <input
-              type="text"
-              name="studentId"
-              value={formData.studentId}
-              onChange={handleChange}
-              placeholder="IT12345678"
-              className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
-            />
-            {errors.studentId && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.studentId}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="font-semibold text-gray-700">Student Email*</label>
-            <input
-              type="text"
-              name="studentEmail"
-              value={formData.studentEmail}
-              onChange={handleChange}
-              placeholder="student@my.sliit.lk"
-              className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
-            />
-            {errors.studentEmail && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.studentEmail}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="font-semibold text-gray-700">Academic Year*</label>
-            <input
-              type="text"
-              name="accodamicYear"
-              value={formData.accodamicYear}
-              onChange={handleChange}
-              placeholder="Accodamic Year"
-              className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-
-          <div>
-            <label className="font-semibold text-gray-700">Faculty*</label>
-            <input
-              type="text"
-              name="faculty"
-              value={formData.faculty}
-              onChange={handleChange}
-              placeholder="faculty"
-              className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-        </div>
-
-        
-
-        
-
-        <div>
-          <label className="font-semibold text-gray-700">Ticket Category*</label>
-          <select
-            name="ticketCategory"
-            value={formData.ticketCategory}
-            onChange={handleChange}
-            className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="">Select category</option>
-            <option value="Accademic">Accademic</option>
-            <option value="Complaint">Complaint</option>
-            <option value="Technical Issues">Technical Issues</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="font-semibold text-gray-700">Description*</label>
-          <textarea
-            name="description"
-            rows="4"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Describe your issue..."
-            className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-3 rounded-lg text-white ${
-            loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-500"
-          }`}
-        >
-          {loading ? "Submitting..." : "Submit Ticket"}
-        </button>
-      </form>
-    </div>
   );
 }
 

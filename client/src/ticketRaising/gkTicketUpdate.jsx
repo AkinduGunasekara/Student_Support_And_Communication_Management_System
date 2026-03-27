@@ -6,7 +6,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
-    accodamicYear: "",
+    accadomicYear: "",
     faculty: "",
     ticketCategory: "",
     description: "",
@@ -72,7 +72,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
     const requiredFields = [
       "studentId",
       "studentEmail",
-      "accodamicYear",
+      "accadomicYear",
       "faculty",
       "ticketCategory",
       "description",
@@ -127,6 +127,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
       </div>
 
       {/* Form */}
+      <div className="ui-card p-6 mt-5">
       <form onSubmit={handleSubmit} className="space-y-5 p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
@@ -163,7 +164,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
             <input
               type="text"
               name="accodamicYear"
-              value={formData.accodamicYear}
+              value={formData.accadomicYear}
               onChange={handleChange}
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
             />
@@ -216,6 +217,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
           {loading ? "Updating..." : "Update Ticket"}
         </button>
       </form>
+      </div>
     </div>
   );
 }

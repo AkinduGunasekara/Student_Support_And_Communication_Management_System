@@ -52,14 +52,10 @@ export const getMyComplaints = async (req, res) => {
   }
 }
 
-/**
- * ------------------------------------------------
- * Create New Complaint (Student Submit)
- * ------------------------------------------------
- */
+// create 
 export const createComplaint = async (req, res) => {
   try {
-    const { studentId, studentEmail, faculty, accodamicYear, ticketCategory, description } = req.body;
+    const { studentId, studentEmail, faculty, accadomicYear, ticketCategory, description } = req.body;
 
     const regex1 = /^IT\d{8}$/;
     const regex2 = /.+@.+\..+/
@@ -76,7 +72,7 @@ export const createComplaint = async (req, res) => {
       });
     }
 
-    if (!studentId || !studentEmail || !faculty || !accodamicYear || !ticketCategory || !description) {
+    if (!studentId || !studentEmail || !faculty || !accadomicYear || !ticketCategory || !description) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -84,7 +80,7 @@ export const createComplaint = async (req, res) => {
       /*userId: req.user._id,*/
       studentId,
       studentEmail,
-      accodamicYear,
+      accadomicYear,
       faculty,
       ticketCategory,
       description,
@@ -106,7 +102,7 @@ export const createComplaint = async (req, res) => {
  */
 export const updateComplaint = async (req, res) => {
   try {
-    const { studentId, studentEmail, faculty, accodamicYear, ticketCategory, description, status } =
+    const { studentId, studentEmail, faculty, accadomicYear, ticketCategory, description, status } =
       req.body;
 
     const regex1 = /^IT\d{8}$/;
@@ -129,12 +125,12 @@ export const updateComplaint = async (req, res) => {
       {
         studentId,
         studentEmail,
-        accodamicYear,
+        accadomicYear,
         faculty,
         ticketCategory,
         description,
       },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!updatedComplaint) {
@@ -204,7 +200,7 @@ export const replyToComplaint = async (req, res) => {
         replyMessage,
         status: "Resolved",
       },
-      { returnDocument: "after" } // replaces deprecated `new: true`
+      {  returnDocument: "after" } // replaces deprecated `new: true`
     );
 
     if (!complaint) {

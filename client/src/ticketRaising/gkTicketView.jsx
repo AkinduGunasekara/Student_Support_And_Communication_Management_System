@@ -148,7 +148,7 @@ function GkTicketView() {
                     <td className="p-3">{ticket.ticketId}</td>
                     <td className="p-3">{ticket.studentId}</td>
                     <td className="p-3">{ticket.studentEmail}</td>
-                    <td className="p-3">{ticket.accodamicYear}</td>
+                    <td className="p-3">{ticket.accadomicYear}</td>
                     <td className="p-3">{ticket.faculty}</td>
                     <td className="p-3">{ticket.ticketCategory}</td>
                     <td className="p-3 max-w-md whitespace-pre-line break-words">{ticket.description}</td>

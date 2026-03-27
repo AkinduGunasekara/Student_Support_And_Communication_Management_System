@@ -22,11 +22,11 @@ const ticketSchema = new mongoose.Schema(
       required: true,
       // match: [/.+@.+\..+/, "Please enter a valid email address"],
     },
-    accodamicYear:{
+    accadomicYear: {
       type: String,
       required: true,
     },
-    faculty:{
+    faculty: {
       type: String,
       required: true,
     },
