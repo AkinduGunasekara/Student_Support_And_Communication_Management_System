@@ -1,18 +1,17 @@
-
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
-import { LoginPage } from "./pages/LoginPage.jsx";
-import { RegisterPage } from "./pages/RegisterPage.jsx";
-import { StudentDashboard } from "./pages/StudentDashboard.jsx";
-import { AdminDashboard } from "./pages/AdminDashboard.jsx";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { StudentDashboard } from "./pages/StudentDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
 
-import StudentAskQuestion from "./officialMesseging/pages/StudentAskQuestion.jsx";
-import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages.jsx";
-import OfficialLecturerDashboard from "./officialMessaging/pages/LecturerDashboard.jsx";
-import PublicFAQ from "./officialMessaging/pages/PublicFAQ.jsx";
+import StudentAskQuestion from "./officialMessaging/pages/StudentAskQuestion";
+import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages";
+import OfficialLecturerDashboard from "./officialMessaging/pages/LecturerDashboard";
+import PublicFAQ from "./officialMessaging/pages/PublicFAQ";
 
 import GkAdminViewTicket from "./ticketRaising/gkAdminViewTicket.jsx";
 import GkTicketView from "./ticketRaising/gkTicketView.jsx";
