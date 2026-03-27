@@ -1,35 +1,107 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Route, Routes, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { AuthProvider } from "./AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { StudentDashboard } from "./pages/StudentDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
 
+import StudentAskQuestion from "./officialMessaging/pages/StudentAskQuestion";
+import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages";
+import OfficialLecturerDashboard from "./officialMessaging/pages/LecturerDashboard";
+import PublicFAQ from "./officialMessaging/pages/PublicFAQ";
+
+import gkAdminViewTicket from "./ticketRaising/gkAdminViewTicket";
+import gkTicketCreate from "./ticketRaising/gkTicketCreate";
+import gkTicketUpdate from "./ticketRaising/gkTicketUpdate";
+
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <AuthProvider>
+      <Toaster position="top-right" richColors />
+      <Routes>
+        {/* Root redirect to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/public-faq" element={<PublicFAQ />} />
 
-export default App
+        {/* Student Routes */}
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/ask-question"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentAskQuestion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/my-messages"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentMyMessages />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Lecturer Routes */}
+        <Route
+          path="/lecturer/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["lecturer", "admin"]}>
+              <OfficialLecturerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/view-tickets"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <gkAdminViewTicket />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ticket Routes */}
+        <Route
+          path="/ticket/create"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <gkTicketCreate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ticket/update/:id"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <gkTicketUpdate />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
+  );
+}
