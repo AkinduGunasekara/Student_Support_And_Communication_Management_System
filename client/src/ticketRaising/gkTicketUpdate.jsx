@@ -115,110 +115,111 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
   };
 
   return (
-    <div className="mt-0 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
-      {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-3 text-white">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          📝 Update Ticket
-        </h2>
-        <p className="text-blue-100 text-sm mt-1">
-          Modify and resubmit your ticket below.
-        </p>
-      </div>
+    <div className="mt-5 w-full max-w-3xl mx-auto font-sans">
+  {/* Header */}
+  <div className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
+    <h2 className="text-xl font-bold flex items-center gap-2">
+      📝 Update Ticket
+    </h2>
+    <p className="text-blue-100 text-sm mt-1">
+      Modify and resubmit your ticket below.
+    </p>
+  </div>
 
-      {/* Form */}
-      <div className="ui-card p-6 mt-5">
-      <form onSubmit={handleSubmit} className="space-y-5 p-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block font-semibold mb-2">Student ID*</label>
-            <input
-              type="text"
-              name="studentId"
-              value={formData.studentId}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
-              readOnly
-            />
-            {errors.studentId && (
-              <p className="text-red-600 text-sm mt-1">{errors.studentId}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-2">Student Email*</label>
-            <input
-              type="email"
-              name="studentEmail"
-              value={formData.studentEmail}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-            />
-            {errors.studentEmail && (
-              <p className="text-red-600 text-sm mt-1">{errors.studentEmail}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-2">Academic Year*</label>
-            <input
-              type="text"
-              name="accodamicYear"
-              value={formData.accadomicYear}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-2">Faculty*</label>
-            <input
-              type="text"
-              name="faculty"
-              value={formData.faculty}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-2">Ticket Category*</label>
-            <select
-              name="ticketCategory"
-              value={formData.ticketCategory}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-            >
-              <option value="Select category">Select category</option>
-              <option value="Accademic">Accademic</option>
-              <option value="Complaint">Complaint</option>
-              <option value="Technical Issues">Technical Issues</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block font-semibold mb-2">Description*</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100"
-              rows={4}
-            />
-          </div>
+  {/* Form Card */}
+  <div className="bg-white rounded-xl shadow-md border border-gray-200 p-5 mt-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Student ID */}
+        <div>
+          <label className="block font-semibold mb-1 text-sm">Student ID*</label>
+          <input
+            type="text"
+            name="studentId"
+            value={formData.studentId}
+            onChange={handleChange}
+            readOnly
+            className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm"
+          />
         </div>
 
-        <button
-          type="submit"
-          className="w-full py-3 rounded-lg text-white transition-all bg-blue-600 hover:bg-blue-500 shadow-md hover:shadow-lg"
-          disabled={loading}
-        >
-          {loading ? "Updating..." : "Update Ticket"}
-        </button>
-      </form>
+        {/* Student Email */}
+        <div>
+          <label className="block font-semibold mb-1 text-sm">Student Email*</label>
+          <input
+            type="email"
+            name="studentEmail"
+            value={formData.studentEmail}
+            onChange={handleChange}
+            className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm"
+          />
+        </div>
+
+        {/* Academic Year */}
+        <div>
+          <label className="block font-semibold mb-1 text-sm">Academic Year*</label>
+          <input
+            type="text"
+            name="accadomicYear"
+            value={formData.accadomicYear}
+            onChange={handleChange}
+            className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm"
+          />
+        </div>
+
+        {/* Faculty */}
+        <div>
+          <label className="block font-semibold mb-1 text-sm">Faculty*</label>
+          <input
+            type="text"
+            name="faculty"
+            value={formData.faculty}
+            onChange={handleChange}
+            className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm"
+          />
+        </div>
+
+        {/* Ticket Category */}
+        <div>
+          <label className="block font-semibold mb-1 text-sm">Ticket Category*</label>
+          <select
+            name="ticketCategory"
+            value={formData.ticketCategory}
+            onChange={handleChange}
+            className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm"
+          >
+            <option value="">Select category</option>
+            <option value="Academic">Academic</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Technical Issues">Technical Issues</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* Description */}
+        <div className="md:col-span-2">
+          <label className="block font-semibold mb-1 text-sm">Description*</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm resize-none"
+          />
+        </div>
       </div>
-    </div>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-500 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed transition-all"
+      >
+        {loading ? "Updating..." : "Update Ticket"}
+      </button>
+    </form>
+  </div>
+</div>
   );
 }
 
