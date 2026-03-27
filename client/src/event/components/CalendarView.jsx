@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 
-const CalendarView = ({ events }) => {
+const CalendarView = ({ events, onSelectEvent }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(null);
 
@@ -15,12 +16,10 @@ const CalendarView = ({ events }) => {
     year: "numeric",
   });
 
-  // 🔹 Generate days
   const days = [];
   for (let i = 0; i < firstDay; i++) days.push(null);
   for (let i = 1; i <= daysInMonth; i++) days.push(i);
 
-  // 🔹 Helper: get events for a day
   const getEventsForDay = (day) => {
     return events.filter((event) => {
       const d = new Date(event.date);
@@ -28,41 +27,46 @@ const CalendarView = ({ events }) => {
     });
   };
 
+  const typeColors = {
+    Seminar: "bg-red-500",
+    Workshop: "bg-orange-500",
+    Sports: "bg-green-500",
+    Other: "bg-slate-500",
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       {/* 🟦 CALENDAR */}
-      <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow">
+      <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
 
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">{monthName}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {monthName}
+          </h2>
 
           <div className="flex gap-2">
             <button
-              onClick={() =>
-                setCurrentDate(new Date(year, month - 1))
-              }
-              className="px-3 py-1 border rounded-lg"
+              onClick={() => setCurrentDate(new Date(year, month - 1))}
+              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100"
             >
-              Prev
+              <ChevronLeft size={16} />
             </button>
 
             <button
-              onClick={() =>
-                setCurrentDate(new Date(year, month + 1))
-              }
-              className="px-3 py-1 border rounded-lg"
+              onClick={() => setCurrentDate(new Date(year, month + 1))}
+              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100"
             >
-              Next
+              <ChevronRight size={16} />
             </button>
           </div>
         </div>
 
-        {/* Days header */}
-        <div className="grid grid-cols-7 text-sm text-gray-500 mb-2">
+        {/* Days */}
+        <div className="grid grid-cols-7 text-xs text-slate-500 mb-2">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-            <div key={d} className="text-center font-semibold">
+            <div key={d} className="text-center font-medium">
               {d}
             </div>
           ))}
@@ -77,29 +81,27 @@ const CalendarView = ({ events }) => {
               <div
                 key={index}
                 onClick={() => day && setSelectedDay(day)}
-                className={`h-28 p-2 rounded-xl border cursor-pointer flex flex-col
-                  ${day ? "hover:bg-blue-50" : "bg-gray-50"}
-                  ${selectedDay === day ? "bg-blue-100" : ""}
+                className={`h-28 p-2 rounded-xl border border-slate-200 cursor-pointer flex flex-col transition
+                  ${day ? "hover:bg-slate-50" : "bg-slate-50"}
+                  ${selectedDay === day ? "ring-2 ring-blue-500" : ""}
                 `}
               >
-                <span className="text-sm font-semibold">
+                <span className="text-xs font-semibold text-slate-700">
                   {day}
                 </span>
 
-                {/* 🔹 EVENTS INSIDE CELL */}
+                {/* Events */}
                 <div className="mt-1 space-y-1 overflow-hidden">
                   {dayEvents.slice(0, 2).map((event) => (
                     <div
                       key={event.id}
-                      className={`text-xs px-2 py-1 rounded text-white truncate
-                        ${
-                          event.type === "Seminar"
-                            ? "bg-blue-500"
-                            : event.type === "Workshop"
-                            ? "bg-green-500"
-                            : "bg-orange-500"
-                        }
-                      `}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectEvent(event);
+                      }}
+                      className={`text-[10px] px-2 py-1 rounded text-white truncate cursor-pointer ${
+                        typeColors[event.type] || typeColors.Other
+                      }`}
                     >
                       {event.title}
                     </div>
@@ -111,15 +113,15 @@ const CalendarView = ({ events }) => {
         </div>
       </div>
 
-      {/* 🟨 AGENDA PANEL */}
-      <div className="bg-white p-6 rounded-2xl shadow">
+      {/* 🟨 AGENDA */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
 
-        <h2 className="text-lg font-semibold mb-4">
+        <h2 className="text-md font-semibold text-slate-900 mb-4">
           Daily Agenda
         </h2>
 
         {!selectedDay && (
-          <p className="text-gray-400">
+          <p className="text-sm text-slate-400">
             Select a day to view events
           </p>
         )}
@@ -127,19 +129,21 @@ const CalendarView = ({ events }) => {
         {getEventsForDay(selectedDay).map((event) => (
           <div
             key={event.id}
-            className="mb-4 border-l-4 pl-3 py-2"
+            onClick={() => onSelectEvent(event)}
+            className="mb-4 border-l-4 pl-3 py-2 border-blue-500 cursor-pointer hover:bg-slate-50 rounded-lg transition"
           >
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500">
               {event.time}
             </p>
 
-            <h3 className="font-semibold">
+            <h3 className="text-sm font-semibold text-slate-900">
               {event.title}
             </h3>
 
-            <p className="text-sm text-gray-500">
-              📍 {event.location}
-            </p>
+            <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+              <MapPin size={12} />
+              <span>{event.location}</span>
+            </div>
           </div>
         ))}
       </div>

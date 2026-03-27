@@ -7,13 +7,13 @@ import EventDetailsModal from "../components/EventDetailsModal";
 
 const EventsPage = () => {
   const [view, setView] = useState("card");
-const [selectedEvent, setSelectedEvent] = useState(null);
-const [showModal, setShowModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
-const handleAddEvent = (newEvent) => {
-  setEvents((prev) => [...prev, newEvent]);
-};
-  // 🔹 TEMP DATA (later from backend)
+  const handleAddEvent = (newEvent) => {
+    setEvents((prev) => [...prev, newEvent]);
+  };
+
   const events = [
     {
       id: 1,
@@ -52,78 +52,89 @@ const handleAddEvent = (newEvent) => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* 🔹 Navbar */}
       <Navbar />
 
       <div className="p-6">
-        {/* 🔹 Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">
-            University Events
-          </h1>
-          <p className="text-gray-500">
+
+        {/* 🔵 HEADER (DASHBOARD STYLE) */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl p-6 mb-6 shadow">
+          <h1 className="text-2xl font-semibold">University Events</h1>
+          <p className="text-blue-100 text-sm mt-1">
             Discover and connect with your campus community
           </p>
         </div>
 
-        {/* 🔹 Toggle Buttons */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex gap-3">
-            <button
-              onClick={() => setView("card")}
-              className={`px-4 py-2 rounded-lg ${
-                view === "card"
-                  ? "bg-blue-600 text-white"
-                  : "bg-white border"
-              }`}
-            >
-              All Events
-            </button>
+        {/* 🔳 MAIN CARD CONTAINER */}
+        <div className="bg-white rounded-2xl shadow p-6">
 
+          {/* 🔹 TOP BAR */}
+          <div className="flex justify-between items-center mb-6">
+
+            {/* Tabs */}
+            <div className="flex bg-gray-100 rounded-xl p-1">
+              <button
+                onClick={() => setView("card")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  view === "card"
+                    ? "bg-white shadow text-blue-600"
+                    : "text-gray-600"
+                }`}
+              >
+                All Events
+              </button>
+
+              <button
+                onClick={() => setView("calendar")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  view === "calendar"
+                    ? "bg-white shadow text-blue-600"
+                    : "text-gray-600"
+                }`}
+              >
+                Calendar
+              </button>
+            </div>
+
+            {/* Add Button */}
             <button
-              onClick={() => setView("calendar")}
-              className={`px-4 py-2 rounded-lg ${
-                view === "calendar"
-                  ? "bg-blue-600 text-white"
-                  : "bg-white border"
-              }`}
+              onClick={() => setShowModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition"
             >
-              Calendar
+              + Add Event
             </button>
           </div>
 
-          {/* 🔹 Add Event Button (future use) */}
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
-            + Add Event
-          </button>
+          {/* 🔹 CONTENT */}
+          {view === "card" ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {events.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  onClick={setSelectedEvent}
+                />
+              ))}
+            </div>
+          ) : (
+            <CalendarView 
+            events={events} 
+            onSelectEvent={setSelectedEvent}
+          />
+          )}
         </div>
-
-        {/* 🔹 Content */}
-        {view === "card" ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onClick={setSelectedEvent}
-              />
-            ))}
-          </div>
-        ) : (
-          <CalendarView events={events} />
-        )}
       </div>
 
-      {/* 🔹 Modal */}
+      {/* 🔹 MODALS */}
       <EventModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={handleAddEvent}
-        />
-        <EventDetailsModal
+      />
+
+      <EventDetailsModal
         event={selectedEvent}
         onClose={() => setSelectedEvent(null)}
-        />
+      />
     </div>
   );
 };

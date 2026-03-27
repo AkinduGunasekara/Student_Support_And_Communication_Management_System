@@ -1,12 +1,21 @@
 import React from "react";
+import { X, Calendar, Clock, MapPin } from "lucide-react";
 
 const EventDetailsModal = ({ event, onClose }) => {
   if (!event) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
 
-      <div className="bg-white w-full max-w-3xl rounded-2xl overflow-hidden flex">
+      <div className="bg-white w-full max-w-3xl rounded-xl overflow-hidden flex shadow-lg border border-slate-200 relative">
+
+        {/* ❌ Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-500 hover:text-slate-800"
+        >
+          <X size={20} />
+        </button>
 
         {/* LEFT IMAGE */}
         <div className="w-1/2">
@@ -21,36 +30,43 @@ const EventDetailsModal = ({ event, onClose }) => {
         <div className="w-1/2 p-6 flex flex-col justify-between">
 
           <div>
-            <h2 className="text-2xl font-bold mb-3">
+            <h2 className="text-lg font-semibold text-slate-900 mb-3">
               {event.title}
             </h2>
 
-            <p className="text-gray-600 mb-2">
-              📅 {event.date}
-            </p>
+            {/* Meta Info */}
+            <div className="space-y-2 text-sm text-slate-600">
 
-            <p className="text-gray-600 mb-2">
-              ⏰ {event.time}
-            </p>
+              <div className="flex items-center gap-2">
+                <Calendar size={16} />
+                <span>{event.date}</span>
+              </div>
 
-            <p className="text-gray-600 mb-4">
-              📍 {event.location}
-            </p>
+              <div className="flex items-center gap-2">
+                <Clock size={16} />
+                <span>{event.time}</span>
+              </div>
 
-            <p className="text-gray-700">
+              <div className="flex items-center gap-2">
+                <MapPin size={16} />
+                <span>{event.location}</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-600 mt-4">
               This is a sample event description. Later you can connect real data from backend.
             </p>
           </div>
 
           {/* ACTIONS */}
           <div className="flex gap-3 mt-6">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
               Add to Calendar
             </button>
 
             <button
               onClick={onClose}
-              className="border px-4 py-2 rounded-lg"
+              className="border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-slate-100 transition"
             >
               Close
             </button>

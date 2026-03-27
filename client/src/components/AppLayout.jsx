@@ -12,6 +12,7 @@ import {
   MessagesSquare,
   ShieldCheck,
   X,
+  CalendarDays,
 } from "lucide-react";
 
 export const AppLayout = ({ children }) => {
@@ -42,6 +43,11 @@ export const AppLayout = ({ children }) => {
         to: "/public-faq",
         icon: MessageSquareMore,
       },
+      {
+        label: "My Events",
+        to: "/student/events",
+        icon: CalendarDays,
+      },
     ],
     lecturer: [
       {
@@ -54,6 +60,11 @@ export const AppLayout = ({ children }) => {
         to: "/public-faq",
         icon: MessageSquareMore,
       },
+      {
+        label: "My Events",
+        to: "/lecturer/events",
+        icon: CalendarDays,
+      }
     ],
     admin: [
       {
@@ -75,6 +86,11 @@ export const AppLayout = ({ children }) => {
         label: "Public FAQ",
         to: "/public-faq",
         icon: MessagesSquare,
+      },
+      {
+        label: "Event Management",
+        to: "/admin/events",
+        icon: CalendarDays,
       },
     ],
   };
