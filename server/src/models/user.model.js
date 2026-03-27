@@ -2,13 +2,41 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export const USER_ROLES = ["student", "lecturer", "admin"];
+export const FACULTIES = ["Computing", "Engineering", "Business"];
+export const COURSES = [
+    "Information Technology",
+    "Software Engineering",
+    "Cyber Security",
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "Electrical Engineering",
+    "Business Management",
+    "Accounting",
+    "Marketing",
+];
+export const COURSE_BY_FACULTY = {
+    Computing: ["Information Technology", "Software Engineering", "Cyber Security"],
+    Engineering: ["Mechanical Engineering", "Civil Engineering", "Electrical Engineering"],
+    Business: ["Business Management", "Accounting", "Marketing"],
+};
 
 const userSchema = new mongoose.Schema(
     {
+        studentId: {
+            type: String,
+            unique: true,
+            sparse: true,
+            trim: true,
+            match: [/^[A-Za-z]{2}\d{6,8}$/, "Please enter a valid Student ID"],
+            required: function () {
+                return this.role === "student";
+            },
+        },
         name: {
             type: String,
             required: true,
             trim: true,
+            match: [/^[A-Za-z]+(?:\s[A-Za-z]+)*$/, "Name can contain only alphabetic letters and spaces"],
         },
         email: {
             type: String,
@@ -31,12 +59,27 @@ const userSchema = new mongoose.Schema(
             default: "student",
             required: true,
         },
-        department: String,
-        course: String,
-        year: Number,
-        canCreateEvents: {
-         type: Boolean,
-            default: false
+        faculty: {
+            type: String,
+            enum: FACULTIES,
+            required: function () {
+                return this.role !== "admin";
+            },
+        },
+        course: {
+            type: String,
+            enum: COURSES,
+            required: function () {
+                return this.role !== "admin";
+            },
+        },
+        year: {
+            type: Number,
+            min: 1,
+            max: 4,
+            required: function () {
+                return this.role === "student";
+            },
         },
         isActive: {
             type: Boolean,
