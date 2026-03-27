@@ -58,12 +58,21 @@ export const LoginPage = () => {
   return (
     <div className="min-h-screen px-4 py-10 md:px-8">
       <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl md:grid-cols-2">
-        <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-8 py-10 text-white">
-          <p className="text-xs uppercase tracking-[0.16em] text-blue-100">Academic Atelier</p>
-          <h1 className="mt-8 text-4xl font-bold leading-tight">Student Support Portal</h1>
-          <p className="mt-4 max-w-sm text-sm text-blue-100">
-            Access tickets, official messaging, and personalized academic support in one modern workspace.
-          </p>
+        <section 
+          className="relative px-8 py-10 text-white overflow-hidden bg-cover bg-center"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(29, 78, 216, 0.7), rgba(37, 99, 235, 0.7)), url("https://images.unsplash.com/photo-1752920299180-e8fd9276c202?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="relative z-10">
+            <p className="text-xs uppercase tracking-[0.16em] text-blue-100">Academic Atelier</p>
+            <h1 className="mt-8 text-4xl font-bold leading-tight">Student Support Portal</h1>
+            <p className="mt-4 max-w-sm text-sm text-blue-100">
+              Access tickets, official messaging, and personalized academic support in one modern workspace.
+            </p>
+          </div>
         </section>
 
         <section className="px-8 py-10">
