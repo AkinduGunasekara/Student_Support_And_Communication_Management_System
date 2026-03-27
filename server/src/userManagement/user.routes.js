@@ -110,7 +110,7 @@ router.patch(
         if (year !== undefined) update.year = year;
   
         const user = await User.findByIdAndUpdate(req.params.id, update, {
-          new: true,
+          returnDocument: "after",
           runValidators: true,
         }).select("-password");
   

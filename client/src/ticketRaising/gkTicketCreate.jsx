@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { AppLayout } from "../components/AppLayout";
+// import { AppLayout } from "../components/AppLayout";
 
 function GkTicketCreate({ closeModal, refreshTickets }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
-    accodamicYear: "",
+    accadomicYear: "",
+    faculty: "",
     ticketCategory: "",
     description: "",
   });
@@ -67,7 +68,8 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
     if (
       !formData.studentId ||
       !formData.studentEmail ||
-      !formData.accodamicYear ||
+      !formData.accadomicYear ||
+      !formData.faculty ||
       !formData.ticketCategory ||
       !formData.description
     ) {
@@ -96,7 +98,8 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
       setFormData({
         studentId: "",
         studentEmail: "",
-        accodamicYear: "",
+        accadomicYear: "",
+        faculty: "",
         ticketCategory: "",
         description: "",
       });
@@ -113,10 +116,10 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
   };
 
   return (
-    <AppLayout>
-      <div className="ui-page max-w-4xl">
+    
+      <div className="mt-0 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
         <div className="ui-card mb-4 bg-gradient-to-r from-blue-700 to-blue-600 p-5 text-white">
-          <h2 className="text-2xl font-bold">Raise New Ticket</h2>
+          <h2 className="text-2xl font-bold"> 🎫 Raise New Ticket</h2>
           <p className="mt-1 text-sm text-blue-200">Submit your issue to the university support team.</p>
         </div>
 
@@ -150,16 +153,29 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
               </div>
             </div>
 
-            <div>
-              <label className="ui-label">Academic Year*</label>
-              <input
-                type="text"
-                name="accodamicYear"
-                value={formData.accodamicYear}
-                onChange={handleChange}
-                placeholder="Academic Year"
-                className="ui-input"
-              />
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div>
+                <label className="ui-label">Academic Year*</label>
+                <input
+                  type="text"
+                  name="accadomicYear"
+                  value={formData.accadomicYear}
+                  onChange={handleChange}
+                  placeholder="Academic Year"
+                  className="ui-input"
+                />
+              </div>
+
+              <div>
+                <label className="ui-label">Faculty*</label>
+                <input
+                  type="text"
+                  name="faculty"
+                  value={formData.faculty}
+                  onChange={handleChange}
+                  className="ui-input"
+                />
+              </div>
             </div>
 
             <div>
@@ -200,7 +216,6 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
           </form>
         </div>
       </div>
-    </AppLayout>
   );
 }
 

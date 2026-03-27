@@ -155,7 +155,7 @@ router.post("/login", async (req, res) => {
       }
 
       const updated = await User.findByIdAndUpdate(req.user._id, update, {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }).select("-password");
 

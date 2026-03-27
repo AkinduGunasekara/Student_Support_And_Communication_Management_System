@@ -13,9 +13,11 @@ import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages";
 import OfficialLecturerDashboard from "./officialMessaging/pages/LecturerDashboard";
 import PublicFAQ from "./officialMessaging/pages/PublicFAQ";
 
-import gkAdminViewTicket from "./ticketRaising/gkAdminViewTicket";
-import gkTicketCreate from "./ticketRaising/gkTicketCreate";
-import gkTicketUpdate from "./ticketRaising/gkTicketUpdate";
+import GkAdminViewTicket from "./ticketRaising/gkAdminViewTicket.jsx";
+import GkTicketView from "./ticketRaising/gkTicketView.jsx";
+import GkTicketCreate from "./ticketRaising/gkTicketCreate.jsx";
+import GkTicketUpdate from "./ticketRaising/gkTicketUpdate.jsx";
+import GkTicketDelete from "./ticketRaising/gkTicketDelete.jsx";
 
 export default function App() {
   return (
@@ -55,6 +57,15 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/student/view-ticket"
+          element={
+            //<ProtectedRoute allowedRoles={["student"]}>
+              <GkTicketView />
+            //</ProtectedRoute>
+          }
+        />
+
 
         {/* Lecturer Routes */}
         <Route
@@ -76,10 +87,10 @@ export default function App() {
           }
         />
         <Route
-          path="/admin/view-tickets"
+          path="/admin/view-ticket"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <gkAdminViewTicket />
+              <GkAdminViewTicket />
             </ProtectedRoute>
           }
         />
@@ -88,17 +99,26 @@ export default function App() {
         <Route
           path="/ticket/create"
           element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <gkTicketCreate />
-            </ProtectedRoute>
+            //<ProtectedRoute allowedRoles={["student"]}>
+              <GkTicketCreate />
+            //</ProtectedRoute>
           }
         />
         <Route
           path="/ticket/update/:id"
           element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <gkTicketUpdate />
-            </ProtectedRoute>
+            //<ProtectedRoute allowedRoles={["student"]}>
+              <GkTicketUpdate />
+            //</ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ticket/delete/:id"
+          element={
+            //<ProtectedRoute allowedRoles={["student"]}>
+              <GkTicketDelete />
+            //</ProtectedRoute>
           }
         />
       </Routes>

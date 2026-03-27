@@ -80,7 +80,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
         </p>
       </div>
 
-      <div className="p-5 space-y-5">
+      <div className="ui-card p-6 mt-5">
         {/* Ticket Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
@@ -105,7 +105,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
             <label className="block font-semibold text-gray-700 mb-1">Academic Year</label>
             <input
               type="text"
-              value={ticket.accodamicYear}
+              value={ticket.accadomicYear}
               readOnly
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />

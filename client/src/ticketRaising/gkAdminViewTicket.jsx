@@ -90,6 +90,7 @@ function gkAdminViewTicket() {
                   <th className="px-6 py-4 font-bold">Student ID</th>
                   <th className="px-6 py-4 font-bold">Email</th>
                   <th className="px-6 py-4 font-bold">Accodamic Year</th>
+                  <th className="px-6 py-4 font-bold">Faculty</th>
                   <th className="px-6 py-4 font-bold">Category</th>
                   <th className="px-6 py-4 font-bold">Subject</th>
                   <th className="px-6 py-4 font-bold">Status</th>
@@ -119,7 +120,11 @@ function gkAdminViewTicket() {
                       </td>
 
                       <td className="px-6 py-4 text-gray-600">
-                        {ticket.accodamicYear}
+                        {ticket.accadomicYear}
+                      </td>
+
+                      <td className="px-6 py-4 text-gray-600">
+                        {ticket.faculty}
                       </td>
 
                       <td className="px-6 py-4">

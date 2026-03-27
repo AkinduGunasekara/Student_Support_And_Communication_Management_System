@@ -38,6 +38,11 @@ export const AppLayout = ({ children }) => {
         icon: MessagesSquare,
       },
       {
+        label: "My Tickets",
+        to: "/student/view-ticket",
+        icon: MessagesSquare,
+      },
+      {
         label: "Public FAQ",
         to: "/public-faq",
         icon: MessageSquareMore,
@@ -68,7 +73,7 @@ export const AppLayout = ({ children }) => {
       },
       {
         label: "Ticket Center",
-        to: "/admin/view-tickets",
+        to: "/admin/view-ticket",
         icon: FileQuestion,
       },
       {
