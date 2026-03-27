@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { XCircle } from "lucide-react";
+import { AppLayout } from "../components/AppLayout.jsx";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import GkTicketCreate from "./gkTicketCreate.jsx";
@@ -72,15 +73,16 @@ function GkTicketView() {
   };
 
   return (
+    <AppLayout>
     <main className="font-sens-serif max-w-7xl mx-auto px-6 py-10">
       {/* Header Section */}
       <section className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-3xl font-extrabold text-on-surface tracking-tight mb-2">
-            Support & Assistance
+            My Tickets
           </h1>
           <p className="text-on-surface-variant max-w-2xl">
-            Submit new inquiries or track existing support requests regarding academics, finance, and campus IT services.
+          Raise a new ticket or monitor the status of your existing requests for academic or IT support.
           </p>
         </div>
         <button
@@ -261,6 +263,7 @@ function GkTicketView() {
         </div>
       )}
     </main>
+    </AppLayout>
   );
 }
 
