@@ -5,11 +5,13 @@ import { XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import GkTicketCreate from "./gkTicketCreate.jsx";
-import GkTicketUpdate from "./gkTicketUpdate.jsx";
-import GkTicketDelete from "./gkTicketDelete.jsx";
+import GkTicketCreate from "../ticketRaising/gkTicketCreate.jsx";
+import GkTicketUpdate from "../ticketRaising/gkTicketUpdate.jsx";
+import GkTicketDelete from "../ticketRaising/gkTicketDelete.jsx";
+import { useAuth } from "../AuthContext.jsx"; // Make sure this path is correct
 
 function GkTicketView() {
+  const { user } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -18,20 +20,23 @@ function GkTicketView() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [searchCategory, setSearchCategory] = useState("");
 
-  // Fetch all tickets
+  // Fetch logged-in user's tickets only
   const fetchTickets = async () => {
+    if (!user) return;
     setLoading(true);
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("ssc_token");
     if (!token) {
       toast.error("You are not logged in. Please login first.");
       navigate("/login");
       return;
     }
     try {
-      const res = await axios.get("http://localhost:5001/api/tickets/my", {
+      const res = await axios.get(`http://localhost:5001/api/tickets/my`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTickets(res.data);
+      // Filter tickets for this user only
+      const userTickets = res.data.filter(t => t.userId === user.id);
+      setTickets(userTickets);
     } catch (err) {
       console.error("Error fetching tickets:", err);
       toast.error("Failed to fetch tickets. Please try again later.");
@@ -42,18 +47,15 @@ function GkTicketView() {
 
   useEffect(() => {
     fetchTickets();
-  }, []);
+  }, [user]);
 
-  // Filter tickets
   const filteredTickets = tickets.filter(t =>
     t.ticketCategory?.toLowerCase().includes(searchCategory.toLowerCase())
   );
 
-  // Count tickets by status
   const pendingCount = tickets.filter(t => t.status === "Pending").length;
-  const inProgressCount = tickets.filter(t => t.status === "Resolved").length;
+  const resolvedCount = tickets.filter(t => t.status === "Resolved").length;
 
-  // Open update modal
   const handleEdit = (ticket) => {
     if (ticket.status === "Pending") {
       setSelectedTicket(ticket);
@@ -63,7 +65,6 @@ function GkTicketView() {
     }
   };
 
-  // Open delete modal
   const handleDelete = (ticket) => {
     if (ticket.status === "Pending") {
       setSelectedTicket(ticket);
@@ -101,7 +102,7 @@ function GkTicketView() {
         </div>
         <div className="bg-surface-container-lowest p-6 rounded-xl shadow-xl border-l-4 border-green-600 flex flex-col justify-between h-32">
           <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Resolved</span>
-          <span className="text-3xl font-extrabold text-on-surface">{inProgressCount}</span>
+          <span className="text-3xl font-extrabold text-on-surface">{resolvedCount}</span>
         </div>
         <div className="bg-surface-container-lowest p-6 rounded-xl shadow-xl border-l-4 border-yellow-400 flex flex-col justify-between h-32">
           <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Pending</span>
@@ -122,7 +123,7 @@ function GkTicketView() {
         </div>
       </section>
 
-      {/* Table Container */}
+      {/* Table */}
       <div className="font-sens-serif max-w-7xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
         {loading ? (
           <p className="text-center text-gray-600 py-10">Loading tickets...</p>
@@ -136,7 +137,8 @@ function GkTicketView() {
                   <th className="p-3">Ticket ID</th>
                   <th className="p-3">Student ID</th>
                   <th className="p-3">Email</th>
-                  <th className="p-3">Year</th>
+                  <th className="p-3">Faculty</th>
+                  <th className="p-3">Academic Year</th>
                   <th className="p-3">Category</th>
                   <th className="p-3">Subject</th>
                   <th className="p-3">Status</th>
@@ -149,6 +151,7 @@ function GkTicketView() {
                     <td className="p-3">{ticket.ticketId}</td>
                     <td className="p-3">{ticket.studentId}</td>
                     <td className="p-3">{ticket.studentEmail}</td>
+                    <td className="p-3">{ticket.faculty}</td>
                     <td className="p-3">{ticket.accodamicYear}</td>
                     <td className="p-3">{ticket.ticketCategory}</td>
                     <td className="p-3 max-w-md whitespace-pre-line break-words">{ticket.description}</td>

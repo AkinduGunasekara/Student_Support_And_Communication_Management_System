@@ -1,44 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useAuth } from "../AuthContext.jsx"; // adjust path
 
 function GkTicketCreate({ closeModal, refreshTickets }) {
+  const { user } = useAuth(); // get logged-in user
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
+    faculty: "",
     academicYear: "",
     ticketCategory: "",
     description: "",
   });
 
-  const [errors, setErrors] = useState({
-    studentId: "",
-    studentEmail: "",
-  });
-
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // Prefill user info
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        studentId: user.studentId || "",
+        studentEmail,
+        faculty,
+        academicYear,
+      }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     let error = "";
 
-    // Student ID validation (partial typing allowed)
-    if (name === "studentId") {
-      const typingRegex = /^IT\d{0,8}$/;
-      if (!typingRegex.test(value)) return;
-
-      const fullRegex = /^IT\d{8}$/;
-      if (!fullRegex.test(value)) {
-        error = "Invalid Student ID (Format: IT12345678)";
-      }
-    }
-
-    // Email validation (must end with @my.sliit.lk)
-    if (name === "studentEmail") {
-      const regex = /^[^\s@]+@my\.sliit\.lk$/;
-      if (!regex.test(value)) {
-        error = "Invalid email (format: student@my.sliit.lk)";
-      }
+    if (name === "studentId" && !/^IT\d{0,8}$/.test(value)) return;
+    if (name === "studentEmail" && !/^[^\s@]+@my\.sliit\.lk$/.test(value)) {
+      error = "Invalid email format (student@my.sliit.lk)";
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -48,21 +46,26 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const idValid = /^IT\d{8}$/.test(formData.studentId);
-    const emailValid = /^[^\s@]+@my\.sliit\.lk$/.test(formData.studentEmail);
-
-    if (
-      !formData.studentId ||
-      !formData.studentEmail ||
-      !formData.academicYear ||
-      !formData.ticketCategory ||
-      !formData.description
-    ) {
-      return toast.error("All fields are required");
+    // Validate required fields
+    const requiredFields = [
+      "studentId",
+      "studentEmail",
+      "faculty",
+      "academicYear",
+      "ticketCategory",
+      "description",
+    ];
+    for (let field of requiredFields) {
+      if (!formData[field]) {
+        return toast.error("All fields are required");
+      }
     }
 
-    if (!idValid) return toast.error("Invalid Student ID");
-    if (!emailValid) return toast.error("Invalid Email Address");
+    // Validate Student ID & Email
+    if (!/^IT\d{8}$/.test(formData.studentId))
+      return toast.error("Invalid Student ID");
+    if (!/^[^\s@]+@my\.sliit\.lk$/.test(formData.studentEmail))
+      return toast.error("Invalid email address");
 
     setLoading(true);
 
@@ -73,24 +76,21 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       toast.success("Ticket submitted successfully!", { position: "top-center" });
-
       refreshTickets?.();
       closeModal?.();
 
-      setFormData({
-        studentId: "",
-        studentEmail: "",
-        academicYear: "",
+      // Reset form
+      setFormData((prev) => ({
+        ...prev,
         ticketCategory: "",
         description: "",
-      });
-      setErrors({ studentId: "", studentEmail: "" });
+      }));
+      setErrors({});
     } catch (err) {
       toast.error(err.response?.data?.message || "Error submitting ticket");
     } finally {
@@ -120,10 +120,8 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
               onChange={handleChange}
               placeholder="IT12345678"
               className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
+              disabled
             />
-            {errors.studentId && (
-              <p className="text-red-500 text-sm mt-1">{errors.studentId}</p>
-            )}
           </div>
 
           <div>
@@ -135,23 +133,35 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
               onChange={handleChange}
               placeholder="student@my.sliit.lk"
               className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
+              disabled
             />
-            {errors.studentEmail && (
-              <p className="text-red-500 text-sm mt-1">{errors.studentEmail}</p>
-            )}
           </div>
-        </div>
 
-        <div>
-          <label className="font-semibold text-gray-700">Academic Year*</label>
-          <input
-            type="text"
-            name="academicYear"
-            value={formData.academicYear}
-            onChange={handleChange}
-            placeholder="Academic Year"
-            className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
-          />
+          <div>
+            <label className="font-semibold text-gray-700">Faculty*</label>
+            <input
+              type="text"
+              name="faculty"
+              value={formData.faculty}
+              onChange={handleChange}
+              placeholder="Faculty"
+              className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
+              disabled
+            />
+          </div>
+
+          <div>
+            <label className="font-semibold text-gray-700">Academic Year*</label>
+            <input
+              type="text"
+              name="academicYear"
+              value={formData.academicYear}
+              onChange={handleChange}
+              placeholder="Academic Year"
+              className="w-full bg-gray-100 border border-gray-300 p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400"
+              disabled
+            />
+          </div>
         </div>
 
         <div>
