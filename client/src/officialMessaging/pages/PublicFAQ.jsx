@@ -76,37 +76,37 @@ export default function PublicFAQ() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-slate-50 px-4 py-6 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 text-white shadow-lg">
-          <p className="text-sm font-medium text-blue-100">Official Messaging</p>
+        <div className="ui-card mb-6 rounded-3xl bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white shadow-lg">
+          <p className="text-sm font-medium text-blue-200">Official Messaging</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight">Public FAQ</h1>
-          <p className="mt-2 max-w-2xl text-sm text-blue-100">
+          <p className="mt-2 max-w-2xl text-sm text-blue-200">
             Browse officially answered public questions by faculty, course, and
             keyword.
           </p>
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Total Public FAQs</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Total Public FAQs</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">{totalFaq}</h2>
           </div>
 
-          <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Filtered Results</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Filtered Results</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {totalFiltered}
             </h2>
           </div>
 
-          <div className="rounded-3xl border border-purple-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Faculties Covered</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Faculties Covered</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {facultyCount}
             </h2>
           </div>
         </div>
 
-        <div className="mb-6 rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+        <div className="ui-card mb-6 p-6">
           <div className="grid gap-4 md:grid-cols-3">
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -117,7 +117,7 @@ export default function PublicFAQ() {
                 placeholder="Search subject, question, answer..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                className="ui-input"
               />
             </div>
 
@@ -131,7 +131,7 @@ export default function PublicFAQ() {
                   setFaculty(e.target.value);
                   setCourse("");
                 }}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                className="ui-select"
               >
                 <option value="">All Faculties</option>
                 <option value="Computing">Computing</option>
@@ -147,7 +147,7 @@ export default function PublicFAQ() {
               <select
                 value={course}
                 onChange={(e) => setCourse(e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                className="ui-select"
               >
                 <option value="">All Courses</option>
                 {availableCourses.map((courseOption) => (
@@ -160,9 +160,9 @@ export default function PublicFAQ() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+        <div className="ui-card p-6">
           {loading ? (
-            <div className="py-16 text-center text-slate-500">
+            <div className="py-16 text-center text-slate-600">
               Loading public FAQ...
             </div>
           ) : filteredMessages.length === 0 ? (
@@ -170,17 +170,14 @@ export default function PublicFAQ() {
               <p className="text-lg font-semibold text-slate-700">
                 No public FAQ found
               </p>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 Try changing your search or filters.
               </p>
             </div>
           ) : (
             <div className="space-y-5">
               {filteredMessages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
-                >
+                <div key={msg._id} className="ui-card p-5 transition hover:shadow-md">
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-wrap items-center gap-3">
@@ -192,13 +189,13 @@ export default function PublicFAQ() {
                         </span>
                       </div>
 
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-600">
                         {msg.faculty || "-"} • {msg.course || "-"} • Year{" "}
                         {msg.academicYear || "-"} • Semester{" "}
                         {msg.semester || "-"}
                       </p>
 
-                      <div className="rounded-2xl bg-slate-50 p-4">
+                      <div className="ui-card-soft p-4">
                         <p className="text-sm font-semibold text-slate-700">
                           Question
                         </p>
@@ -207,7 +204,7 @@ export default function PublicFAQ() {
                         </p>
                       </div>
 
-                      <div className="rounded-2xl bg-blue-50 p-4">
+                      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
                         <p className="text-sm font-semibold text-blue-700">
                           Official Answer
                         </p>
@@ -217,7 +214,7 @@ export default function PublicFAQ() {
                       </div>
                     </div>
 
-                    <div className="w-full rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 md:max-w-xs">
+                    <div className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 md:max-w-xs">
                       <p>
                         <span className="font-semibold">Answered By:</span>{" "}
                         {msg.answeredBy?.name || "Lecturer"}
@@ -245,3 +242,4 @@ export default function PublicFAQ() {
     </div>
   );
 }
+

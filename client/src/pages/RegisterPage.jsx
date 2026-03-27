@@ -113,59 +113,59 @@ export const RegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 shadow-2xl rounded-3xl p-8">
-        <h1 className="text-3xl font-bold text-white mb-2 text-center">
-          Create Account
-        </h1>
-        <p className="text-slate-400 text-center mb-6">
-          Register to access the portal
-        </p>
+    <div className="min-h-screen px-4 py-10 md:px-8">
+      <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl md:grid-cols-[1fr_1.2fr]">
+        <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-8 py-10 text-white">
+          <p className="text-xs uppercase tracking-[0.16em] text-blue-100">Academic Atelier</p>
+          <h1 className="mt-8 text-4xl font-bold leading-tight">Join the Academic Network</h1>
+          <p className="mt-4 max-w-sm text-sm text-blue-100">
+            Create your account to manage support tickets, communicate with lecturers, and track important updates.
+          </p>
+        </section>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <section className="px-8 py-10">
+          <h2 className="text-3xl font-bold text-slate-900">Create Account</h2>
+          <p className="mt-2 text-sm text-slate-500">Register with institutional details to get started.</p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Name
-            </label>
+            <label className="ui-label">Name</label>
             <input
               type="text"
               name="name"
               required
               pattern="[A-Za-z]+(\s[A-Za-z]+)*"
               title="Name can contain only alphabetic letters and spaces"
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="ui-input"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Email
-            </label>
+            <label className="ui-label">Email</label>
             <input
               type="email"
               name="email"
               required
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="ui-input"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Password
-            </label>
+            <label className="ui-label">Password</label>
             <input
               type="password"
               name="password"
               minLength={6}
               required
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              title="Password must be at least 6 characters"
+              placeholder="At least 6 characters"
+              className="ui-input"
             />
+            <p className="mt-1 text-xs text-slate-500">Minimum 6 characters required</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Role
-            </label>
+            <label className="ui-label">Role</label>
             <select
               name="role"
               required
@@ -174,7 +174,7 @@ export const RegisterPage = () => {
                 const nextRole = event.target.value;
                 setSelectedRole(nextRole);
               }}
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="ui-select"
             >
               <option value="student">Student</option>
               <option value="lecturer">Lecturer</option>
@@ -182,9 +182,7 @@ export const RegisterPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Faculty
-            </label>
+            <label className="ui-label">Faculty</label>
             <select
               name="faculty"
               required
@@ -197,7 +195,7 @@ export const RegisterPage = () => {
                   setSelectedCourse("");
                 }
               }}
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="ui-select"
             >
               <option value="" disabled>
                 Select faculty
@@ -212,16 +210,14 @@ export const RegisterPage = () => {
 
           {["student", "lecturer"].includes(selectedRole) && (
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Course
-              </label>
+              <label className="ui-label">Course</label>
               <select
                 name="course"
                 required
                 value={selectedCourse}
                 onChange={(event) => setSelectedCourse(event.target.value)}
                 disabled={!selectedFaculty}
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="ui-select"
               >
                 <option value="" disabled>
                   {selectedFaculty ? "Select course" : "Select faculty first"}
@@ -237,14 +233,12 @@ export const RegisterPage = () => {
 
           {selectedRole === "student" && (
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Year
-              </label>
+              <label className="ui-label">Year</label>
               <select
                 name="year"
                 required
                 defaultValue=""
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="ui-select"
               >
                 <option value="" disabled>
                   Select year
@@ -260,36 +254,29 @@ export const RegisterPage = () => {
 
           {selectedRole === "student" && (
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Student ID
-              </label>
+              <label className="ui-label">Student ID</label>
               <input
                 type="text"
                 name="studentId"
                 required
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="ui-input"
                 placeholder="e.g., STU001"
               />
             </div>
           )}
 
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-cyan-500 text-slate-950 font-semibold py-3 hover:bg-cyan-400 transition"
-          >
-            Register
+          <button type="submit" className="btn-primary w-full px-4 py-3">
+            Create Account
           </button>
 
-          <p className="text-sm text-slate-400 text-center">
+          <p className="text-center text-sm text-slate-500">
             Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-cyan-400 hover:underline font-medium"
-            >
-              Login
+            <Link to="/login" className="font-semibold text-blue-700 hover:text-blue-800">
+              Sign in
             </Link>
           </p>
         </form>
+        </section>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../AuthContext.jsx"; // adjust path
+import { AppLayout } from "../components/AppLayout";
 
 function GkTicketCreate({ closeModal, refreshTickets }) {
   const { user } = useAuth(); // get logged-in user
@@ -99,16 +100,13 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
   };
 
   return (
-    <div className="mt-0 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
-      <div className="mb-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-3 text-white">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          🎫 Raise New Ticket
-        </h2>
-        <p className="text-blue-100 text-sm mt-1">
-          Submit your issue to the university support team.
-        </p>
-      </div>
-
+    <AppLayout>
+      <div className="ui-page max-w-4xl">
+        <div className="ui-card mb-4 bg-gradient-to-r from-blue-700 to-blue-600 p-5 text-white">
+          <h2 className="text-2xl font-bold">Raise New Ticket</h2>
+          <p className="mt-1 text-sm text-blue-200">Submit your issue to the university support team.</p>
+        </div>
+          
       <form onSubmit={handleSubmit} className="space-y-5 p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
@@ -203,6 +201,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
         </button>
       </form>
     </div>
+    </AppLayout>
   );
 }
 

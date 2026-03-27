@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
+import { UserProfile } from "../components/UserProfile";
 import { getMyFeedback, submitFeedback } from "../feedback/feedbackService";
 
 // Constants for star rating
@@ -57,24 +58,26 @@ export const StudentDashboard = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-3xl p-8 shadow-2xl mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Student Dashboard
-          </h1>
-          <p className="text-white/90">
+      <div className="ui-page">
+        <div className="ui-card mb-6 bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white">
+          <h1 className="text-3xl font-bold">Student Dashboard</h1>
+          <p className="mt-2 text-blue-200">
             Welcome {user?.name || "Student"} — manage feedback and access
             official messaging.
           </p>
         </div>
 
+        <div id="profile-section" className="mb-8">
+          <UserProfile />
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-6 mb-8">
           <Link
             to="/student/ask-question"
-            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-cyan-400 transition"
+            className="ui-card p-6 transition hover:-translate-y-0.5"
           >
-            <h2 className="text-xl font-semibold mb-2">Ask Official Question</h2>
-            <p className="text-slate-400">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Ask Official Question</h2>
+            <p className="text-slate-600">
               Send academic or official questions to lecturers.
             </p>
           </Link>
@@ -91,57 +94,53 @@ export const StudentDashboard = () => {
 
           <Link
             to="/student/my-messages"
-            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-emerald-400 transition"
+            className="ui-card p-6 transition hover:-translate-y-0.5"
           >
-            <h2 className="text-xl font-semibold mb-2">My Messages</h2>
-            <p className="text-slate-400">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">My Messages</h2>
+            <p className="text-slate-600">
               View answers, status, and recent official communication.
             </p>
           </Link>
 
           <Link
             to="/public-faq"
-            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-purple-400 transition"
+            className="ui-card p-6 transition hover:-translate-y-0.5"
           >
-            <h2 className="text-xl font-semibold mb-2">Public FAQ</h2>
-            <p className="text-slate-400">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Public FAQ</h2>
+            <p className="text-slate-600">
               Browse public answered questions from lecturers and admins.
             </p>
           </Link>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <h2 className="text-2xl font-semibold mb-4">Submit Feedback</h2>
-            <p className="text-sm text-slate-400 mb-4">
+          <section className="ui-card p-6">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-4">Submit Feedback</h2>
+            <p className="text-sm text-slate-600 mb-4">
               Submit feedback for a resolved ticket response using a 1 to 5 star
               rating.
             </p>
 
             <form onSubmit={handleSubmitFeedback} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Ticket ID
-                </label>
+                <label className="ui-label">Ticket ID</label>
                 <input
                   type="text"
                   value={ticketId}
                   onChange={(event) => setTicketId(event.target.value)}
                   placeholder="Example: t001"
                   required
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="ui-input"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Star Rating
-                </label>
+                <label className="ui-label">Star Rating</label>
                 <select
                   value={rating}
                   onChange={(event) => setRating(Number(event.target.value))}
                   required
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="ui-select"
                 >
                   <option value={1}>1</option>
                   <option value={2}>2</option>
@@ -152,47 +151,42 @@ export const StudentDashboard = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Comment
-                </label>
+                <label className="ui-label">Comment</label>
                 <textarea
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
                   required
                   rows={4}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="ui-textarea"
                   placeholder="Write your feedback"
                 />
               </div>
 
-              <button
-                type="submit"
-                className="rounded-xl bg-cyan-500 text-slate-950 font-semibold py-3 px-5 hover:bg-cyan-400 transition"
-              >
+              <button type="submit" className="btn-primary px-5 py-3">
                 Submit Feedback
               </button>
             </form>
           </section>
 
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <h2 className="text-2xl font-semibold mb-4">My Feedback</h2>
+          <section className="ui-card p-6">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-4">My Feedback</h2>
 
             {loadingFeedback ? (
-              <p className="text-slate-400">Loading feedback...</p>
+              <p className="text-slate-600">Loading feedback...</p>
             ) : feedbackList.length === 0 ? (
-              <p className="text-slate-400">No feedback submitted yet.</p>
+              <p className="text-slate-600">No feedback submitted yet.</p>
             ) : (
               <div className="space-y-3">
                 {feedbackList.map((item) => (
                   <div
                     key={item._id}
-                    className="border border-slate-700 rounded-2xl p-4 bg-slate-800"
+                    className="ui-card-soft p-4"
                   >
-                    <p className="font-medium text-white">Ticket: {item.ticketId}</p>
-                    <p className="text-sm text-slate-300 mt-1">
+                    <p className="font-medium text-slate-900">Ticket: {item.ticketId}</p>
+                    <p className="text-sm text-slate-600 mt-1">
                       Rating: {item.rating}/5 ({renderStars(item.rating)})
                     </p>
-                    <p className="mt-2 text-slate-200">{item.comment}</p>
+                    <p className="mt-2 text-slate-700">{item.comment}</p>
                   </div>
                 ))}
               </div>
@@ -203,3 +197,5 @@ export const StudentDashboard = () => {
     </AppLayout>
   );
 };
+
+

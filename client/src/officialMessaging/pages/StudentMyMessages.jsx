@@ -7,6 +7,7 @@ import {
 } from "../services/messageService";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { AppLayout } from "../../components/AppLayout";
 
 export default function StudentMyMessages() {
   const { token } = useAuth();
@@ -98,49 +99,49 @@ export default function StudentMyMessages() {
   const unreadCount = messages.filter((msg) => !msg.studentNotified).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-slate-50 px-4 py-6 md:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 text-white shadow-lg">
-          <p className="text-sm font-medium text-blue-100">
+    <AppLayout>
+      <div className="ui-page">
+        <div className="ui-card mb-6 bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white shadow-lg">
+          <p className="text-sm font-medium text-blue-200">
             Student Support & Communication System
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight">
             My Messages
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-blue-100">
+          <p className="mt-2 max-w-2xl text-sm text-blue-200">
             View your submitted questions, official replies, visibility status,
             and notification updates in one place.
           </p>
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-3xl border border-blue-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Open Messages</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Open Messages</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">{openCount}</h2>
           </div>
 
-          <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Answered Messages</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Answered Messages</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {answeredCount}
             </h2>
           </div>
 
-          <div className="rounded-3xl border border-amber-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Unread Updates</p>
+          <div className="ui-card p-5">
+            <p className="text-sm text-slate-600">Unread Updates</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-900">
               {unreadCount}
             </h2>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm md:p-8">
+        <div className="ui-card p-6 md:p-8">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
                 Submitted Questions
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-600">
                 Track status, read lecturer replies, and manage open requests.
               </p>
             </div>
@@ -149,7 +150,7 @@ export default function StudentMyMessages() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                className="ui-select"
               >
                 <option value="ALL">All Status</option>
                 <option value="OPEN">Open</option>
@@ -159,7 +160,7 @@ export default function StudentMyMessages() {
 
               <Link
                 to="/student/ask-question"
-                className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                className="btn-primary inline-flex items-center justify-center px-5 py-3"
               >
                 Ask New Question
               </Link>
@@ -167,7 +168,7 @@ export default function StudentMyMessages() {
           </div>
 
           {loading ? (
-            <div className="py-16 text-center text-slate-500">
+            <div className="py-16 text-center text-slate-600">
               Loading messages...
             </div>
           ) : filteredMessages.length === 0 ? (
@@ -175,12 +176,12 @@ export default function StudentMyMessages() {
               <p className="text-lg font-semibold text-slate-700">
                 No messages found
               </p>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-600">
                 You haven&apos;t sent any questions for this filter yet.
               </p>
               <Link
                 to="/student/ask-question"
-                className="mt-5 inline-flex rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                className="btn-primary mt-5 inline-flex px-5 py-3"
               >
                 Send Your First Question
               </Link>
@@ -188,10 +189,7 @@ export default function StudentMyMessages() {
           ) : (
             <div className="space-y-5">
               {filteredMessages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
-                >
+                <div key={msg._id} className="ui-card p-5 transition hover:shadow-md">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-wrap items-center gap-3">
@@ -228,12 +226,12 @@ export default function StudentMyMessages() {
                         </span>
                       </div>
 
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-600">
                         {msg.faculty || "-"} • {msg.course || "-"} • Year{" "}
                         {msg.academicYear || "-"} • Semester {msg.semester || "-"}
                       </p>
 
-                      <div className="rounded-2xl bg-slate-50 p-4">
+                      <div className="ui-card-soft p-4">
                         <p className="text-sm font-semibold text-slate-700">
                           Question
                         </p>
@@ -243,7 +241,7 @@ export default function StudentMyMessages() {
                       </div>
 
                       {msg.answer ? (
-                        <div className="rounded-2xl bg-blue-50 p-4">
+                        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
                           <p className="text-sm font-semibold text-blue-700">
                             Official Reply
                           </p>
@@ -252,7 +250,7 @@ export default function StudentMyMessages() {
                           </p>
                         </div>
                       ) : (
-                        <div className="rounded-2xl bg-amber-50 p-4">
+                        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                           <p className="text-sm font-medium text-amber-700">
                             Waiting for lecturer response
                           </p>
@@ -260,7 +258,7 @@ export default function StudentMyMessages() {
                       )}
                     </div>
 
-                    <div className="w-full rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 lg:max-w-xs">
+                    <div className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 lg:max-w-xs">
                       <p>
                         <span className="font-semibold">Student ID:</span>{" "}
                         {msg.studentRegistrationId || "-"}
@@ -295,7 +293,7 @@ export default function StudentMyMessages() {
                           <button
                             onClick={() => handleMarkSeen(msg._id)}
                             disabled={markingId === msg._id}
-                            className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="btn-primary rounded-2xl px-4 py-2 disabled:cursor-not-allowed disabled:opacity-70"
                           >
                             {markingId === msg._id
                               ? "Updating..."
@@ -307,7 +305,7 @@ export default function StudentMyMessages() {
                           <button
                             onClick={() => handleDelete(msg._id)}
                             disabled={deletingId === msg._id}
-                            className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-70"
                           >
                             {deletingId === msg._id
                               ? "Deleting..."
@@ -323,6 +321,7 @@ export default function StudentMyMessages() {
           )}
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }
+

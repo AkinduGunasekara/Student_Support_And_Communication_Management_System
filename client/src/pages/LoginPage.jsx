@@ -56,58 +56,49 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 shadow-2xl rounded-3xl p-8">
-        <h1 className="text-3xl font-bold text-white mb-2 text-center">
-          Welcome Back
-        </h1>
-        <p className="text-slate-400 text-center mb-6">
-          Login to access the Student Support Portal
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Email or Student ID
-            </label>
-            <input
-              type="text"
-              name="identifier"
-              required
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              placeholder="Enter your email or student ID"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              required
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-cyan-500 text-slate-950 font-semibold py-3 hover:bg-cyan-400 transition"
-          >
-            Login
-          </button>
-
-          <p className="text-sm text-slate-400 text-center">
-            Don&apos;t have an account?{" "}
-            <Link
-              to="/register"
-              className="text-cyan-400 hover:underline font-medium"
-            >
-              Register
-            </Link>
+    <div className="min-h-screen px-4 py-10 md:px-8">
+      <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl md:grid-cols-2">
+        <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-8 py-10 text-white">
+          <p className="text-xs uppercase tracking-[0.16em] text-blue-100">Academic Atelier</p>
+          <h1 className="mt-8 text-4xl font-bold leading-tight">Student Support Portal</h1>
+          <p className="mt-4 max-w-sm text-sm text-blue-100">
+            Access tickets, official messaging, and personalized academic support in one modern workspace.
           </p>
-        </form>
+        </section>
+
+        <section className="px-8 py-10">
+          <h2 className="text-3xl font-bold text-slate-900">Sign In</h2>
+          <p className="mt-2 text-sm text-slate-500">Use your university credentials to continue.</p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <div>
+              <label className="ui-label">Email or Student ID</label>
+              <input
+                type="text"
+                name="identifier"
+                required
+                className="ui-input"
+                placeholder="name@university.edu"
+              />
+            </div>
+
+            <div>
+              <label className="ui-label">Password</label>
+              <input type="password" name="password" required className="ui-input" />
+            </div>
+
+            <button type="submit" className="btn-primary mt-2 w-full px-4 py-3">
+              Sign In
+            </button>
+
+            <p className="text-center text-sm text-slate-500">
+              Don&apos;t have an account?{" "}
+              <Link to="/register" className="font-semibold text-blue-700 hover:text-blue-800">
+                Create one
+              </Link>
+            </p>
+          </form>
+        </section>
       </div>
     </div>
   );

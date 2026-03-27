@@ -246,7 +246,7 @@ export default function QuestionForm({
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
           Ask a Question
         </h2>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-slate-600">
           Submit your academic or official question to the relevant lecturer or
           department.
         </p>
@@ -433,7 +433,7 @@ export default function QuestionForm({
             ) : (
               <span />
             )}
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-600">
               {formData.subject.length}/150 characters
             </p>
           </div>
@@ -458,14 +458,14 @@ export default function QuestionForm({
             ) : (
               <span />
             )}
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-600">
               {formData.question.length}/2000 characters
             </p>
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-4">
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-600">
             Make sure your question is clear, polite, and related to academic or
             official matters.
           </p>
