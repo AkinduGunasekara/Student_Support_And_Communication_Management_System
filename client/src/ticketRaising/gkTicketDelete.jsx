@@ -11,16 +11,16 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
     if (!ticketId) return;
 
     const fetchTicket = async () => {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        toast.error("You are not logged in. Please login first.");
-        return;
-      }
+      // const token = localStorage.getItem("authToken");
+      // if (!token) {
+      //   toast.error("You are not logged in. Please login first.");
+      //   return;
+      // }
 
       try {
         const res = await axios.get(
           `http://localhost:5001/api/tickets/${ticketId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          // { headers: { Authorization: `Bearer ${token}` } }
         );
         setTicket(res.data);
       } catch (err) {
@@ -38,16 +38,16 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this ticket?")) return;
 
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      toast.error("Unauthorized. Please login again.");
-      return;
-    }
+    // const token = localStorage.getItem("authToken");
+    // if (!token) {
+    //   toast.error("Unauthorized. Please login again.");
+    //   return;
+    // }
 
     try {
       await axios.delete(
         `http://localhost:5001/api/tickets/${ticketId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        // { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Ticket deleted successfully!", { position: "top-center" });
 
@@ -106,6 +106,15 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
             <input
               type="text"
               value={ticket.accodamicYear}
+              readOnly
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
+            />
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">Faculty</label>
+            <input
+              type="text"
+              value={ticket.faculty}
               readOnly
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />

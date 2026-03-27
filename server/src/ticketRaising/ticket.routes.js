@@ -8,14 +8,12 @@ import {
   deleteComplaint,
   replyToComplaint,
 } from "../ticketRaising/ticket.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
-
 
 const router = express.Router();
 
 /**
  * ----------------------------------------
- * Get All Complaints Admin side
+ * Get All Complaints
  * ----------------------------------------
  */
 router.get("/getall", getAllComplaints);
@@ -24,32 +22,32 @@ router.put("/:id/reply", replyToComplaint)
 
 /**
  * ----------------------------------------
- * Get logging user
+ * Get Complaint By ID
  * ----------------------------------------
  */
-router.get("/:id", authMiddleware, getComplaintById);
+router.get("/:id", getComplaintById);
 
-router.get("/my", authMiddleware, getMyComplaints);
+router.get("/my", getMyComplaints);
 
 /**
  * ----------------------------------------
  * Create New Complaint (Student Submit)
  * ----------------------------------------
  */
-router.post("/create", authMiddleware, createComplaint);
+router.post("/create", createComplaint);
 
 /**
  * ----------------------------------------
  * Update Full Complaint
  * ----------------------------------------
  */
-router.put("/:id", authMiddleware, updateComplaint);
+router.put("/:id", updateComplaint);
 
 /**
  * ----------------------------------------
  * Delete Complaint
  * ----------------------------------------
  */
-router.delete("/:id", authMiddleware, deleteComplaint);
+router.delete("/:id", deleteComplaint);
 
 export default router;

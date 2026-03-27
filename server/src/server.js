@@ -1,15 +1,17 @@
 import dotenv from "dotenv";
-dotenv.config();
-
 import express from "express";
 import cors from "cors";
-import authRouter from "./userManagement/auth.routes.js";
-import userRouter from "./userManagement/user.routes.js";
 import ticketRouter from "./ticketRaising/ticket.routes.js";
-import messageRouter from "./officialMessaging/message.routes.js";
-import feedbackRouter from "./feedback/feedback.routes.js";
+// import usersRoutes from "./routes/vd_usersRoutes.js";
+// import adminRoutes from "./routes/vd_adminRoutes.js";
 import { connectDB } from "./config/db.js";
+// import { initializeRentCronJobs } from "./jobs/sn_monthlyReminder.js";
+// import { initSocket } from "./socket.js";
+// import "./jobs/ks_ParcelRemaiderJob.js";
+// import searchRoutes from "./routes/vd_searchRoutes.js";
+// import { initializeParcelCronJobs } from "./jobs/ks_ParcelRemaiderJob.js";
 
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -26,16 +28,13 @@ app.use(
 //middleware
 app.use(express.json());
 
-app.use("/api/auth", authRouter);
-app.use("/api/users", userRouter);
 app.use("/api/tickets", ticketRouter);
-app.use("/api/messages", messageRouter);
-app.use("/api/feedback", feedbackRouter);
 
 app.listen(PORT, () => {
-  console.log("Server started on port:", PORT);
+    console.log("Server started on port:", PORT);
 
-  // initSocket(serverInstance);
-  // initializeRentCronJobs();
-  // initializeParcelCronJobs();
+    // initSocket(serverInstance);
+    // initializeRentCronJobs();
+    // initializeParcelCronJobs(); 
 });
+

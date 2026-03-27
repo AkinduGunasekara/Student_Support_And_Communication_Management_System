@@ -1,186 +1,69 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
-@import "tailwindcss";
+/* :root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-:root {
-  --brand-50: #eff6ff;
-  --brand-100: #dbeafe;
-  --brand-200: #bfdbfe;
-  --brand-300: #93c5fd;
-  --brand-500: #2563eb;
-  --brand-600: #1d4ed8;
-  --brand-700: #1e40af;
-  --ink-900: #0f172a;
-  --ink-700: #334155;
-  --ink-500: #475569;
-  --border: #e2e8f0;
-  --surface: #ffffff;
-  --surface-soft: #f8fafc;
-  --ring: rgba(37, 99, 235, 0.22);
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
 }
-
-html,
-body,
-#root {
-  min-height: 100%;
+a:hover {
+  color: #535bf2;
 }
 
 body {
   margin: 0;
-  font-family: "Inter", sans-serif;
-  color: var(--ink-900);
-  background:
-    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.08), transparent 30%),
-    radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.08), transparent 32%),
-    var(--surface-soft);
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
 }
 
-.ui-page {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
 }
 
-.ui-card {
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
-}
-
-.ui-card-soft {
-  background: var(--surface-soft);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-}
-
-.ui-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--ink-900);
-}
-
-.ui-subtitle {
-  color: var(--ink-500);
-  font-size: 0.95rem;
-}
-
-.ui-input,
-.ui-select,
-.ui-textarea {
-  width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.75rem;
-  background: #fff;
-  color: var(--ink-900);
-  padding: 0.7rem 0.9rem;
-  font-size: 0.92rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.ui-input:focus,
-.ui-select:focus,
-.ui-textarea:focus {
-  outline: none;
-  border-color: var(--brand-500);
-  box-shadow: 0 0 0 4px var(--ring);
-}
-
-.ui-label {
-  display: block;
-  margin-bottom: 0.4rem;
-  font-size: 0.83rem;
-  font-weight: 600;
-  color: var(--ink-700);
-}
-
-.btn-primary,
-.btn-secondary,
-.btn-danger {
-  border: none;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 0.9rem;
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
-.btn-primary {
-  background: var(--brand-600);
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: var(--brand-700);
-}
-
-.btn-secondary {
-  background: #e2e8f0;
-  color: var(--ink-700);
-}
-
-.btn-secondary:hover {
-  background: #cbd5e1;
-}
-
-.btn-danger {
-  background: #dc2626;
-  color: #fff;
-}
-
-.btn-danger:hover {
-  background: #b91c1c;
-}
-
-.btn-primary:focus-visible,
-.btn-secondary:focus-visible,
-.btn-danger:focus-visible,
-button:focus-visible,
-a:focus-visible {
-  outline: 3px solid var(--brand-300);
-  outline-offset: 2px;
-}
-
-.ui-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.ui-table-wrap {
-  border-radius: 1rem;
-  overflow: auto;
-  border: 1px solid var(--border);
-  background: #fff;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
-}
-
-.ui-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 720px;
-}
-
-.ui-table th,
-.ui-table td {
-  text-align: left;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  font-size: 0.88rem;
-}
-
-.ui-table th {
-  background: #f1f5f9;
-  color: #334155;
-  font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+} */
+@import "tailwindcss";

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { XCircle } from "lucide-react";
-import { AppLayout } from "../components/AppLayout";
+import { FaClock, FaCheckCircle, FaTicketAlt, FaPlus } from "react-icons/fa";
 
 function gkAdminViewTicket() {
   const [tickets, setTickets] = useState([]);
@@ -56,40 +56,53 @@ function gkAdminViewTicket() {
   const resolved = tickets.filter(t => t.status === "Resolved").length;
 
   return (
-    <AppLayout>
-      <div className="ui-page">
-        <div className="ui-card mb-8 bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white">
-          <div>
-            <h1 className="text-3xl font-extrabold">Ticket Management System</h1>
-            <p className="mt-2 max-w-xl text-blue-200">Manage and respond to student complaints efficiently.</p>
+    <div className="min-h-screen bg-gray-50 p-8 font-sens-serif">
+      <div className="max-w-7xl mx-auto">
+
+        {/* HEADER */}
+        <div className="max-w-7xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white rounded-t-2xl flex justify-between items-start mb-10">
+          <div className="">
+            <h1 className="text-3xl font-extrabold text-white-900">
+              Ticket Management System
+            </h1>
+            <p className="text-white-600 mt-2 max-w-xl">
+              Manage and respond to student complaints efficiently.
+            </p>
           </div>
         </div>
 
+        {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="ui-card p-6 border-l-4 border-blue-600">
+
+          <div className="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600">
             <p className="text-xs uppercase text-gray-500 font-bold">Total Tickets</p>
             <h2 className="text-3xl font-bold mt-2">{total}</h2>
           </div>
 
-          <div className="ui-card p-6 border-l-4 border-emerald-600">
+          <div className="bg-white p-6 rounded-xl shadow border-l-4 border-green-600">
             <p className="text-xs uppercase text-gray-500 font-bold">Resolved</p>
             <h2 className="text-3xl font-bold mt-2">{resolved}</h2>
           </div>
 
-          <div className="ui-card p-6 border-l-4 border-amber-500">
+          <div className="bg-white p-6 rounded-xl shadow border-l-4 border-yellow-500">
             <p className="text-xs uppercase text-gray-500 font-bold">Pending</p>
             <h2 className="text-3xl font-bold mt-2">{pending}</h2>
           </div>
+
         </div>
 
-        <div className="ui-table-wrap">
+        {/* TABLE */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="ui-table text-sm text-left">
-              <thead>
+            <table className="w-full text-sm text-left">
+
+              {/* Table Head */}
+              <thead className="bg-gray-100 text-gray-700">
                 <tr>
                   <th className="px-6 py-4 font-bold">Student ID</th>
                   <th className="px-6 py-4 font-bold">Email</th>
                   <th className="px-6 py-4 font-bold">Accodamic Year</th>
+                  <th className="px-6 py-4 font-bold">Facultyr</th>
                   <th className="px-6 py-4 font-bold">Category</th>
                   <th className="px-6 py-4 font-bold">Subject</th>
                   <th className="px-6 py-4 font-bold">Status</th>
@@ -97,6 +110,7 @@ function gkAdminViewTicket() {
                 </tr>
               </thead>
 
+              {/* Table Body */}
               <tbody className="divide-y divide-gray-200">
                 {tickets.length === 0 ? (
                   <tr>
@@ -108,8 +122,9 @@ function gkAdminViewTicket() {
                   tickets.map((ticket) => (
                     <tr
                       key={ticket._id}
-                      className="hover:bg-slate-50 transition"
+                      className="hover:bg-gray-50 transition"
                     >
+
                       <td className="px-6 py-4 text-gray-900">
                         {ticket.studentId}
                       </td>
@@ -120,6 +135,10 @@ function gkAdminViewTicket() {
 
                       <td className="px-6 py-4 text-gray-600">
                         {ticket.accodamicYear}
+                      </td>
+
+                      <td className="px-6 py-4 text-gray-600">
+                        {ticket.faculty}
                       </td>
 
                       <td className="px-6 py-4">
@@ -148,7 +167,7 @@ function gkAdminViewTicket() {
                         {ticket.status === "Pending" ? (
                           <button
                             onClick={() => setSelectedTicket(ticket)}
-                            className="btn-primary px-4 py-1.5"
+                            className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg hover:bg-indigo-500 transition"
                           >
                             Reply
                           </button>
@@ -156,18 +175,26 @@ function gkAdminViewTicket() {
                           <span className="text-gray-400 font-medium">Replied</span>
                         )}
                       </td>
+
                     </tr>
                   ))
                 )}
               </tbody>
+
             </table>
           </div>
         </div>
+        
+
       </div>
 
+      {/* Reply Modal */}
       {selectedTicket && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
-          <div className="ui-card relative w-full max-w-lg p-6">
+          
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg relative">
+
+            {/* Close */}
             <button
               onClick={() => setSelectedTicket(null)}
               className="absolute top-3 right-3 text-gray-500 hover:text-red-600"
@@ -189,25 +216,28 @@ function gkAdminViewTicket() {
               {selectedTicket.description}
             </p>
 
+            {/* Reply Input */}
             <textarea
               rows="4"
               value={replyMessage}
               onChange={(e) => setReplyMessage(e.target.value)}
               placeholder="Type your reply..."
-              className="ui-textarea mb-4"
+              className="w-full border rounded-lg p-2 mb-4 focus:ring-2 focus:ring-indigo-400"
             />
 
             <button
               onClick={handleReply}
               disabled={loadingReply}
-              className="btn-primary w-full py-2 disabled:opacity-50"
+              className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500 cursor-pointer disabled:opacity-50"
             >
               {loadingReply ? "Sending..." : "Send Reply"}
             </button>
+
           </div>
         </div>
       )}
-    </AppLayout>
+
+    </div>
   );
 }
 
