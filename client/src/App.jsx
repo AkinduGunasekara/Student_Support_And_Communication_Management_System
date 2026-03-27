@@ -18,18 +18,32 @@ import gkAdminViewTicket from "./ticketRaising/gkAdminViewTicket";
 import gkTicketCreate from "./ticketRaising/gkTicketCreate";
 import gkTicketUpdate from "./ticketRaising/gkTicketUpdate";
 
+import EventsPage from "./event/screens/EventsPage";
+
 export default function App() {
   return (
     <AuthProvider>
       <Toaster position="top-right" richColors />
       <Routes>
         {/* Root redirect to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        
+
+        <Route
+        path="/"
+        element={
+          localStorage.getItem("token") ? (
+            <Navigate to="/events" />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/public-faq" element={<PublicFAQ />} />
+
+        <Route path="/events" element={<EventsPage />} />
+
 
         {/* Student Routes */}
         <Route
@@ -105,5 +119,4 @@ export default function App() {
       </Routes>
     </AuthProvider>
   );
->>>>>>> mirshab
 }
