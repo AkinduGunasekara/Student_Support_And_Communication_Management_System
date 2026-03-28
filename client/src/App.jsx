@@ -7,6 +7,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { TicketCenter } from "./pages/TicketCenter";
 
 import StudentAskQuestion from "./officialMessaging/pages/StudentAskQuestion";
 import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages";
@@ -60,9 +61,9 @@ export default function App() {
         <Route
           path="/student/view-ticket"
           element={
-            //<ProtectedRoute allowedRoles={["student"]}>
+            <ProtectedRoute allowedRoles={["student"]}>
               <GkTicketView />
-            //</ProtectedRoute>
+            </ProtectedRoute>
           }
         />
 
@@ -87,6 +88,14 @@ export default function App() {
           }
         />
         <Route
+          path="/admin/tickets"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <TicketCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/view-ticket"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
@@ -99,26 +108,26 @@ export default function App() {
         <Route
           path="/ticket/create"
           element={
-            //<ProtectedRoute allowedRoles={["student"]}>
+            <ProtectedRoute allowedRoles={["student"]}>
               <GkTicketCreate />
-            //</ProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/ticket/update/:id"
           element={
-            //<ProtectedRoute allowedRoles={["student"]}>
+            <ProtectedRoute allowedRoles={["student"]}>
               <GkTicketUpdate />
-            //</ProtectedRoute>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/ticket/delete/:id"
           element={
-            //<ProtectedRoute allowedRoles={["student"]}>
+            <ProtectedRoute allowedRoles={["student"]}>
               <GkTicketDelete />
-            //</ProtectedRoute>
+            </ProtectedRoute>
           }
         />
       </Routes>

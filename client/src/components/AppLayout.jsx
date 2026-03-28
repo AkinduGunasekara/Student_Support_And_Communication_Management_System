@@ -73,7 +73,7 @@ export const AppLayout = ({ children }) => {
       },
       {
         label: "Ticket Center",
-        to: "/admin/view-ticket",
+        to: "/admin/tickets",
         icon: FileQuestion,
       },
       {

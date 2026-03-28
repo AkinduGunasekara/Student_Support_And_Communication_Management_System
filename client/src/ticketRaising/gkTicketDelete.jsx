@@ -11,16 +11,16 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
     if (!ticketId) return;
 
     const fetchTicket = async () => {
-      // const token = localStorage.getItem("authToken");
-      // if (!token) {
-      //   toast.error("You are not logged in. Please login first.");
-      //   return;
-      // }
+      const token = localStorage.getItem("ssc_token");
+      if (!token) {
+        toast.error("You are not logged in. Please login first.");
+        return;
+      }
 
       try {
         const res = await axios.get(
           `http://localhost:5001/api/tickets/${ticketId}`,
-          // { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setTicket(res.data);
       } catch (err) {
@@ -38,16 +38,16 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this ticket?")) return;
 
-    // const token = localStorage.getItem("authToken");
-    // if (!token) {
-    //   toast.error("Unauthorized. Please login again.");
-    //   return;
-    // }
+    const token = localStorage.getItem("ssc_token");
+    if (!token) {
+      toast.error("Unauthorized. Please login again.");
+      return;
+    }
 
     try {
       await axios.delete(
         `http://localhost:5001/api/tickets/${ticketId}`,
-        // { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Ticket deleted successfully!", { position: "top-center" });
 

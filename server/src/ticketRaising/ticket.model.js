@@ -3,10 +3,10 @@ import Counter from "../config/counter.js"
 
 const ticketSchema = new mongoose.Schema(
   {
-    /* userId: { 
+    userId: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "User", 
-      required: true }, */
+      required: true },
 
     ticketId: { 
       type: String, 
