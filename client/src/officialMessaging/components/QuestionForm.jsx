@@ -464,6 +464,67 @@ export default function QuestionForm({
           </div>
         </div>
 
+        {/* Attachments Section */}
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <h3 className="mb-4 text-sm font-semibold text-slate-700">
+            Attachments (Optional)
+          </h3>
+          
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Image Upload */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                Upload Images
+              </label>
+              <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-4 text-center transition hover:border-blue-400">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <svg className="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-xs text-slate-600">
+                    Drag & drop images or <span className="font-semibold text-blue-600">click to browse</span>
+                  </p>
+                  <p className="text-xs text-slate-500">PNG, JPG, GIF up to 5MB each</p>
+                </div>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  disabled
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-500">Coming soon</p>
+            </div>
+
+            {/* File Upload */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                Upload Files
+              </label>
+              <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-4 text-center transition hover:border-blue-400">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <svg className="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-xs text-slate-600">
+                    Drag & drop files or <span className="font-semibold text-blue-600">click to browse</span>
+                  </p>
+                  <p className="text-xs text-slate-500">PDF, DOC, DOCX up to 10MB each</p>
+                </div>
+                <input
+                  type="file"
+                  multiple
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  disabled
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-500">Coming soon</p>
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-4">
           <p className="text-sm text-slate-600">
             Make sure your question is clear, polite, and related to academic or
