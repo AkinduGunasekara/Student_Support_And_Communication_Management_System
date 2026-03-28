@@ -1,15 +1,20 @@
 import React, { useState } from "react";
+import { X, UploadCloud } from "lucide-react";
 
 const EventModal = ({ isOpen, onClose, onSave }) => {
   const [form, setForm] = useState({
     title: "",
+    description: "",
     date: "",
-    time: "",
+    startTime: "",
+    endTime: "",
     location: "",
-    type: "Seminar",
+    type: "academic",
+    image: null,
   });
 
-  // 🔴 IMPORTANT: prevents crash
+  const [error, setError] = useState("");
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
@@ -19,99 +24,176 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
     }));
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setForm((prev) => ({
+        ...prev,
+        image: file,
+      }));
+    }
+  };
+
   const handleSubmit = () => {
+    // ✅ SIMPLE VALIDATION (no alerts)
     if (!form.title || !form.date) {
-      alert("Title and date required");
+      setError("Title and date are required");
       return;
     }
 
+    if (form.startTime && form.endTime && form.startTime >= form.endTime) {
+      setError("End time must be after start time");
+      return;
+    }
+
+    // ✅ SAVE
     onSave({
       ...form,
       id: Date.now(),
     });
 
-    // reset form (optional but good)
+    // reset
     setForm({
       title: "",
+      description: "",
       date: "",
-      time: "",
+      startTime: "",
+      endTime: "",
       location: "",
-      type: "Seminar",
+      type: "academic",
+      image: null,
     });
 
+    setError("");
+
+    // ✅ CLOSE IMMEDIATELY (no alerts, smooth UX)
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      
-      <div className="bg-white w-full max-w-md rounded-xl p-6 shadow-lg">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
 
-        <h2 className="text-xl font-bold mb-4">Add Event</h2>
+      {/* BACKDROP */}
+      <div
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-        <div className="space-y-3">
+      {/* MODAL */}
+      <div className="relative bg-white w-full max-w-4xl rounded-2xl shadow-xl border border-slate-200 p-6 flex gap-6">
+
+        {/* CLOSE */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-500 hover:text-slate-800"
+        >
+          <X size={18} />
+        </button>
+
+        {/* LEFT - IMAGE */}
+        <div className="w-1/2 flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-6 text-center">
+
+          <UploadCloud size={40} className="text-blue-500 mb-3" />
+
+          <p className="text-sm text-slate-600 mb-2">
+            Upload Event Image
+          </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="text-sm"
+          />
+
+          {form.image && (
+            <p className="text-xs text-green-600 mt-2">
+              {form.image.name}
+            </p>
+          )}
+        </div>
+
+        {/* RIGHT */}
+        <div className="w-1/2 space-y-4">
+
+          <h2 className="text-lg font-semibold text-slate-900">
+            Create Event
+          </h2>
+
+          {/* ERROR MESSAGE */}
+          {error && (
+            <p className="text-red-500 text-xs">{error}</p>
+          )}
 
           <input
             name="title"
             value={form.title}
-            onChange={handleChange}
             placeholder="Event Title"
-            className="w-full border p-2 rounded"
+            onChange={handleChange}
+            className="w-full border border-slate-200 p-2 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
           />
 
-          <input
-            type="date"
-            name="date"
-            value={form.date}
+          <textarea
+            name="description"
+            value={form.description}
+            placeholder="Description"
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border border-slate-200 p-2 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
           />
 
-          <input
-            type="time"
-            name="time"
-            value={form.time}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          />
+          {/* DATE + TIME */}
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              className="border border-slate-200 p-2 rounded-lg text-sm"
+            />
+
+            <input
+              type="time"
+              name="startTime"
+              value={form.startTime}
+              onChange={handleChange}
+              className="border border-slate-200 p-2 rounded-lg text-sm"
+            />
+          </div>
 
           <input
             name="location"
             value={form.location}
-            onChange={handleChange}
             placeholder="Location"
-            className="w-full border p-2 rounded"
+            onChange={handleChange}
+            className="w-full border border-slate-200 p-2 rounded-lg text-sm"
           />
 
           <select
             name="type"
             value={form.type}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border border-slate-200 p-2 rounded-lg text-sm"
           >
-            <option>Seminar</option>
-            <option>Workshop</option>
-            <option>Sports</option>
+            <option value="academic">Academic</option>
+            <option value="club">Club</option>
+            <option value="sports">Sports</option>
+            <option value="other">Other</option>
           </select>
 
-        </div>
+          {/* 🔥 INFO MESSAGE */}
+          <p className="text-xs text-slate-500">
+            Admin will review your event. Once approved, it will be visible in the university calendar for everyone.
+          </p>
 
-        <div className="flex justify-end gap-2 mt-5">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded"
-          >
-            Cancel
-          </button>
-
+          {/* ACTION */}
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            Save
+            Create Event
           </button>
-        </div>
 
+        </div>
       </div>
     </div>
   );

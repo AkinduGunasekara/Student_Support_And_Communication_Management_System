@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import Navbar from "../components/Navbar";
-import EventCard from "../components/EventCard";
-import CalendarView from "../components/CalendarView";
-import EventModal from "../components/EventModal";
-import EventDetailsModal from "../components/EventDetailsModal";
+import Navbar from "./components/Navbar";
+import EventCard from "./components/EventCard";
+import CalendarView from "./components/CalendarView";
+import EventModal from "./components/EventModal";
+import EventDetailsModal from "./components/EventDetailsModal";
+
+// 🔥 import your image here
+import banner from "../assets/event-banner.jpg";
 
 const EventsPage = () => {
   const [view, setView] = useState("card");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const handleAddEvent = (newEvent) => {
-    setEvents((prev) => [...prev, newEvent]);
-  };
-
-  const events = [
+  const [events, setEvents] = useState([
     {
       id: 1,
       title: "Quantum Computing: The Future of Logic",
@@ -48,7 +47,11 @@ const EventsPage = () => {
       image:
         "https://images.unsplash.com/photo-1517649763962-0c623066013b",
     },
-  ];
+  ]);
+
+  const handleAddEvent = (newEvent) => {
+    setEvents((prev) => [...prev, newEvent]);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -56,12 +59,29 @@ const EventsPage = () => {
 
       <div className="p-6">
 
-        {/* 🔵 HEADER (DASHBOARD STYLE) */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl p-6 mb-6 shadow">
-          <h1 className="text-2xl font-semibold">University Events</h1>
-          <p className="text-blue-100 text-sm mt-1">
-            Discover and connect with your campus community
-          </p>
+        {/* 🔥 HERO HEADER (NEW DESIGN) */}
+        <div className="relative rounded-2xl overflow-hidden mb-6 shadow">
+
+          {/* IMAGE */}
+          <img
+            src={banner}
+            alt="events banner"
+            className="w-full h-64 object-cover"
+          />
+
+          {/* OVERLAY */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+
+          {/* TEXT */}
+          <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
+            <h1 className="text-3xl font-bold">
+              Discover. Join. Connect.
+            </h1>
+
+            <p className="text-sm mt-2 text-white/80">
+              Everything happening on your campus, in one place
+            </p>
+          </div>
         </div>
 
         {/* 🔳 MAIN CARD CONTAINER */}
@@ -116,10 +136,10 @@ const EventsPage = () => {
               ))}
             </div>
           ) : (
-            <CalendarView 
-            events={events} 
-            onSelectEvent={setSelectedEvent}
-          />
+            <CalendarView
+              events={events}
+              onSelectEvent={setSelectedEvent}
+            />
           )}
         </div>
       </div>

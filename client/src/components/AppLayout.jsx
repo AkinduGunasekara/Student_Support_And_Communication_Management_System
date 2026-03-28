@@ -102,11 +102,9 @@ export const AppLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {showMobileSidebar && (
-        <button
-          type="button"
+        <div
           onClick={() => setShowMobileSidebar(false)}
           className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden"
-          aria-label="Close navigation overlay"
         />
       )}
 
@@ -242,7 +240,9 @@ export const AppLayout = ({ children }) => {
           </div>
         </nav>
 
-        <main className="pb-8">{children}</main>
+        <main className="relative z-10 pb-8">
+        {children}
+      </main>
       </div>
     </div>
   );

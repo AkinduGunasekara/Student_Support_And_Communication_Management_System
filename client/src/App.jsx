@@ -18,7 +18,10 @@ import gkAdminViewTicket from "./ticketRaising/gkAdminViewTicket";
 import gkTicketCreate from "./ticketRaising/gkTicketCreate";
 import gkTicketUpdate from "./ticketRaising/gkTicketUpdate";
 
-import EventsPage from "./event/screens/EventsPage";
+import EventsPage from "./event/EventsPage";
+import StudentEventsPage from "./event/StudentEventsPage";
+import LecturerEventsPage from "./event/LecturerEventsPage";
+import AdminEventsPage from "./event/AdminEventsPage";
 
 export default function App() {
   return (
@@ -30,7 +33,7 @@ export default function App() {
         <Route
         path="/"
         element={
-          localStorage.getItem("token") ? (
+          localStorage.getItem("ssc_token") ? (
             <Navigate to="/events" />
           ) : (
             <Navigate to="/login" />
@@ -42,7 +45,11 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/public-faq" element={<PublicFAQ />} />
 
+        {/*Events*/}
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/student/events" element={<StudentEventsPage />} />
+        <Route path="/lecturer/events" element={<LecturerEventsPage />} />
+        <Route path="/admin/events" element={<AdminEventsPage />} />
 
 
         {/* Student Routes */}
