@@ -226,7 +226,7 @@ export const TicketCenter = () => {
 
                   {/* Reply Form */}
                   {replyingTo === ticket._id ? (
-                    <div className="space-y-3 bg-blue-500 p-4 rounded-lg border border-slate-300">
+                    <div className="space-y-3 p-4 rounded-lg border border-slate-300">
                       <label className="text-sm font-semibold text-slate-700">Type your reply:</label>
                       <textarea
                         value={replyText}
