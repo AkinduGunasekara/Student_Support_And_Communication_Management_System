@@ -7,7 +7,8 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
-    accodamicYear: "",
+    academicYear: "",
+    faculty: "",
     ticketCategory: "",
     description: "",
   });
@@ -72,7 +73,8 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
     const requiredFields = [
       "studentId",
       "studentEmail",
-      "accodamicYear",
+      "academicYear",
+      "faculty",
       "ticketCategory",
       "description",
     ];
@@ -90,7 +92,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
 
     setLoading(true);
 
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("ssc_token");
     if (!token) {
       toast.error("Unauthorized. Please login again.");
       return;
@@ -115,88 +117,128 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
 
   return (
     <AppLayout>
-      <div className="ui-page max-w-4xl">
-        <div className="ui-card bg-gradient-to-r from-blue-700 to-blue-600 p-5 text-white">
-          <h2 className="text-2xl font-bold">Update Ticket</h2>
-          <p className="mt-1 text-sm text-blue-200">Modify and resubmit your ticket below.</p>
-        </div>
+      <div className="w-full max-w-3xl mx-auto font-sans">
 
-        <div className="ui-card mt-4 p-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              <div>
-                <label className="ui-label">Student ID*</label>
-                <input
-                  type="text"
-                  name="studentId"
-                  value={formData.studentId}
-                  onChange={handleChange}
-                  className="ui-input cursor-not-allowed bg-slate-100"
-                  readOnly
-                />
-                {errors.studentId && <p className="mt-1 text-sm text-red-600">{errors.studentId}</p>}
-              </div>
+    {/* Header */}
+    <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        📝 Update Ticket
+      </h2>
+      <p className="text-blue-100 text-sm mt-1">
+        Modify and resubmit your ticket below.
+      </p>
+    </div>
 
-              <div>
-                <label className="ui-label">Student Email*</label>
-                <input
-                  type="email"
-                  name="studentEmail"
-                  value={formData.studentEmail}
-                  onChange={handleChange}
-                  className="ui-input"
-                />
-                {errors.studentEmail && <p className="mt-1 text-sm text-red-600">{errors.studentEmail}</p>}
-              </div>
+    {/* Form Card */}
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mt-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
 
-              <div>
-                <label className="ui-label">Academic Year*</label>
-                <input
-                  type="text"
-                  name="accodamicYear"
-                  value={formData.accodamicYear}
-                  onChange={handleChange}
-                  className="ui-input"
-                />
-              </div>
+        <div className="grid md:grid-cols-2 gap-4">
 
-              <div>
-                <label className="ui-label">Ticket Category*</label>
-                <select
-                  name="ticketCategory"
-                  value={formData.ticketCategory}
-                  onChange={handleChange}
-                  className="ui-select"
-                >
-                  <option value="Select category">Select category</option>
-                  <option value="Academic">Academic</option>
-                  <option value="Complaint">Complaint</option>
-                  <option value="Technical Issues">Technical Issues</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+          {/* Student ID */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Student ID*
+            </label>
+            <input
+              type="text"
+              name="studentId"
+              value={formData.studentId}
+              readOnly
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm cursor-not-allowed"
+            />
+          </div>
 
-              <div className="md:col-span-2">
-                <label className="ui-label">Description*</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="ui-textarea"
-                  rows={4}
-                />
-              </div>
-            </div>
+          {/* Student Email */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Student Email*
+            </label>
+            <input
+              type="email"
+              name="studentEmail"
+              value={formData.studentEmail}
+              readOnly
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-sm cursor-not-allowed"
+            />
+          </div>
 
-            <button
-              type="submit"
-              className="btn-primary w-full py-3 disabled:cursor-not-allowed disabled:opacity-70"
-              disabled={loading}
+          {/* Academic Year */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Academic Year*
+            </label>
+            <input
+              type="text"
+              name="academicYear"
+              value={formData.academicYear}
+              onChange={handleChange}
+              placeholder="e.g. Year 3 Semester 1"
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+
+          {/* Faculty */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Faculty*
+            </label>
+            <input
+              type="text"
+              name="faculty"
+              value={formData.faculty}
+              onChange={handleChange}
+              placeholder="e.g. Computing"
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+
+              {/* Category */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Ticket Category*
+            </label>
+            <select
+              name="ticketCategory"
+              value={formData.ticketCategory}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              {loading ? "Updating..." : "Update Ticket"}
-            </button>
-          </form>
-        </div>
+              <option value="">Select category</option>
+              <option value="Academic">Academic</option>
+              <option value="Complaint">Complaint</option>
+              <option value="Technical Issues">Technical Issues</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+              {/* Description */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold mb-1">
+              Description*
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={4}
+              placeholder="Describe your issue..."
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            />
+          </div>
+          </div>
+
+            {/* Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-all shadow-md disabled:opacity-70"
+        >
+          {loading ? "Updating..." : "Update Ticket"}
+        </button>
+
+      </form>
+    </div>
       </div>
     </AppLayout>
   );
