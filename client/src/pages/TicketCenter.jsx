@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
 import { UserProfile } from "../components/UserProfile";
@@ -7,7 +8,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
 export const TicketCenter = () => {
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState(null);
@@ -35,7 +36,7 @@ export const TicketCenter = () => {
       setTickets(data);
     } catch (error) {
       console.error("Error fetching tickets:", error);
-      alert("Failed to load tickets");
+      toast.error("Failed to load tickets");
     } finally {
       setLoading(false);
     }
@@ -43,7 +44,7 @@ export const TicketCenter = () => {
 
   const handleReplyToTicket = async (ticketId) => {
     if (!replyText.trim()) {
-      alert("Please enter a reply message");
+      toast.error("Please enter a reply message");
       return;
     }
 
@@ -61,14 +62,15 @@ export const TicketCenter = () => {
         throw new Error("Failed to send reply");
       }
 
-      const updatedTicket = await response.json();
+      const responseData = await response.json();
+      const updatedTicket = responseData.complaint || responseData;
       setTickets(tickets.map((t) => (t._id === ticketId ? updatedTicket : t)));
       setReplyingTo(null);
       setReplyText("");
-      alert("Reply sent successfully");
+      toast.success(responseData.message || "Reply sent successfully");
     } catch (error) {
       console.error("Error sending reply:", error);
-      alert("Failed to send reply");
+      toast.error("Failed to send reply");
     }
   };
 
@@ -94,7 +96,7 @@ export const TicketCenter = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="ui-card p-6 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
             <p className="text-sm text-blue-600 font-semibold uppercase">Total Tickets</p>
             <h2 className="text-3xl font-bold text-blue-900">{tickets.length}</h2>
@@ -112,7 +114,7 @@ export const TicketCenter = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="mb-6 flex gap-3">
+        <div className="mb-6 flex flex-wrap gap-3">
           <button
             onClick={() => setFilterStatus("all")}
             className={`px-4 py-2 rounded-lg font-semibold transition ${
@@ -198,7 +200,7 @@ export const TicketCenter = () => {
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 uppercase font-semibold">Year</p>
-                      <p className="text-sm font-medium text-slate-900">{ticket.accadomicYear}</p>
+                      <p className="text-sm font-medium text-slate-900">{ticket.academicYear || ticket.accadomicYear}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 uppercase font-semibold">Date</p>
@@ -226,19 +228,19 @@ export const TicketCenter = () => {
 
                   {/* Reply Form */}
                   {replyingTo === ticket._id ? (
-                    <div className="space-y-3 bg-blue-500 p-4 rounded-lg border border-slate-300">
-                      <label className="text-sm font-semibold text-slate-700">Type your reply:</label>
+                    <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                      <label className="text-sm font-semibold text-slate-800">Type your reply:</label>
                       <textarea
                         value={replyText}
                         onChange={(e) => setReplyText(e.target.value)}
                         placeholder="Type your reply to the student..."
-                        className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows="4"
                       />
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           onClick={() => handleReplyToTicket(ticket._id)}
-                          className="btn-primary text-sm px-4 py-2"
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
                         >
                           Send Reply
                         </button>
@@ -247,7 +249,7 @@ export const TicketCenter = () => {
                             setReplyingTo(null);
                             setReplyText("");
                           }}
-                          className="btn-secondary text-sm px-4 py-2"
+                          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
                         >
                           Cancel
                         </button>

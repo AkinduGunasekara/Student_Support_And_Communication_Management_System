@@ -96,7 +96,7 @@ export const getComplaintById = async (req, res) => {
       !studentId ||
       !studentEmail ||
       !faculty ||
-      !accadomicYear ||
+      !academicYear ||
       !ticketCategory ||
       !description
     ) {
@@ -107,7 +107,7 @@ export const getComplaintById = async (req, res) => {
       userId: req.user._id, // 🔥 CONNECT USER
       studentId,
       studentEmail,
-      accadomicYear,
+      academicYear,
       faculty,
       ticketCategory,
       description,
@@ -221,8 +221,7 @@ export const replyToComplaint = async (req, res) => {
         replyMessage,
         status: "Resolved",
       },
-
-      { returnDocument: 'after' }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!complaint) {
@@ -231,22 +230,29 @@ export const replyToComplaint = async (req, res) => {
       });
     }
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: complaint.studentEmail,
-      subject: "Complaint Response",
-      html: `
-        <h2>Complaint Response</h2>
-        <p>Hello ${complaint.studentId}</p>
-        <p><b>Your Issue:</b> ${complaint.description}</p>
-        <hr/>
-        <p><b>Reply:</b> ${replyMessage}</p>
-        <p>Status: <b>${complaint.status}</b></p>
-      `,
+    let emailSent = true;
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: complaint.studentEmail,
+        subject: "Complaint Response",
+        html: `
+          <h2>Complaint Response</h2>
+          <p>Hello ${complaint.studentId}</p>
+          <p><b>Your Issue:</b> ${complaint.description}</p>
+          <hr/>
+          <p><b>Reply:</b> ${replyMessage}</p>
+          <p>Status: <b>${complaint.status}</b></p>
+        `,
       });
+    } catch (mailError) {
+      emailSent = false;
+      console.error("Email send error:", mailError);
+    }
 
-      res.status(200).json({
-      message: "Reply sent & updated",
+    res.status(200).json({
+      message: emailSent ? "Reply sent & updated" : "Reply updated, but email failed",
+      emailSent,
       complaint,
     });
   } catch (error) {

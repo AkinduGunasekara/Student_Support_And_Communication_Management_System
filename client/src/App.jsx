@@ -60,7 +60,7 @@ export default function App() {
         />
 
         <Route
-          path="/student/view-ticket/:id"
+          path="/student/view-ticket"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <GkTicketView />

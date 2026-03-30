@@ -3,7 +3,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { AppLayout } from "../components/AppLayout";
 
-function GkTicketCreate({ closeModal, refreshTickets }) {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
+function GkTicketCreate({ closeModal, refreshTickets, embedded = false }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
@@ -73,7 +75,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
     setLoading(true);
     try {
       const token = localStorage.getItem("ssc_token");
-      await axios.post("http://localhost:5001/api/tickets/create", 
+      await axios.post(`${API_BASE_URL}/api/tickets/create`,
         formData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,21 +110,17 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
     }
   };
 
-  return (
-    <AppLayout>
-      <div className="w-full max-w-3xl mx-auto">
-      
-      {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md">
-        <h2 className="text-xl font-bold">🎫 Raise New Ticket</h2>
+  const formContent = (
+    <div className="w-full max-w-3xl mx-auto px-1 sm:px-2">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-5 text-white shadow-md">
+        <h2 className="text-xl font-bold">Raise New Ticket</h2>
         <p className="text-sm text-blue-100">Submit your issue to the university support team.</p>
-        </div>
+      </div>
 
-        {/* Form Card */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 mt-5 p-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-lg sm:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {/* Row 1 */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
       
               <div>
                 <label className="block text-sm font-semibold mb-1">
@@ -134,7 +132,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
                   value={formData.studentId}
                   onChange={handleChange}
                   placeholder="IT12345678"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
                 {errors.studentId && (
                   <p className="text-red-500 text-xs mt-1">
@@ -153,7 +151,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
                   value={formData.studentEmail}
                   onChange={handleChange}
                   placeholder="student@my.sliit.lk"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
                 {errors.studentEmail && (
                   <p className="text-red-500 text-xs mt-1">
@@ -164,7 +162,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
             </div>
 
             {/* Row 2 */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-semibold mb-1">
                 Academic Year*
@@ -175,7 +173,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
                 value={formData.academicYear}
                 onChange={handleChange}
                 placeholder="e.g. Year 3 Semester 1"
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
@@ -189,7 +187,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
                 value={formData.faculty}
                 onChange={handleChange}
                 placeholder="e.g. Computing"
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
           </div>
@@ -204,7 +202,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
               value={formData.ticketCategory}
                 onChange={handleChange}
                 
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="">Select category</option>
               <option value="Academic">Academic</option>
@@ -225,7 +223,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
               value={formData.description}
                 onChange={handleChange}
                 placeholder="Describe your issue..."
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
               />
             </div>
 
@@ -233,7 +231,7 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-all disabled:opacity-70"
+              className="w-full rounded-lg bg-blue-600 py-3 text-white font-semibold transition-all hover:bg-blue-500 disabled:opacity-70"
             >
               {loading ? "Submitting..." : "Submit Ticket"}
             </button>
@@ -241,8 +239,13 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
           </form>
         </div>
       </div>
-    </AppLayout>
   );
+
+  if (embedded) {
+    return formContent;
+  }
+
+  return <AppLayout><div className="ui-page">{formContent}</div></AppLayout>;
 }
 
 export default GkTicketCreate;

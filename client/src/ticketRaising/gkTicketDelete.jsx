@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
 function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
 
       try {
         const res = await axios.get(
-          `http://localhost:5001/api/tickets/${ticketId}`,
+          `${API_BASE_URL}/api/tickets/${ticketId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setTicket(res.data);
@@ -45,7 +47,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
 
     try {
       await axios.delete(
-        `http://localhost:5001/api/tickets/${ticketId}`,
+        `${API_BASE_URL}/api/tickets/${ticketId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Ticket deleted successfully!", { position: "top-center" });
@@ -106,7 +108,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
             <label className="block font-semibold text-gray-700 mb-1">Academic Year</label>
             <input
               type="text"
-              value={ticket.accadomicYear}
+              value={ticket.academicYear || ticket.accadomicYear}
               readOnly
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />

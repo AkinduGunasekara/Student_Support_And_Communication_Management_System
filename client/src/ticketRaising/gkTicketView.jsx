@@ -4,10 +4,11 @@ import toast from "react-hot-toast";
 import { XCircle } from "lucide-react";
 import { AppLayout } from "../components/AppLayout";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import GkTicketCreate from "./gkTicketCreate.jsx";
 import GkTicketUpdate from "./gkTicketUpdate.jsx";
 import GkTicketDelete from "./gkTicketDelete.jsx";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
 function GkTicketView() {
   const [tickets, setTickets] = useState([]);
@@ -32,7 +33,7 @@ function GkTicketView() {
 
     try {
         const res = await axios.get(
-        "http://localhost:5001/api/tickets/my", // 🔥 IMPORTANT CHANGE
+        `${API_BASE_URL}/api/tickets/my`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -79,7 +80,7 @@ function GkTicketView() {
     <AppLayout>
         <main className="max-w-7xl mx-auto px-6 py-10">
             {/* Header */}
-        <section className="mb-12 flex justify-between items-center">
+        <section className="mb-8 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:justify-between sm:items-center">
           <div>
             <h1 className="text-3xl font-bold">My Tickets</h1>
             <p className="text-gray-500">Manage your support requests</p>
@@ -87,14 +88,14 @@ function GkTicketView() {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-5 py-3 rounded-xl flex items-center gap-2"
+            className="bg-blue-600 text-white px-5 py-3 rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <FaPlus /> New Ticket
           </button>
         </section>
 
         {/* Stats */}
-        <section className="grid grid-cols-3 gap-6 mb-8">
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
           <div className="p-5 bg-white shadow rounded-xl">
             <p>Total</p>
             <h2 className="text-2xl font-bold">{tickets.length}</h2>
@@ -174,7 +175,7 @@ function GkTicketView() {
                         {ticket.faculty}
                       </td>
                       <td className="px-6 py-4 text-gray-700">
-                        {ticket.accadomicYear}
+                        {ticket.academicYear || ticket.accadomicYear}
                       </td>
                       <td className="px-6 py-4 text-gray-700 max-w-xs truncate">
                         {ticket.description}
@@ -227,7 +228,7 @@ function GkTicketView() {
          {/* CREATE MODAL */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white p-6 rounded-xl w-full max-w-2xl relative my-6 mx-4">
+            <div className="relative my-6 mx-4 w-full max-w-3xl rounded-xl bg-white p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="absolute top-4 right-4 z-10"
@@ -236,6 +237,7 @@ function GkTicketView() {
               </button>
                 <GkTicketCreate
                 user={user} // 🔥 PASS USER
+                embedded
                 closeModal={() => setShowCreateModal(false)}
                 refreshTickets={fetchTickets}
               />
@@ -246,7 +248,7 @@ function GkTicketView() {
         {/* UPDATE MODAL */}
         {selectedTicket && modalType === "update" && (
           <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white rounded-xl w-full max-w-2xl relative my-6 mx-4">
+            <div className="relative my-6 mx-4 w-full max-w-3xl rounded-xl bg-white p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => {
                   setModalType(null);
@@ -258,6 +260,7 @@ function GkTicketView() {
               </button>
                 <GkTicketUpdate
                 ticketId={selectedTicket._id}
+                embedded
                 closeModal={() => {
                   setModalType(null);
                   setSelectedTicket(null);
@@ -271,7 +274,7 @@ function GkTicketView() {
          {/* DELETE MODAL */}
         {selectedTicket && modalType === "delete" && (
           <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white rounded-xl w-full max-w-2xl relative my-6 mx-4">
+            <div className="relative my-6 mx-4 w-full max-w-3xl rounded-xl bg-white p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => {
                   setModalType(null);
