@@ -9,45 +9,42 @@ import {
   replyToComplaint,
 } from "../ticketRaising/ticket.controller.js";
 
+import { authMiddleware, requireRole } from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
 /**
  * ----------------------------------------
- * Get All Complaints
+ * Admin Routes
  * ----------------------------------------
  */
-router.get("/getall", getAllComplaints);
+router.get(
+  "/getall",
+  authMiddleware,
+  requireRole("admin"),
+  getAllComplaints
+);
 
-router.put("/:id/reply", replyToComplaint)
+router.put(
+  "/:id/reply",
+  authMiddleware,
+  requireRole("admin"),
+  replyToComplaint
+);
 
 /**
  * ----------------------------------------
- * Get Complaint By ID
+ * User Routes
  * ----------------------------------------
  */
-router.get("/:id", getComplaintById);
+router.get("/my", authMiddleware, requireRole("student"), getMyComplaints);
 
-router.get("/my", getMyComplaints);
+router.get("/:id", authMiddleware, requireRole("student"), getComplaintById);
 
-/**
- * ----------------------------------------
- * Create New Complaint (Student Submit)
- * ----------------------------------------
- */
-router.post("/create", createComplaint);
+router.post("/create", authMiddleware, requireRole("student"), createComplaint);
 
-/**
- * ----------------------------------------
- * Update Full Complaint
- * ----------------------------------------
- */
-router.put("/:id", updateComplaint);
+router.put("/:id", authMiddleware, requireRole("student"), updateComplaint);
 
-/**
- * ----------------------------------------
- * Delete Complaint
- * ----------------------------------------
- */
-router.delete("/:id", deleteComplaint);
+router.delete("/:id", authMiddleware, requireRole("student"), deleteComplaint);
 
 export default router;

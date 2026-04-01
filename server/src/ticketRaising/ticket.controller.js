@@ -5,13 +5,16 @@ import nodemailer from "nodemailer";
 dotenv.config();
 
 /**
- * ------------------------------------------------
- * Get All Complaints (Admin / Lecturer Dashboard)
- * ------------------------------------------------
+ * ----------------------------------------
+ * Get All Complaints (Admin)
+ * ----------------------------------------
  */
 export const getAllComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find().sort({ createdAt: -1 });
+    const complaints = await Complaint.find()
+      .populate("userId", "name email")
+      .sort({ createdAt: -1 });
+
     res.status(200).json(complaints);
   } catch (error) {
     console.error("Error in getAllComplaints:", error);
@@ -20,13 +23,14 @@ export const getAllComplaints = async (req, res) => {
 };
 
 /**
- * ------------------------------------------------
+ * ----------------------------------------
  * Get Complaint By ID
- * ------------------------------------------------
+ * ----------------------------------------
  */
 export const getComplaintById = async (req, res) => {
   try {
-    const complaint = await Complaint.findById(req.params.id);
+    const complaint = await Complaint.findById(req.params.id)
+      .populate("userId", "name email");
 
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
@@ -40,50 +44,71 @@ export const getComplaintById = async (req, res) => {
 };
 
 /**
- * Get logged-in user's services
+ * ----------------------------------------
+ * Get Logged-in User Complaints
+ * ----------------------------------------
  */
 export const getMyComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    const complaints = await Complaint.find({ userId: req.user._id })
+      .sort({ createdAt: -1 });
+
     res.status(200).json(complaints);
   } catch (error) {
-    console.error("Error in getMyTickets:", error);
+    console.error("Error in getMyComplaints:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 /**
- * ------------------------------------------------
- * Create New Complaint (Student Submit)
- * ------------------------------------------------
+ * ----------------------------------------
+ * Create Complaint (User-wise)
+ * ----------------------------------------
  */
 export const createComplaint = async (req, res) => {
   try {
-    const { studentId, studentEmail, accodamicYear, ticketCategory, description } = req.body;
+    const {
+      studentId,
+      studentEmail,
+      faculty,
+      accadomicYear,
+      ticketCategory,
+      description,
+    } = req.body;
 
     const regex1 = /^IT\d{8}$/;
-    const regex2 = /.+@.+\..+/
+    const regex2 = /.+@.+\..+/;
 
     if (!regex1.test(studentId)) {
       return res.status(400).json({
-        message: "Invalid Student ID. Format must be IT followed by 8 digits (e.g., IT12345678)"
+        message:
+          "Invalid Student ID. Format must be IT followed by 8 digits",
       });
     }
 
     if (!regex2.test(studentEmail)) {
       return res.status(400).json({
-        message: "Invalid Student Email. Format must be student@domain.lk "
+        message: "Invalid email format",
       });
     }
 
-    if (!studentId || !studentEmail || !accodamicYear || !ticketCategory || !description) {
+    if (
+      !studentId ||
+      !studentEmail ||
+      !faculty ||
+      !accadomicYear ||
+      !ticketCategory ||
+      !description
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const complaint = new Complaint({
+      userId: req.user._id, // 🔥 CONNECT USER
       studentId,
       studentEmail,
-      accodamicYear,
+      accadomicYear,
+      faculty,
       ticketCategory,
       description,
     });
@@ -98,45 +123,28 @@ export const createComplaint = async (req, res) => {
 };
 
 /**
- * ------------------------------------------------
- * Update Complaint (Edit Details)
- * ------------------------------------------------
+ * ----------------------------------------
+ * Update Complaint (Only Owner)
+ * ----------------------------------------
  */
 export const updateComplaint = async (req, res) => {
   try {
-    const { studentId, studentEmail, accodamicYear, ticketCategory, description, status } =
-      req.body;
+    const complaint = await Complaint.findById(req.params.id);
 
-    const regex1 = /^IT\d{8}$/;
-    const regex2 = /.+@.+\..+/
-
-    if (!regex1.test(studentId)) {
-      return res.status(400).json({
-        message: "Invalid Student ID. Format must be IT followed by 8 digits (e.g., IT12345678)"
-      });
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found" });
     }
 
-    if (!regex2.test(studentEmail)) {
-      return res.status(400).json({
-        message: "Invalid Student Email. Format must be student@domain.lk "
-      });
+    // 🔒 Only owner can edit
+    if (complaint.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
     }
 
     const updatedComplaint = await Complaint.findByIdAndUpdate(
       req.params.id,
-      {
-        studentId,
-        studentEmail,
-        accodamicYear,
-        ticketCategory,
-        description,
-      },
-      { new: true }
+      req.body,
+      { returnDocument: 'after' }
     );
-
-    if (!updatedComplaint) {
-      return res.status(404).json({ message: "Complaint not found" });
-    }
 
     res.status(200).json(updatedComplaint);
   } catch (error) {
@@ -146,19 +154,26 @@ export const updateComplaint = async (req, res) => {
 };
 
 /**
- * ------------------------------------------------
- * Delete Complaint
- * ------------------------------------------------
+ * ----------------------------------------
+ * Delete Complaint (Only Owner)
+ * ----------------------------------------
  */
 export const deleteComplaint = async (req, res) => {
   try {
-    const deletedComplaint = await Complaint.findByIdAndDelete(req.params.id);
+    const complaint = await Complaint.findById(req.params.id);
 
-    if (!deletedComplaint) {
+    if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
     }
 
-    res.status(200).json({ message: "Complaint deleted successfully" });
+    // 🔒 Only owner can delete
+    if (complaint.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    await complaint.deleteOne();
+
+    res.status(200).json({ message: "Deleted successfully" });
   } catch (error) {
     console.error("Error in deleteComplaint:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -166,23 +181,25 @@ export const deleteComplaint = async (req, res) => {
 };
 
 /**
- * --- Nodemailer Setup ---
+ * ----------------------------------------
+ * Nodemailer Setup
+ * ----------------------------------------
  */
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,           // SSL port
-  secure: true,        // use SSL
+  service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, // your Gmail
-    pass: process.env.EMAIL_PASS, // Gmail App Password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false, // ignore self-signed certs (dev only)
+    rejectUnauthorized: false,
   },
 });
 
 /**
- * Admin reply to complaint and send email
+ * ----------------------------------------
+ * Admin Reply + Email
+ * ----------------------------------------
  */
 export const replyToComplaint = async (req, res) => {
   try {
@@ -194,14 +211,13 @@ export const replyToComplaint = async (req, res) => {
       });
     }
 
-    // Find complaint by ID and update
     const complaint = await Complaint.findByIdAndUpdate(
       req.params.id,
       {
         replyMessage,
         status: "Resolved",
       },
-      { returnDocument: "after" } // replaces deprecated `new: true`
+      { returnDocument: 'after' }
     );
 
     if (!complaint) {
@@ -210,46 +226,26 @@ export const replyToComplaint = async (req, res) => {
       });
     }
 
-    // Send email to student
-    const mailOptions = {
-      from: `"Complaint Support Team" <${process.env.EMAIL_USER}>`,
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
       to: complaint.studentEmail,
-      subject: "Response to Your Complaint",
+      subject: "Complaint Response",
       html: `
         <h2>Complaint Response</h2>
-        <p>Hello ${complaint.studentId || "Student"},</p>
-        
-        <p>We have reviewed your complaint regarding:</p>
-        <p><b>${complaint.description}</b></p>
-
+        <p>Hello ${complaint.studentId}</p>
+        <p><b>Your Issue:</b> ${complaint.description}</p>
         <hr/>
-
-        <p><b>Admin Reply:</b></p>
-        <p>${replyMessage}</p>
-
-        <br/>
-        <p>Your complaint status is now: 
-          <span style="color:green;"><b>${complaint.status}</b></span>
-        </p>
-
-        <br/>
-        <p>Thank you for bringing this to our attention.</p>
-        <p>Best regards,<br/>Support Team</p>
+        <p><b>Reply:</b> ${replyMessage}</p>
+        <p>Status: <b>${complaint.status}</b></p>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-
-    return res.status(200).json({
-      message: "Reply sent successfully and complaint updated",
+    res.status(200).json({
+      message: "Reply sent & updated",
       complaint,
     });
-
   } catch (error) {
-    console.error("Error replying to complaint:", error);
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
+    console.error("Reply error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

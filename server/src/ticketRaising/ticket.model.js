@@ -3,7 +3,15 @@ import Counter from "../config/counter.js"
 
 const ticketSchema = new mongoose.Schema(
   {
-    ticketId: { type: String, unique: true},
+    userId: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User", 
+      required: true },
+
+    ticketId: { 
+      type: String, 
+      unique: true},
+
     studentId: {
       type: String,
       required: true
@@ -14,7 +22,11 @@ const ticketSchema = new mongoose.Schema(
       required: true,
       // match: [/.+@.+\..+/, "Please enter a valid email address"],
     },
-    accodamicYear:{
+    accadomicYear: {
+      type: String,
+      required: true,
+    },
+    faculty: {
       type: String,
       required: true,
     },
