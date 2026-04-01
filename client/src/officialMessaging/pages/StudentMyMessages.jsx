@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { AppLayout } from "../../components/AppLayout";
 
+const BACKEND_URL = "http://localhost:5001";
+
 export default function StudentMyMessages() {
   const { token } = useAuth();
   const [messages, setMessages] = useState([]);
@@ -365,6 +367,76 @@ export default function StudentMyMessages() {
                               <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">
                                 {msg.question}
                               </p>
+
+                              {/* Student Attachment Display */}
+                              {msg.attachment?.fileUrl && (
+                                <div className="mt-5 pt-5 border-t border-slate-200">
+                                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500 mb-3">
+                                    📎 Your Attachment
+                                  </p>
+                                  <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                                    {msg.attachment.fileType?.startsWith("image/") ? (
+                                      <div className="space-y-2">
+                                        <img
+                                          src={`${BACKEND_URL}${msg.attachment.fileUrl}`}
+                                          alt={msg.attachment.fileName}
+                                          className="max-w-full h-auto rounded-lg max-h-64 object-cover"
+                                        />
+                                        <div className="flex items-center justify-between gap-2">
+                                          <p className="text-sm font-semibold text-slate-700 break-all flex-1">
+                                            🖼️ {msg.attachment.fileName}
+                                          </p>
+                                          <a
+                                            href={`${BACKEND_URL}${msg.attachment.fileUrl}`}
+                                            download={msg.attachment.fileName}
+                                            className="flex-shrink-0 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline whitespace-nowrap"
+                                          >
+                                            Download
+                                          </a>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3 flex-1">
+                                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-200">
+                                            <svg
+                                              className="h-5 w-5 text-blue-700"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                              />
+                                            </svg>
+                                          </div>
+                                          <div className="flex-1">
+                                            <p className="text-sm font-semibold text-slate-700 break-all">
+                                              📄 {msg.attachment.fileName}
+                                            </p>
+                                            <p className="text-xs text-slate-600">
+                                              {msg.attachment.fileType}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <a
+                                          href={`${BACKEND_URL}${msg.attachment.fileUrl}`}
+                                          download={msg.attachment.fileName}
+                                          className="flex-shrink-0 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition whitespace-nowrap"
+                                        >
+                                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                          </svg>
+                                          Download
+                                        </a>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
                             </div>
 
                             {msg.answer ? (
