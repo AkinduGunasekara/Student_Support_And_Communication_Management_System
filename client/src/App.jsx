@@ -5,7 +5,9 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { TicketCenter } from "./pages/TicketCenter";
 
 import { LoginPage } from "./pages/LoginPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 
@@ -30,6 +32,8 @@ export default function App() {
         
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/public-faq" element={<PublicFAQ />} />
 

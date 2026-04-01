@@ -68,6 +68,50 @@ export const changeUserPassword = async (passwordData, token) => {
 };
 
 /**
+ * Request a password reset email
+ * @param {string} email - Account email address
+ * @returns {Promise} Reset request response
+ */
+export const requestPasswordReset = async (email) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.message || "Failed to request password reset");
+  }
+
+  return response.json();
+};
+
+/**
+ * Reset password using the emailed token
+ * @param {object} resetData - { token, newPassword }
+ * @returns {Promise} Success message
+ */
+export const resetPassword = async (resetData) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(resetData),
+  });
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.message || "Failed to reset password");
+  }
+
+  return response.json();
+};
+
+/**
  * Delete user account permanently
  * @param {string} token - Authentication token
  * @returns {Promise} Success message
