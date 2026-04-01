@@ -39,6 +39,7 @@ export const answerMessage = async (id, answerData, token) => {
   return axios.patch(`${API_BASE}/${id}/answer`, answerData, {
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   });
 };
@@ -47,6 +48,7 @@ export const updateVisibility = async (id, visibilityData, token) => {
   return axios.patch(`${API_BASE}/${id}/visibility`, visibilityData, {
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   });
 };
@@ -58,6 +60,7 @@ export const markAsNotified = async (id, token) => {
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     }
   );
