@@ -18,11 +18,11 @@ function GkTicketView() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [searchCategory, setSearchCategory] = useState("");
 
-  // ✅ GET USER + TOKEN
+  // GET USER + TOKEN
   const token = localStorage.getItem("ssc_token");
   const user = JSON.parse(localStorage.getItem("ssc_user")); // adjust if needed
 
-  // ✅ Fetch ONLY logged-in user's tickets
+  // Fetch ONLY logged-in user's tickets
   const fetchTickets = async () => {
     setLoading(true);
 
@@ -33,7 +33,7 @@ function GkTicketView() {
 
     try {
       const res = await axios.get(
-        "http://localhost:5001/api/tickets/my", // 🔥 IMPORTANT CHANGE
+        "http://localhost:5001/api/tickets/my", 
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -62,6 +62,7 @@ function GkTicketView() {
   const pendingCount = tickets.filter((t) => t.status === "Pending").length;
   const resolvedCount = tickets.filter((t) => t.status === "Resolved").length;
 
+  // Open update modal
   const handleEdit = (ticket) => {
     if (ticket.status === "Pending") {
       setSelectedTicket(ticket);
@@ -71,6 +72,7 @@ function GkTicketView() {
     }
   };
 
+  // Open delete modal
   const handleDelete = (ticket) => {
     if (ticket.status === "Pending") {
       setSelectedTicket(ticket);
@@ -146,7 +148,6 @@ function GkTicketView() {
                   <tr>
                     <th className="px-6 py-4 text-left font-semibold">Ticket ID</th>
                     <th className="px-6 py-4 text-left font-semibold">Student ID</th>
-                    <th className="px-6 py-4 text-left font-semibold">Student Email</th>
                     <th className="px-6 py-4 text-left font-semibold">Category</th>
                     <th className="px-6 py-4 text-left font-semibold">Faculty</th>
                     <th className="px-6 py-4 text-left font-semibold">Year</th>
@@ -164,11 +165,13 @@ function GkTicketView() {
                       <td className="px-6 py-4 font-semibold text-gray-900">
                         {ticket.ticketId}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
-                        {ticket.studentId}
-                      </td>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
-                        {ticket.studentEmail}
+                      <td className="px-6 py-4">
+                          <div className="text-xs text-gray-500">
+                            {ticket.studentId}
+                          </div>
+                          <div className="font-medium">
+                            {ticket.studentEmail}
+                          </div>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-blue-700 font-medium">
@@ -181,9 +184,7 @@ function GkTicketView() {
                       <td className="px-6 py-4 text-gray-700">
                         {ticket.accadomicYear}
                       </td>
-                      <td className="px-6 py-4 text-gray-700 max-w-xs truncate">
-                        {ticket.description}
-                      </td>
+                      <td className="p-3 max-w-md whitespace-pre-line break-words">{ticket.description}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -195,32 +196,22 @@ function GkTicketView() {
                           {ticket.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2 justify-center">
-                          <button
-                            onClick={() => handleEdit(ticket)}
-                            disabled={ticket.status !== "Pending"}
-                            className={`px-3 py-1.5 rounded-lg transition-colors font-semibold text-sm ${
-                              ticket.status === "Pending"
-                                ? "bg-blue-600 text-white hover:bg-blue-700"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            }`}
-                          >
-                            <FaEdit className="inline mr-1" /> Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(ticket)}
-                            disabled={ticket.status !== "Pending"}
-                            className={`px-3 py-1.5 rounded-lg transition-colors font-semibold text-sm ${
-                              ticket.status === "Pending"
-                                ? "bg-red-600 text-white hover:bg-red-700"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            }`}
-                          >
-                            <FaTrash className="inline mr-1" /> Delete
-                          </button>
-                        </div>
-                      </td>
+                      <td className="p-3">
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() => handleEdit(ticket)}
+                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(ticket)}
+                          className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs"
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
+                    </td>
                     </tr>
                   ))}
                 </tbody>
@@ -231,17 +222,17 @@ function GkTicketView() {
 
         {/* CREATE MODAL */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white p-6 rounded-xl w-full max-w-2xl relative my-6 mx-4">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50 overflow-y-auto">
+            <div className="bg-white p-6 rounded-xl w-full max-w-3xl relative my-6 mx-4">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="absolute top-4 right-4 z-10"
+                className="absolute top-2 right-1 z-10 hover:text-red-600 cursor-pointer"
               >
                 <XCircle size={24} />
               </button>
 
               <GkTicketCreate
-                user={user} // 🔥 PASS USER
+                user={user}
                 closeModal={() => setShowCreateModal(false)}
                 refreshTickets={fetchTickets}
               />
@@ -251,14 +242,14 @@ function GkTicketView() {
 
         {/* UPDATE MODAL */}
         {selectedTicket && modalType === "update" && (
-          <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white rounded-xl w-full max-w-2xl relative my-6 mx-4">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50 overflow-y-auto">
+            <div className="bg-white p-6 rounded-xl w-full max-w-3xl relative my-6 mx-4">
               <button
                 onClick={() => {
                   setModalType(null);
                   setSelectedTicket(null);
                 }}
-                className="absolute top-4 right-4 z-10"
+                className="absolute top-2 right-1 z-10 hover:text-red-600 cursor-pointer"
               >
                 <XCircle size={24} />
               </button>
@@ -277,14 +268,14 @@ function GkTicketView() {
 
         {/* DELETE MODAL */}
         {selectedTicket && modalType === "delete" && (
-          <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white rounded-xl w-full max-w-2xl relative my-6 mx-4">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50 overflow-y-auto">
+            <div className="bg-white p-6 rounded-xl w-full max-w-3xl relative my-6 mx-4">
               <button
                 onClick={() => {
                   setModalType(null);
                   setSelectedTicket(null);
                 }}
-                className="absolute top-4 right-4 z-10"
+                className="absolute top-2 right-1 z-10 hover:text-red-600 cursor-pointer"
               >
                 <XCircle size={24} />
               </button>

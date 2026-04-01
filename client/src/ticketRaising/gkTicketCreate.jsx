@@ -205,7 +205,7 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
               <option value="">Select category</option>
               <option value="Academic">Academic</option>
               <option value="Complaint">Complaint</option>
-              <option value="Technical Issues">Technical Issues</option>
+              <option value="Technical">Technical</option>
               <option value="Other">Other</option>
             </select>
           </div>

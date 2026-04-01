@@ -115,14 +115,14 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
   };
 
   return (
-  <div className="w-full max-w-3xl mx-auto font-sans">
+  <div className="w-full max-w-3xl mx-auto">
 
     {/* Header */}
     <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md">
-      <h2 className="text-xl font-bold flex items-center gap-2">
+      <h2 className="text-xl font-bold">
         📝 Update Ticket
       </h2>
-      <p className="text-blue-100 text-sm mt-1">
+      <p className="text-sm text-blue-100">
         Modify and resubmit your ticket below.
       </p>
     </div>
@@ -205,7 +205,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
               <option value="">Select category</option>
               <option value="Academic">Academic</option>
               <option value="Complaint">Complaint</option>
-              <option value="Technical Issues">Technical Issues</option>
+              <option value="Technical">Technical</option>
               <option value="Other">Other</option>
             </select>
           </div>

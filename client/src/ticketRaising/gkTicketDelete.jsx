@@ -70,12 +70,12 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   }
 
   return (
-    <div className="mt-5 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
-      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md">
+        <h2 className="text-xl font-bold">
           🗑️ Delete Ticket
         </h2>
-        <p className="text-blue-100 text-sm mt-1">
+        <p className="text-sm text-blue-100">
           Review the details before deleting this ticket.
         </p>
       </div>
