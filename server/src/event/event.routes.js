@@ -8,7 +8,9 @@ import {
   approveEvent,
   rejectEvent,
   getMyEvents,
+  updateEvent,
 } from "./event.controller.js";
+
 
 import {
   authMiddleware,
@@ -20,7 +22,7 @@ const router = express.Router();
 // 🔥 MULTER CONFIG
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "uploads/events/");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -34,6 +36,8 @@ router.get("/", getApprovedEvents);
 
 // 🔹 USER
 router.get("/my-events", authMiddleware, getMyEvents);
+
+router.put("/:id", authMiddleware, upload.single("image"), updateEvent);
 
 // 🔹 ADMIN
 router.get("/admin/pending", authMiddleware, requireRole("admin"), getPendingEvents);

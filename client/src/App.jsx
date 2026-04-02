@@ -28,6 +28,8 @@ import StudentEventsPage from "./event/StudentEventsPage";
 import LecturerEventsPage from "./event/LecturerEventsPage";
 import AdminEventsPage from "./event/AdminEventsPage";
 
+import LandingPage from "./pages/LandingPage";
+
 export default function App() {
   return (
     <AuthProvider>
@@ -35,16 +37,7 @@ export default function App() {
       <Routes>
         {/* Root redirect to login */}
 
-        <Route
-        path="/"
-        element={
-          localStorage.getItem("ssc_token") ? (
-            <Navigate to="/events" />
-          ) : (
-            <Navigate to="/login" />
-          )
-        }
-      />
+        <Route path="/" element={<LandingPage />} />
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />

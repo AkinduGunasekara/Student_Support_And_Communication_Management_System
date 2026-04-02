@@ -4,6 +4,36 @@ import { X, Calendar, Clock, MapPin } from "lucide-react";
 const EventDetailsModal = ({ event, onClose }) => {
   if (!event) return null;
 
+  // 🔥 GOOGLE CALENDAR FUNCTION
+  const handleAddToCalendar = () => {
+    try {
+      const start = new Date(event.date);
+
+      const [startHour, startMin] = event.startTime.split(":");
+      const [endHour, endMin] = event.endTime.split(":");
+
+      const startDate = new Date(start);
+      startDate.setHours(startHour, startMin);
+
+      const endDate = new Date(start);
+      endDate.setHours(endHour, endMin);
+
+      const formatDate = (date) =>
+        date.toISOString().replace(/-|:|\.\d+/g, "");
+
+      const url = `https://www.google.com/calendar/render?action=TEMPLATE
+&text=${encodeURIComponent(event.title)}
+&details=${encodeURIComponent(event.description || "")}
+&location=${encodeURIComponent(event.location || "")}
+&dates=${formatDate(startDate)}/${formatDate(endDate)}`;
+
+      window.open(url, "_blank");
+    } catch (err) {
+      console.error("Calendar error:", err);
+      alert("Failed to add to calendar");
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
 
@@ -39,7 +69,9 @@ const EventDetailsModal = ({ event, onClose }) => {
 
               <div className="flex items-center gap-2">
                 <Calendar size={16} />
-                <span>{event.date}</span>
+                <span>
+                  {new Date(event.date).toLocaleDateString()}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -53,14 +85,20 @@ const EventDetailsModal = ({ event, onClose }) => {
               </div>
             </div>
 
+            {/* 🔥 REAL DESCRIPTION */}
             <p className="text-sm text-slate-600 mt-4">
-              This is a sample event description. Later you can connect real data from backend.
+              {event.description || "No description available."}
             </p>
           </div>
 
           {/* ACTIONS */}
           <div className="flex gap-3 mt-6">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+
+            {/* 🔥 GOOGLE CALENDAR BUTTON */}
+            <button
+              onClick={handleAddToCalendar}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+            >
               Add to Calendar
             </button>
 

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, UploadCloud } from "lucide-react";
-import { createEvent } from "../../services/eventService";
+import { createEvent, updateEvent } from "../../services/eventService";
 
-const EventModal = ({ isOpen, onClose, onSave }) => {
+const EventModal = ({ isOpen, onClose, onSave, event }) => {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -15,6 +15,34 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
   });
 
   const [error, setError] = useState("");
+
+  // 🔥 PREFILL FORM WHEN EDITING
+  useEffect(() => {
+    if (event) {
+      setForm({
+        title: event.title || "",
+        description: event.description || "",
+        date: event.date ? event.date.split("T")[0] : "",
+        startTime: event.startTime || "",
+        endTime: event.endTime || "",
+        location: event.location || "",
+        type: event.type || "academic",
+        image: null,
+      });
+    } else {
+      // 🔥 RESET WHEN CREATING NEW
+      setForm({
+        title: "",
+        description: "",
+        date: "",
+        startTime: "",
+        endTime: "",
+        location: "",
+        type: "academic",
+        image: null,
+      });
+    }
+  }, [event]);
 
   if (!isOpen) return null;
 
@@ -36,26 +64,32 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleSubmit = async () => {
-  try {
-    if (!form.title || !form.date || !form.startTime || !form.endTime) {
-      setError("Please fill all required fields");
-      return;
+    try {
+      if (!form.title || !form.date || !form.startTime || !form.endTime) {
+        setError("Please fill all required fields");
+        return;
+      }
+
+      let result;
+
+      if (event) {
+        // 🔥 UPDATE EVENT
+        result = await updateEvent(event.id, form);
+      } else {
+        // 🔥 CREATE EVENT
+        result = await createEvent(form);
+      }
+
+      if (onSave) onSave(result);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Failed");
     }
-
-    await createEvent(form);
-
-    if (onSave) onSave();
-    onClose();
-
-  } catch (err) {
-    console.error(err);
-    setError(err.response?.data?.message || "Failed to create event");
-  }
-};
+  };
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-
       {/* BACKDROP */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
@@ -64,7 +98,7 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
 
       {/* MODAL */}
       <div className="relative bg-white w-full max-w-4xl rounded-2xl shadow-xl border border-slate-200 p-6 flex gap-6">
-
+        
         {/* CLOSE */}
         <button
           onClick={onClose}
@@ -75,7 +109,6 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
 
         {/* LEFT - IMAGE */}
         <div className="w-1/2 flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-6 text-center">
-
           <UploadCloud size={40} className="text-blue-500 mb-3" />
 
           <p className="text-sm text-slate-600 mb-2">
@@ -98,12 +131,11 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
 
         {/* RIGHT */}
         <div className="w-1/2 space-y-4">
-
           <h2 className="text-lg font-semibold text-slate-900">
-            Create Event
+            {event ? "Edit Event" : "Create Event"}
           </h2>
 
-          {/* ERROR MESSAGE */}
+          {/* ERROR */}
           {error && (
             <p className="text-red-500 text-xs">{error}</p>
           )}
@@ -141,7 +173,8 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
               onChange={handleChange}
               className="border border-slate-200 p-2 rounded-lg text-sm"
             />
-             <input
+
+            <input
               type="time"
               name="endTime"
               value={form.endTime}
@@ -170,19 +203,16 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
             <option value="other">Other</option>
           </select>
 
-          {/* 🔥 INFO MESSAGE */}
           <p className="text-xs text-slate-500">
-            Admin will review your event. Once approved, it will be visible in the university calendar for everyone.
+            Admin will review your event. Once approved, it will be visible for everyone.
           </p>
 
-          {/* ACTION */}
           <button
             onClick={handleSubmit}
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            Create Event
+            {event ? "Update Event" : "Create Event"}
           </button>
-
         </div>
       </div>
     </div>

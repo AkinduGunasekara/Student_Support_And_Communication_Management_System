@@ -4,6 +4,7 @@ import EventCard from "./components/EventCard";
 import CalendarView from "./components/CalendarView";
 import EventModal from "./components/EventModal";
 import EventDetailsModal from "./components/EventDetailsModal";
+import { useAuth } from "../AuthContext"; // ✅ ADDED
 
 import { getApprovedEvents } from "../services/eventService";
 
@@ -11,10 +12,11 @@ import { getApprovedEvents } from "../services/eventService";
 import banner from "../assets/event-banner.jpg";
 
 const EventsPage = () => {
+  const { user } = useAuth(); // ✅ ADDED
+
   const [view, setView] = useState("card");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
   const [events, setEvents] = useState([]);
 
   // 🔥 FETCH EVENTS FROM BACKEND
@@ -23,11 +25,16 @@ const EventsPage = () => {
       try {
         const data = await getApprovedEvents();
 
+        if (!Array.isArray(data)) {
+          console.error("Events is not an array:", data);
+          return;
+        }
+
         const formatted = data.map((e) => ({
           ...e,
-          id: e._id, // ✅ VERY IMPORTANT
+          id: e._id,
           image: e.image
-            ? `http://localhost:5001${e.image}` // ✅ fix uploaded images
+            ? `http://localhost:5001${e.image}`
             : "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
           dateShort: new Date(e.date).toLocaleDateString("en-US", {
             month: "short",
@@ -45,9 +52,18 @@ const EventsPage = () => {
     fetchEvents();
   }, []);
 
-  // 🔹 Add event locally (optional)
+  // 🔹 Add event locally
   const handleAddEvent = (newEvent) => {
     setEvents((prev) => [...prev, newEvent]);
+  };
+
+  // 🔒 EXTRA SAFETY (prevents manual trigger)
+  const handleOpenModal = () => {
+    if (!user) {
+      alert("Please login to create an event");
+      return;
+    }
+    setShowModal(true);
   };
 
   return (
@@ -58,7 +74,6 @@ const EventsPage = () => {
 
         {/* 🔥 HERO HEADER */}
         <div className="relative rounded-2xl overflow-hidden mb-6 shadow">
-
           <img
             src={banner}
             alt="events banner"
@@ -109,13 +124,15 @@ const EventsPage = () => {
               </button>
             </div>
 
-            {/* Add Button */}
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition"
-            >
-              + Add Event
-            </button>
+            {/* 🔒 Add Button (PROTECTED) */}
+            {user && (
+              <button
+                onClick={handleOpenModal}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition"
+              >
+                + Add Event
+              </button>
+            )}
           </div>
 
           {/* 🔹 CONTENT */}

@@ -1,47 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppLayout } from "../components/AppLayout";
 import { Plus } from "lucide-react";
 import EventModal from "./components/EventModal";
 import EventCard from "./components/EventCard";
-
-// 🔥 banner image
 import banner from "../assets/event-banner.jpg";
+import { getMyEvents } from "../services/eventService";
 
 const StudentEventsPage = () => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "AI Seminar",
-      date: "2026-04-10",
-      time: "10:00 - 12:00",
-      location: "Hall A",
-      type: "Seminar",
-      status: "pending",
-      image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
-    },
-    {
-      id: 2,
-      title: "UX Workshop",
-      date: "2026-04-12",
-      time: "09:00 - 12:00",
-      location: "Innovation Lab",
-      type: "Workshop",
-      status: "approved",
-      image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a",
-    },
-    {
-      id: 3,
-      title: "Sports Meet",
-      date: "2026-04-15",
-      time: "16:00",
-      location: "Sports Complex",
-      type: "Sports",
-      status: "rejected",
-      image: "https://images.unsplash.com/photo-1517649763962-0c623066013b",
-    },
-  ]);
-
+  const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
+
+  // 🔥 FETCH MY EVENTS
+  useEffect(() => {
+    const fetchMyEvents = async () => {
+      try {
+        const data = await getMyEvents();
+
+        const formatted = data.map((e) => ({
+          ...e,
+          id: e._id,
+          image: e.image
+            ? `http://localhost:5001${e.image}`
+            : "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
+          time: `${e.startTime} - ${e.endTime}`,
+        }));
+
+        setEvents(formatted);
+      } catch (err) {
+        console.error("Fetch my events error:", err);
+      }
+    };
+
+    fetchMyEvents();
+  }, []);
 
   return (
     <AppLayout>
@@ -68,7 +59,7 @@ const StudentEventsPage = () => {
         {/* 🔥 ACTION BAR */}
         <div className="flex justify-between items-center mb-6">
 
-          {/* FILTERS */}
+          {/* FILTERS (UI only for now) */}
           <div className="flex gap-2">
             <button className="px-4 py-2 rounded-full bg-blue-600 text-white text-sm">
               All
@@ -120,9 +111,15 @@ const StudentEventsPage = () => {
               <div className="flex gap-2 mt-2">
 
                 {event.status !== "approved" && (
-                  <button className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600">
-                    Edit
-                  </button>
+                  <button
+                  onClick={() => {
+                    setSelectedEvent(event);   // 🔥 store event
+                    setShowModal(true);        // 🔥 open modal
+                  }}
+                  className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
+                >
+                  Edit
+                </button>
                 )}
 
                 <button className="flex-1 bg-green-500 text-white text-xs py-2 rounded-lg hover:bg-green-600">
@@ -134,14 +131,22 @@ const StudentEventsPage = () => {
           ))}
 
         </div>
+
+        {/* 🔥 EMPTY STATE */}
+        {events.length === 0 && (
+          <p className="text-center text-gray-500 mt-6">
+            No events created yet
+          </p>
+        )}
       </div>
 
       {/* 🔥 MODAL */}
       <EventModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSave={(newEvent) => {
-          setEvents((prev) => [...prev, newEvent]);
+        onSave={() => {
+          // 🔥 refresh after create
+          window.location.reload();
         }}
       />
 

@@ -1,70 +1,69 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppLayout } from "../components/AppLayout";
 import { Plus } from "lucide-react";
 import EventModal from "./components/EventModal";
 import EventCard from "./components/EventCard";
-import banner from "../assets/event-banner.jpg"; // adjust path if needed
+import banner from "../assets/event-banner.jpg";
+
+// 🔥 IMPORT API
+import { getMyEvents } from "../services/eventService";
 
 const LecturerEventsPage = () => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Engineering Seminar",
-      date: "2026-04-10",
-      time: "10:00 - 12:00",
-      location: "Hall A",
-      type: "Seminar",
-      status: "pending",
-      image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
-    },
-    {
-      id: 2,
-      title: "Robotics Workshop",
-      date: "2026-04-12",
-      time: "09:00 - 12:00",
-      location: "Lab 2",
-      type: "Workshop",
-      status: "approved",
-      image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a",
-    },
-  ]);
-
+  const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  // 🔥 FETCH FUNCTION (REUSABLE)
+  const fetchMyEvents = async () => {
+    try {
+      const data = await getMyEvents();
+
+      const formatted = data.map((e) => ({
+        ...e,
+        id: e._id,
+        image: e.image
+          ? `http://localhost:5001${e.image}`
+          : "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
+        time: `${e.startTime} - ${e.endTime}`,
+      }));
+
+      setEvents(formatted);
+    } catch (err) {
+      console.error("Fetch my events error:", err);
+    }
+  };
+
+  // 🔥 INITIAL LOAD
+  useEffect(() => {
+    fetchMyEvents();
+  }, []);
 
   return (
     <AppLayout>
       <div className="p-6">
 
-        {/* 🔵 HEADER */}
         {/* 🔥 HERO HEADER */}
-<div className="relative rounded-2xl overflow-hidden mb-6 shadow">
+        <div className="relative rounded-2xl overflow-hidden mb-6 shadow">
+          <img
+            src={banner}
+            alt="events banner"
+            className="w-full h-52 object-cover"
+          />
 
-  {/* IMAGE */}
-  <img
-    src={banner}
-    alt="events banner"
-    className="w-full h-52 object-cover"
-  />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
 
-  {/* OVERLAY */}
-  <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
-
-  {/* TEXT */}
-  <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
-    <h1 className="text-xl font-bold">
-      My Events
-    </h1>
-
-    <p className="text-sm mt-1 text-white/80">
-      Manage events created by you
-    </p>
-  </div>
-</div>
+          <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
+            <h1 className="text-xl font-bold">My Events</h1>
+            <p className="text-sm mt-1 text-white/80">
+              Manage events created by you
+            </p>
+          </div>
+        </div>
 
         {/* 🔥 ACTION BAR */}
         <div className="flex justify-between items-center mb-6">
 
-          {/* FILTERS */}
+          {/* FILTERS (UI ONLY FOR NOW) */}
           <div className="flex gap-2">
             <button className="px-4 py-2 rounded-full bg-blue-600 text-white text-sm">
               All
@@ -82,7 +81,10 @@ const LecturerEventsPage = () => {
 
           {/* CREATE BUTTON */}
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setSelectedEvent(null); // 🔥 ensure create mode
+              setShowModal(true);
+            }}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
           >
             <Plus size={16} />
@@ -116,7 +118,13 @@ const LecturerEventsPage = () => {
               <div className="flex gap-2 mt-2">
 
                 {event.status !== "approved" && (
-                  <button className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600">
+                  <button
+                    onClick={() => {
+                      setSelectedEvent(event); // 🔥 pass event to modal
+                      setShowModal(true);
+                    }}
+                    className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
+                  >
                     Edit
                   </button>
                 )}
@@ -130,15 +138,24 @@ const LecturerEventsPage = () => {
           ))}
 
         </div>
+
+        {/* 🔥 EMPTY STATE */}
+        {events.length === 0 && (
+          <p className="text-center text-gray-500 mt-6">
+            No events created yet
+          </p>
+        )}
       </div>
 
       {/* 🔥 MODAL */}
       <EventModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onSave={(newEvent) => {
-          setEvents((prev) => [...prev, newEvent]);
+        onClose={() => {
+          setShowModal(false);
+          setSelectedEvent(null);
         }}
+        event={selectedEvent}
+        onSave={fetchMyEvents}   // 🔥 FIXED (no crash now)
       />
 
     </AppLayout>

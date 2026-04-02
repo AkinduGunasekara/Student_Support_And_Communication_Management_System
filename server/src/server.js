@@ -18,7 +18,6 @@ import path from "path";
 // import serviceRequestRouter from "./routes/GKServicceRequestRoutes.js";
 // import announcementRoutes from "./routes/GKAnnouncementRouter.js";
 import { connectDB } from "./config/db.js";
-import path from "path";
 // import { initializeRentCronJobs } from "./jobs/sn_monthlyReminder.js";
 // import noteRoutes from "./routes/SDnotesRoutes.js";
 // import purchaseRoutes from "./routes/SDpurchaseRoutes.js";
@@ -52,12 +51,13 @@ app.use("/api/users", userRouter);
 app.use("/api/tickets", ticketRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/feedback", feedbackRouter);
-<<<<<<< HEAD
-app.use("/uploads", express.static(path.resolve("uploads")));
-=======
+
+// Events route
 app.use("/api/events", eventRoutes);
 
-// Events UPLOADS (VERY IMPORTANT)
+// Serve uploaded files
+app.use("/uploads", express.static(path.resolve("uploads")));
+
 
 
 app.listen(PORT, () => {

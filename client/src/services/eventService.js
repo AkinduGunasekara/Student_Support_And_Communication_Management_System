@@ -28,7 +28,7 @@ export const createEvent = async (form) => {
   const res = await axios.post(API, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${localStorage.getItem("ssc_token")}`, // ✅ FIXED
+      Authorization: `Bearer ${localStorage.getItem("ssc_token")}`, 
     },
   });
 
@@ -37,14 +37,30 @@ export const createEvent = async (form) => {
 
 
 // 🔹 GET APPROVED (PUBLIC)
-export const getApprovedEvents = () => axios.get(API);
+export const getApprovedEvents = async () => {
+  const res = await axios.get(API);
+  return res.data;
+};
 
 // 🔹 MY EVENTS
-export const getMyEvents = () =>
-  axios.get(`${API}/my-events`, authHeader());
+export const getMyEvents = async () => {
+  const res = await axios.get(`${API}/my-events`, authHeader());
+  return res.data;
+};
+
+export const updateEvent = async (id, data) => {
+  const res = await axios.put(`${API}/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("ssc_token")}`,
+    },
+  });
+
+  return res.data;
+};
+
 
 // 🔹 ADMIN
-const getToken = () => localStorage.getItem("token");
+const getToken = () => localStorage.getItem("ssc_token");
 
 // 🔹 GET PENDING EVENTS (ADMIN)
 export const getPendingEvents = async () => {
