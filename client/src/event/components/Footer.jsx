@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/Logo.png"; // ✅ added
+import logo from "../../assets/Logo2.png"; // ✅ added
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Footer = () => {
           <img
             src={logo}
             alt="Campus One"
-            className="h-14 cursor-pointer" // ✅ same size as navbar
+            className="h-30 cursor-pointer" // ✅ same size as navbar
             onClick={() => navigate("/")}
           />
 
