@@ -47,7 +47,7 @@ function gkAdminViewTicket() {
     } catch (err) {
       toast.error("Failed to send reply");
     } finally {
-      setLoadingReply(false);``
+      setLoadingReply(false);
     }
   };
 
@@ -56,15 +56,14 @@ function gkAdminViewTicket() {
   const pending = tickets.filter(t => t.status === "Pending").length;
   const resolved = tickets.filter(t => t.status === "Resolved").length;
 
-  // Filter tickets
-  const filteredTickets = filterStatus === "all" 
-    ? tickets 
+  //filter tickets
+  const filteredTickets = filterStatus ==="all"
+    ? tickets
     : tickets.filter(t => t.status === filterStatus);
 
   return (
     <AppLayout>
-      <div className="ui-page">
-        <div className="ui-card mb-8 bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white">
+      <div className="ui-card mb-8 bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">🎫 Admin Ticket Management</h1>
           <p className="text-blue-200">Manage and respond to student support tickets efficiently.</p>
         </div>
@@ -74,12 +73,13 @@ function gkAdminViewTicket() {
           <div className="ui-card p-6 border-l-4 border-blue-600 bg-gradient-to-br from-blue-50 to-blue-100">
             <p className="text-xs uppercase text-blue-600 font-bold">Total Tickets</p>
             <h2 className="text-4xl font-bold mt-2 text-blue-900">{total}</h2>
+        
           </div>
 
           <div className="ui-card p-6 border-l-4 border-yellow-500 bg-gradient-to-br from-yellow-50 to-yellow-100">
             <p className="text-xs uppercase text-yellow-600 font-bold">Pending</p>
             <h2 className="text-4xl font-bold mt-2 text-yellow-900">{pending}</h2>
-          </div>
+            </div>
 
           <div className="ui-card p-6 border-l-4 border-emerald-600 bg-gradient-to-br from-emerald-50 to-emerald-100">
             <p className="text-xs uppercase text-emerald-600 font-bold">Resolved</p>
@@ -87,7 +87,7 @@ function gkAdminViewTicket() {
           </div>
         </div>
 
-        {/* Filter Tabs */}
+                {/* Filter Tabs */}
         <div className="mb-6 flex gap-3">
           <button
             onClick={() => setFilterStatus("all")}
@@ -175,7 +175,7 @@ function gkAdminViewTicket() {
                       </td>
 
                       <td className="px-6 py-4 text-gray-700">
-                        {ticket.accadomicYear}
+                        {ticket.academicYear}
                       </td>
 
                       <td className="px-6 py-4 text-gray-700 max-w-xs truncate hover:text-clip">
@@ -213,7 +213,6 @@ function gkAdminViewTicket() {
             </table>
           </div>
         </div>
-      </div>
 
       {/* Reply Modal */}
       {selectedTicket && (
@@ -244,7 +243,7 @@ function gkAdminViewTicket() {
                 <p className="text-gray-900">{selectedTicket.studentId} ({selectedTicket.studentEmail})</p>
               </div>
 
-              <div>
+            <div>
                 <p className="text-xs uppercase text-gray-500 font-semibold mb-2">Issue Description</p>
                 <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedTicket.description}</p>
               </div>

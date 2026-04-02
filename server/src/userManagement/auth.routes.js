@@ -1,7 +1,9 @@
 import express from "express";
+import crypto from "crypto";
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/jwt.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
+import { isMailConfigured, sendPasswordResetEmail } from "../utils/mailer.js";
 import {
   COURSES,
   COURSE_BY_FACULTY,
@@ -134,6 +136,99 @@ router.post("/login", async (req, res) => {
       });
     } catch (error) {
       console.error("Login error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Request a password reset link by email
+  router.post("/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const emailAddress = String(email).trim().toLowerCase();
+      const user = await User.findOne({ email: emailAddress });
+
+      if (!user || !user.isActive) {
+        return res.json({
+          message:
+            "If an account exists for that email, a password reset link has been sent.",
+        });
+      }
+
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetTokenHash = crypto.createHash("sha256").update(resetToken).digest("hex");
+      const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
+
+      user.resetPasswordToken = resetTokenHash;
+      user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
+      await user.save({ validateBeforeSave: false });
+
+      let emailSent = false;
+      try {
+        emailSent = await sendPasswordResetEmail({
+          to: user.email,
+          name: user.name,
+          resetUrl,
+        });
+      } catch (mailError) {
+        console.error("Password reset email error:", mailError);
+      }
+
+      const response = {
+        message:
+          "If an account exists for that email, a password reset link has been sent.",
+      };
+
+      if (!emailSent && !isMailConfigured) {
+        response.resetUrl = resetUrl;
+      }
+
+      return res.json(response);
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Reset password using the emailed token
+  router.post("/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+
+      if (!token || !newPassword) {
+        return res
+          .status(400)
+          .json({ message: "Token and newPassword are required" });
+      }
+
+      if (String(newPassword).length < 6) {
+        return res
+          .status(400)
+          .json({ message: "Password must be at least 6 characters" });
+      }
+
+      const tokenHash = crypto.createHash("sha256").update(String(token)).digest("hex");
+      const user = await User.findOne({
+        resetPasswordToken: tokenHash,
+        resetPasswordExpires: { $gt: new Date() },
+      }).select("+password");
+
+      if (!user) {
+        return res.status(400).json({ message: "Reset link is invalid or has expired" });
+      }
+
+      user.password = newPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return res.json({ message: "Password reset successfully" });
+    } catch (error) {
+      console.error("Reset password error:", error);
       return res.status(500).json({ message: "Server error" });
     }
   });

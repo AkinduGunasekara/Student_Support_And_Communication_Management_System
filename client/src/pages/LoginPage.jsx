@@ -96,6 +96,15 @@ export const LoginPage = () => {
               <input type="password" name="password" required className="ui-input" />
             </div>
 
+            <div className="flex items-center justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-sm font-semibold text-blue-700 hover:text-blue-800"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
             <button type="submit" className="btn-primary mt-2 w-full px-4 py-3">
               Sign In
             </button>
