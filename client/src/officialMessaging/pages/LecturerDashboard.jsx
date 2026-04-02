@@ -7,6 +7,10 @@ import {
   answerMessage,
   getLecturerMessages,
   updateVisibility,
+  generateCSVReport,
+  generateJSONReport,
+  generateHTMLReport,
+  generatePDFReport,
 } from "../services/messageService";
 
 export default function LecturerDashboard() {
@@ -16,6 +20,7 @@ export default function LecturerDashboard() {
   const [loading, setLoading] = useState(true);
   const [answeringId, setAnsweringId] = useState(null);
   const [visibilityId, setVisibilityId] = useState(null);
+  const [exportingFormat, setExportingFormat] = useState(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -179,6 +184,78 @@ export default function LecturerDashboard() {
   const publicCount = messages.filter((msg) => msg.isPublic).length;
   const privateCount = messages.filter((msg) => !msg.isPublic).length;
 
+  const stats = {
+    total: messages.length,
+    open: openCount,
+    answered: answeredCount,
+    public: publicCount,
+    private: privateCount,
+  };
+
+  const handleExportCSV = () => {
+    try {
+      setExportingFormat("csv");
+      generateCSVReport(
+        filteredMessages,
+        `messages-report-${new Date().getTime()}.csv`
+      );
+      toast.success("CSV report downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to export CSV");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
+  const handleExportJSON = () => {
+    try {
+      setExportingFormat("json");
+      generateJSONReport(
+        filteredMessages,
+        stats,
+        `messages-report-${new Date().getTime()}.json`
+      );
+      toast.success("JSON report downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to export JSON");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
+  const handleExportHTML = () => {
+    try {
+      setExportingFormat("html");
+      generateHTMLReport(
+        filteredMessages,
+        stats,
+        `messages-report-${new Date().getTime()}.html`
+      );
+      toast.success("HTML report downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to export HTML");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    try {
+      setExportingFormat("pdf");
+      await generatePDFReport(
+        filteredMessages,
+        stats,
+        `messages-report-${new Date().getTime()}.pdf`
+      );
+      toast.success("PDF report downloaded successfully");
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("Failed to export PDF");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
   const getStatusClasses = (status) => {
     switch (status) {
       case "ANSWERED":
@@ -301,6 +378,77 @@ export default function LecturerDashboard() {
                 <option value="PUBLIC">Published FAQ</option>
                 <option value="PRIVATE">Private Only</option>
               </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="ui-card mb-6 p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-700">
+                📥 Export Reports
+              </h3>
+              <p className="mt-1 text-xs text-slate-600">
+                Download filtered messages in your preferred format
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="btn-primary rounded-lg px-4 py-2 text-sm font-medium transition hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "csv" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting CSV...
+                  </>
+                ) : (
+                  <>📊 Export CSV</>
+                )}
+              </button>
+
+              <button
+                onClick={handleExportJSON}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "json" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting JSON...
+                  </>
+                ) : (
+                  <>📄 Export JSON</>
+                )}
+              </button>
+
+              <button
+                onClick={handleExportHTML}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 transition hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "html" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting HTML...
+                  </>
+                ) : (
+                  <>🖨️ Export HTML</>
+                )}
+              </button>
+
+              <button
+                onClick={handleExportPDF}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "pdf" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting PDF...
+                  </>
+                ) : (
+                  <>📑 Export PDF</>
+                )}
+              </button>
             </div>
           </div>
         </div>
