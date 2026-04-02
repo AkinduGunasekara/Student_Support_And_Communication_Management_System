@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
 function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
     if (!ticketId) return;
 
     const fetchTicket = async () => {
-      const token = localStorage.getItem("ssc_token");
+        const token = localStorage.getItem("ssc_token");
       if (!token) {
         toast.error("You are not logged in. Please login first.");
         return;
@@ -19,7 +21,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
 
       try {
         const res = await axios.get(
-          `http://localhost:5001/api/tickets/${ticketId}`,
+          `${API_BASE_URL}/api/tickets/${ticketId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setTicket(res.data);
@@ -37,7 +39,6 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   // Handle ticket deletion
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this ticket?")) return;
-
     const token = localStorage.getItem("ssc_token");
     if (!token) {
       toast.error("Unauthorized. Please login again.");
@@ -46,7 +47,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
 
     try {
       await axios.delete(
-        `http://localhost:5001/api/tickets/${ticketId}`,
+        `${API_BASE_URL}/api/tickets/${ticketId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Ticket deleted successfully!", { position: "top-center" });
@@ -70,12 +71,12 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md">
-        <h2 className="text-xl font-bold">
+    <div className="mt-5 w-full max-w-4xl mx-auto overflow-hidden font-sens-serif">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           🗑️ Delete Ticket
         </h2>
-        <p className="text-sm text-blue-100">
+        <p className="text-blue-100 text-sm mt-1">
           Review the details before deleting this ticket.
         </p>
       </div>
@@ -92,6 +93,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />
           </div>
+
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Student Email</label>
             <input
@@ -101,15 +103,17 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />
           </div>
+
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Academic Year</label>
             <input
               type="text"
-              value={ticket.accadomicYear}
+              value={ticket.academicYear || ticket.accadomicYear}
               readOnly
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />
           </div>
+
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Faculty</label>
             <input
@@ -119,6 +123,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />
           </div>
+
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Ticket Category</label>
             <input
@@ -128,6 +133,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
               className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
             />
           </div>
+          
         </div>
 
         <div>

@@ -7,6 +7,10 @@ import {
   answerMessage,
   getLecturerMessages,
   updateVisibility,
+  generateCSVReport,
+  generateJSONReport,
+  generateHTMLReport,
+  generatePDFReport,
 } from "../services/messageService";
 
 export default function LecturerDashboard() {
@@ -16,6 +20,7 @@ export default function LecturerDashboard() {
   const [loading, setLoading] = useState(true);
   const [answeringId, setAnsweringId] = useState(null);
   const [visibilityId, setVisibilityId] = useState(null);
+  const [exportingFormat, setExportingFormat] = useState(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -179,6 +184,78 @@ export default function LecturerDashboard() {
   const publicCount = messages.filter((msg) => msg.isPublic).length;
   const privateCount = messages.filter((msg) => !msg.isPublic).length;
 
+  const stats = {
+    total: messages.length,
+    open: openCount,
+    answered: answeredCount,
+    public: publicCount,
+    private: privateCount,
+  };
+
+  const handleExportCSV = () => {
+    try {
+      setExportingFormat("csv");
+      generateCSVReport(
+        filteredMessages,
+        `messages-report-${new Date().getTime()}.csv`
+      );
+      toast.success("CSV report downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to export CSV");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
+  const handleExportJSON = () => {
+    try {
+      setExportingFormat("json");
+      generateJSONReport(
+        filteredMessages,
+        stats,
+        `messages-report-${new Date().getTime()}.json`
+      );
+      toast.success("JSON report downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to export JSON");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
+  const handleExportHTML = () => {
+    try {
+      setExportingFormat("html");
+      generateHTMLReport(
+        filteredMessages,
+        stats,
+        `messages-report-${new Date().getTime()}.html`
+      );
+      toast.success("HTML report downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to export HTML");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    try {
+      setExportingFormat("pdf");
+      await generatePDFReport(
+        filteredMessages,
+        stats,
+        `messages-report-${new Date().getTime()}.pdf`
+      );
+      toast.success("PDF report downloaded successfully");
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("Failed to export PDF");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
   const getStatusClasses = (status) => {
     switch (status) {
       case "ANSWERED":
@@ -189,6 +266,17 @@ export default function LecturerDashboard() {
       default:
         return "bg-amber-100 text-amber-700 border border-amber-200";
     }
+  };
+
+  const isImageFile = (fileType) => {
+    return fileType?.startsWith("image/");
+  };
+
+  const getFileIcon = (fileType) => {
+    if (fileType?.includes("pdf")) return "📕";
+    if (fileType?.includes("word") || fileType?.includes("document"))
+      return "📄";
+    return "📎";
   };
 
   return (
@@ -305,6 +393,77 @@ export default function LecturerDashboard() {
           </div>
         </div>
 
+        <div className="ui-card mb-6 p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-700">
+                📥 Export Reports
+              </h3>
+              <p className="mt-1 text-xs text-slate-600">
+                Download filtered messages in your preferred format
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={handleExportCSV}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="btn-primary rounded-lg px-4 py-2 text-sm font-medium transition hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "csv" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting CSV...
+                  </>
+                ) : (
+                  <>📊 Export CSV</>
+                )}
+              </button>
+
+              <button
+                onClick={handleExportJSON}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "json" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting JSON...
+                  </>
+                ) : (
+                  <>📄 Export JSON</>
+                )}
+              </button>
+
+              <button
+                onClick={handleExportHTML}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 transition hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "html" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting HTML...
+                  </>
+                ) : (
+                  <>🖨️ Export HTML</>
+                )}
+              </button>
+
+              <button
+                onClick={handleExportPDF}
+                disabled={exportingFormat !== null || filteredMessages.length === 0}
+                className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {exportingFormat === "pdf" ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Exporting PDF...
+                  </>
+                ) : (
+                  <>📑 Export PDF</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="ui-card p-6">
           {loading ? (
             <div className="py-16 text-center text-slate-600">
@@ -372,6 +531,82 @@ export default function LecturerDashboard() {
                           {msg.question}
                         </p>
                       </div>
+
+                      {msg.attachment && msg.attachment.fileUrl && (
+                        <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
+                          <p className="text-sm font-semibold text-purple-700 mb-3">
+                            📎 Student Attachment
+                          </p>
+                          {isImageFile(msg.attachment.fileType) ? (
+                            <div className="space-y-3">
+                              <img
+                                src={`http://localhost:5001${msg.attachment.fileUrl}`}
+                                alt={msg.attachment.fileName}
+                                className="max-h-96 rounded-lg object-contain border border-purple-200"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                              <div className="flex items-center gap-2">
+                                <svg
+                                  className="h-4 w-4 text-purple-600"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                <a
+                                  href={`http://localhost:5001${msg.attachment.fileUrl}`}
+                                  download={msg.attachment.fileName}
+                                  className="text-sm text-purple-700 hover:text-purple-900 font-medium underline"
+                                >
+                                  {msg.attachment.fileName}
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-4 p-3 bg-white rounded-lg border border-purple-200">
+                              <div className="text-2xl">
+                                {getFileIcon(msg.attachment.fileType)}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-slate-900">
+                                  {msg.attachment.fileName}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  {msg.attachment.fileType || "Document"}
+                                </p>
+                              </div>
+                              <a
+                                href={`http://localhost:5001${msg.attachment.fileUrl}`}
+                                download={msg.attachment.fileName}
+                                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-700 transition"
+                              >
+                                <svg
+                                  className="h-4 w-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                  />
+                                </svg>
+                                Download
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {msg.answer ? (
                         <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">

@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { AppLayout } from "../components/AppLayout";
 
-function GkTicketCreate({ closeModal, refreshTickets, user }) {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
+function GkTicketCreate({ closeModal, refreshTickets, embedded = false }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
-    accadomicYear: "",
+    academicYear: "",
     faculty: "",
     ticketCategory: "",
     description: "",
@@ -19,24 +22,28 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
 
   const [loading, setLoading] = useState(false);
 
+  // ✅ Updated handleChange with validation
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     let error = "";
 
+    // ✅ Restrict invalid typing for Student ID (allow partial typing)
     if (name === "studentId") {
       const typingRegex = /^IT\d{0,8}$/;
       if (!typingRegex.test(value)) return;
 
       const regex = /^IT\d{8}$/;
       if (!regex.test(value)) {
-        error = "Invalid Student ID (Format: IT12345678)";
+        error = "Invalid Student ID(Format: IT12345678)";
       }
     }
 
+    // ✅ Email validation
     if (name === "studentEmail") {
       const regex = /.+@.+\..+/;
       if (!regex.test(value)) {
-        error = "Invalid Email (example: student@my.sliit.lk)";
+        error = "Invalid Student Email(example: student@my.sliit.lk)";
       }
     }
 
@@ -44,6 +51,7 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
+  // ✅ Submit handler with final validation
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -53,7 +61,7 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
     if (
       !formData.studentId ||
       !formData.studentEmail ||
-      !formData.accadomicYear ||
+      !formData.academicYear ||
       !formData.faculty ||
       !formData.ticketCategory ||
       !formData.description
@@ -65,21 +73,19 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
     if (!emailValid) return toast.error("Invalid Email");
 
     setLoading(true);
-
     try {
       const token = localStorage.getItem("ssc_token");
-
-      await axios.post(
-        "http://localhost:5001/api/tickets/create",
-        formData,
-        {
+      await axios.post(`${API_BASE_URL}/api/tickets/create`,
+        formData, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
-      );
+        );
 
-      toast.success("Ticket submitted successfully!");
+      toast.success("Ticket submitted successfully!", {
+        position: "top-center",
+      });
 
       refreshTickets && refreshTickets();
       closeModal && closeModal();
@@ -87,7 +93,7 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
       setFormData({
         studentId: "",
         studentEmail: "",
-        accadomicYear: "",
+        academicYear: "",
         faculty: "",
         ticketCategory: "",
         description: "",
@@ -104,75 +110,70 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
     }
   };
 
-  return (
-    <div className="w-full max-w-3xl mx-auto">
-      
-      {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md">
-        <h2 className="text-xl font-bold">🎫 Raise New Ticket</h2>
-        <p className="text-sm text-blue-100">
-          Submit your issue to the support team
-        </p>
+  const formContent = (
+    <div className="w-full max-w-3xl mx-auto px-1 sm:px-2">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-5 text-white shadow-md">
+        <h2 className="text-xl font-bold">Raise New Ticket</h2>
+        <p className="text-sm text-blue-100">Submit your issue to the university support team.</p>
       </div>
 
-      {/* Form Card */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 mt-5 p-6">
-        <form onSubmit={handleSubmit} className="space-y-5">
-
-          {/* Row 1 */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold mb-1">
+      <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-lg sm:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+            {/* Row 1 */}
+          <div className="grid gap-4 md:grid-cols-2">
+      
+              <div>
+                <label className="block text-sm font-semibold mb-1">
                 Student ID*
               </label>
-              <input
-                type="text"
-                name="studentId"
-                value={formData.studentId}
-                onChange={handleChange}
-                placeholder="IT12345678"
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-              {errors.studentId && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.studentId}
-                </p>
-              )}
-            </div>
+                <input
+                  type="text"
+                  name="studentId"
+                  value={formData.studentId}
+                  onChange={handleChange}
+                  placeholder="IT12345678"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+                {errors.studentId && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.studentId}
+                  </p>
+                )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-1">
+              <div>
+                <label className="block text-sm font-semibold mb-1">
                 Student Email*
               </label>
-              <input
-                type="email"
-                name="studentEmail"
-                value={formData.studentEmail}
-                onChange={handleChange}
-                placeholder="student@my.sliit.lk"
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-              {errors.studentEmail && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.studentEmail}
-                </p>
-              )}
+                <input
+                  type="email"
+                  name="studentEmail"
+                  value={formData.studentEmail}
+                  onChange={handleChange}
+                  placeholder="student@my.sliit.lk"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+                {errors.studentEmail && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.studentEmail}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Row 2 */}
-          <div className="grid md:grid-cols-2 gap-4">
+            {/* Row 2 */}
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-semibold mb-1">
                 Academic Year*
               </label>
               <input
                 type="text"
-                name="accadomicYear"
-                value={formData.accadomicYear}
+                name="academicYear"
+                value={formData.academicYear}
                 onChange={handleChange}
                 placeholder="e.g. Year 3 Semester 1"
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
@@ -186,12 +187,12 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
                 value={formData.faculty}
                 onChange={handleChange}
                 placeholder="e.g. Computing"
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
           </div>
 
-          {/* Category */}
+                {/* Category */}
           <div>
             <label className="block text-sm font-semibold mb-1">
               Ticket Category*
@@ -199,18 +200,19 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
             <select
               name="ticketCategory"
               value={formData.ticketCategory}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                onChange={handleChange}
+                
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="">Select category</option>
               <option value="Academic">Academic</option>
               <option value="Complaint">Complaint</option>
-              <option value="Technical">Technical</option>
+              <option value="Technical Issues">Technical Issues</option>
               <option value="Other">Other</option>
             </select>
           </div>
 
-          {/* Description */}
+            {/* Description */}
           <div>
             <label className="block text-sm font-semibold mb-1">
               Description*
@@ -219,25 +221,31 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
               name="description"
               rows="4"
               value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe your issue..."
-              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-            />
-          </div>
+                onChange={handleChange}
+                placeholder="Describe your issue..."
+                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+              />
+            </div>
 
-          {/* Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-all disabled:opacity-70"
-          >
-            {loading ? "Submitting..." : "Submit Ticket"}
-          </button>
+             {/* Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-lg bg-blue-600 py-3 text-white font-semibold transition-all hover:bg-blue-500 disabled:opacity-70"
+            >
+              {loading ? "Submitting..." : "Submit Ticket"}
+            </button>
 
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
   );
+
+  if (embedded) {
+    return formContent;
+  }
+
+  return <AppLayout><div className="ui-page">{formContent}</div></AppLayout>;
 }
 
 export default GkTicketCreate;

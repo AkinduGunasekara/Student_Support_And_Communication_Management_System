@@ -103,6 +103,20 @@ const messageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    attachment: {
+      fileName: {
+        type: String,
+        default: "",
+      },
+      fileUrl: {
+        type: String,
+        default: "",
+      },
+      fileType: {
+        type: String,
+        default: "",
+      },
+    },
   },
   { timestamps: true }
 );

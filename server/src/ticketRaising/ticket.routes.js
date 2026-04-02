@@ -18,6 +18,8 @@ const router = express.Router();
  * Admin Routes
  * ----------------------------------------
  */
+router.get("/", getAllComplaints);
+
 router.get(
   "/getall",
   authMiddleware,
