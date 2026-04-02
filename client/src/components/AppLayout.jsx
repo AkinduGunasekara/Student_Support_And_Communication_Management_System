@@ -12,6 +12,7 @@ import {
   MessagesSquare,
   ShieldCheck,
   X,
+  CalendarDays,
 } from "lucide-react";
 
 export const AppLayout = ({ children }) => {
@@ -47,6 +48,11 @@ export const AppLayout = ({ children }) => {
         to: "/public-faq",
         icon: MessageSquareMore,
       },
+      {
+        label: "My Events",
+        to: "/student/events",
+        icon: CalendarDays,
+      },
     ],
     lecturer: [
       {
@@ -59,6 +65,11 @@ export const AppLayout = ({ children }) => {
         to: "/public-faq",
         icon: MessageSquareMore,
       },
+      {
+        label: "My Events",
+        to: "/lecturer/events",
+        icon: CalendarDays,
+      }
     ],
     admin: [
       {
@@ -81,6 +92,11 @@ export const AppLayout = ({ children }) => {
         to: "/public-faq",
         icon: MessagesSquare,
       },
+      {
+        label: "Event Management",
+        to: "/admin/events",
+        icon: CalendarDays,
+      },
     ],
   };
 
@@ -91,11 +107,9 @@ export const AppLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {showMobileSidebar && (
-        <button
-          type="button"
+        <div
           onClick={() => setShowMobileSidebar(false)}
           className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden"
-          aria-label="Close navigation overlay"
         />
       )}
 
@@ -231,7 +245,9 @@ export const AppLayout = ({ children }) => {
           </div>
         </nav>
 
-        <main className="pb-8">{children}</main>
+        <main className="relative z-10 pb-8">
+        {children}
+      </main>
       </div>
     </div>
   );

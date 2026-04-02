@@ -91,9 +91,9 @@ router.post("/register", async (req, res) => {
             },
         });
         }catch (error) {
-            console.error("Register error:", error);
-            return res.status(500).json({ message: "Server error"});
-        }
+          console.error("REGISTER ERROR FULL:", error); // 👈 shows full error in terminal
+          return res.status(500).json({ message: error.message }); // 👈 shows exact error in Postman
+}
     });
 
     // Login (all roles)

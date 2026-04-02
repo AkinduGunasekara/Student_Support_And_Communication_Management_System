@@ -30,12 +30,13 @@ export const LoginPage = () => {
       }
 
       const data = await response.json();
+      localStorage.setItem("ssc_token", data.token);
       login(data);
 
       if (data.user.role === "student") {
-        navigate("/student/dashboard");
+        navigate("/events");
       } else if (data.user.role === "lecturer") {
-        navigate("/lecturer/dashboard");
+        navigate("/events");
       } else if (data.user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
@@ -49,9 +50,9 @@ export const LoginPage = () => {
 
   if (user) {
     if (user.role === "student")
-      return <Navigate to="/student/dashboard" replace />;
+      return <Navigate to="/events" replace />;
     if (user.role === "lecturer")
-      return <Navigate to="/lecturer/dashboard" replace />;
+      return <Navigate to="/events" replace />;
     if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
   }
 
