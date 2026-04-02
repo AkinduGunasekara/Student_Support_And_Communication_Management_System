@@ -268,6 +268,17 @@ export default function LecturerDashboard() {
     }
   };
 
+  const isImageFile = (fileType) => {
+    return fileType?.startsWith("image/");
+  };
+
+  const getFileIcon = (fileType) => {
+    if (fileType?.includes("pdf")) return "📕";
+    if (fileType?.includes("word") || fileType?.includes("document"))
+      return "📄";
+    return "📎";
+  };
+
   return (
     <AppLayout>
       <div className="ui-page">
@@ -520,6 +531,82 @@ export default function LecturerDashboard() {
                           {msg.question}
                         </p>
                       </div>
+
+                      {msg.attachment && msg.attachment.fileUrl && (
+                        <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
+                          <p className="text-sm font-semibold text-purple-700 mb-3">
+                            📎 Student Attachment
+                          </p>
+                          {isImageFile(msg.attachment.fileType) ? (
+                            <div className="space-y-3">
+                              <img
+                                src={`http://localhost:5001${msg.attachment.fileUrl}`}
+                                alt={msg.attachment.fileName}
+                                className="max-h-96 rounded-lg object-contain border border-purple-200"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                              <div className="flex items-center gap-2">
+                                <svg
+                                  className="h-4 w-4 text-purple-600"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                <a
+                                  href={`http://localhost:5001${msg.attachment.fileUrl}`}
+                                  download={msg.attachment.fileName}
+                                  className="text-sm text-purple-700 hover:text-purple-900 font-medium underline"
+                                >
+                                  {msg.attachment.fileName}
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-4 p-3 bg-white rounded-lg border border-purple-200">
+                              <div className="text-2xl">
+                                {getFileIcon(msg.attachment.fileType)}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-slate-900">
+                                  {msg.attachment.fileName}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  {msg.attachment.fileType || "Document"}
+                                </p>
+                              </div>
+                              <a
+                                href={`http://localhost:5001${msg.attachment.fileUrl}`}
+                                download={msg.attachment.fileName}
+                                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-700 transition"
+                              >
+                                <svg
+                                  className="h-4 w-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                  />
+                                </svg>
+                                Download
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {msg.answer ? (
                         <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
