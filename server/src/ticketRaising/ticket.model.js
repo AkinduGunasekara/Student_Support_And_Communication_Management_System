@@ -3,10 +3,10 @@ import Counter from "../config/counter.js"
 
 const ticketSchema = new mongoose.Schema(
   {
-    /* userId: { 
+    userId: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "User", 
-      required: true }, */
+      required: true },
 
     ticketId: { 
       type: String, 
@@ -20,7 +20,15 @@ const ticketSchema = new mongoose.Schema(
     studentEmail: {
       type: String,
       required: true,
-      match: [/.+@.+\..+/, "Please enter a valid email address"],
+      // match: [/.+@.+\..+/, "Please enter a valid email address"],
+    },
+    accadomicYear: {
+      type: String,
+      required: true,
+    },
+    faculty: {
+      type: String,
+      required: true,
     },
     ticketCategory: {
       type: String,
@@ -31,9 +39,12 @@ const ticketSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    replyMessage: {
+      type: String,
+    },
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Completed", "Rejected"],
+      enum: ["Pending", "Resolved"],
       default: "Pending",
     },
   },

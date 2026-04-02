@@ -386,10 +386,15 @@ export const AdminDashboard = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="ui-card p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">Feedback Overview</h2>
-            <p className="text-slate-600">Monitor student feedback and ratings.</p>
-          </div>
+          <Link
+            to="/admin/tickets"
+            className="ui-card p-6 transition hover:-translate-y-0.5 bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200"
+          >
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">🎫 Support Ticket Center</h2>
+            <p className="text-slate-600">
+              Manage and respond to student support tickets.
+            </p>
+          </Link>
 
           <Link
             to="/lecturer/dashboard"

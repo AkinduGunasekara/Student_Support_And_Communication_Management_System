@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { AppLayout } from "../components/AppLayout";
 
-function GkTicketCreate({ closeModal, refreshTickets }) {
+function GkTicketCreate({ closeModal, refreshTickets, user }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
-    accodamicYear: "",
+    accadomicYear: "",
+    faculty: "",
     ticketCategory: "",
     description: "",
   });
@@ -19,45 +19,31 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
 
   const [loading, setLoading] = useState(false);
 
-  // ✅ Updated handleChange with validation
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     let error = "";
 
-    // ✅ Restrict invalid typing for Student ID (allow partial typing)
     if (name === "studentId") {
       const typingRegex = /^IT\d{0,8}$/;
       if (!typingRegex.test(value)) return;
 
       const regex = /^IT\d{8}$/;
       if (!regex.test(value)) {
-        error = "Invalide Student ID(Format: IT12345678)";
+        error = "Invalid Student ID (Format: IT12345678)";
       }
     }
 
-    // ✅ Email validation
     if (name === "studentEmail") {
       const regex = /.+@.+\..+/;
       if (!regex.test(value)) {
-        error = "Invalid Student Email(format: student@my.sliit.lk)";
+        error = "Invalid Email (example: student@my.sliit.lk)";
       }
     }
 
-    // Set form data
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Set errors
-    setErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  // ✅ Submit handler with final validation
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -67,28 +53,33 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
     if (
       !formData.studentId ||
       !formData.studentEmail ||
-      !formData.accodamicYear ||
+      !formData.accadomicYear ||
+      !formData.faculty ||
       !formData.ticketCategory ||
       !formData.description
     ) {
       return toast.error("All fields are required");
     }
 
-    if (!idValid) {
-      return toast.error("Invalid Student ID (Format: IT12345678)");
-    }
-
-    if (!emailValid) {
-      return toast.error("Invalid Email Address");
-    }
+    if (!idValid) return toast.error("Invalid Student ID");
+    if (!emailValid) return toast.error("Invalid Email");
 
     setLoading(true);
-    try {
-      await axios.post("http://localhost:5001/api/tickets/create", formData);
 
-      toast.success("Ticket submitted successfully!", {
-        position: "top-center",
-      });
+    try {
+      const token = localStorage.getItem("ssc_token");
+
+      await axios.post(
+        "http://localhost:5001/api/tickets/create",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Ticket submitted successfully!");
 
       refreshTickets && refreshTickets();
       closeModal && closeModal();
@@ -96,7 +87,8 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
       setFormData({
         studentId: "",
         studentEmail: "",
-        accodamicYear: "",
+        accadomicYear: "",
+        faculty: "",
         ticketCategory: "",
         description: "",
       });
@@ -113,94 +105,138 @@ function GkTicketCreate({ closeModal, refreshTickets }) {
   };
 
   return (
-    <AppLayout>
-      <div className="ui-page max-w-4xl">
-        <div className="ui-card mb-4 bg-gradient-to-r from-blue-700 to-blue-600 p-5 text-white">
-          <h2 className="text-2xl font-bold">Raise New Ticket</h2>
-          <p className="mt-1 text-sm text-blue-200">Submit your issue to the university support team.</p>
-        </div>
+    <div className="w-full max-w-3xl mx-auto">
+      
+      {/* Header */}
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md">
+        <h2 className="text-xl font-bold">🎫 Raise New Ticket</h2>
+        <p className="text-sm text-blue-100">
+          Submit your issue to the support team
+        </p>
+      </div>
 
-        <div className="ui-card p-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              <div>
-                <label className="ui-label">Student ID*</label>
-                <input
-                  type="text"
-                  name="studentId"
-                  value={formData.studentId}
-                  onChange={handleChange}
-                  placeholder="IT12345678"
-                  className="ui-input"
-                />
-                {errors.studentId && <p className="mt-1 text-sm text-red-600">{errors.studentId}</p>}
-              </div>
+      {/* Form Card */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 mt-5 p-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
 
-              <div>
-                <label className="ui-label">Student Email*</label>
-                <input
-                  type="text"
-                  name="studentEmail"
-                  value={formData.studentEmail}
-                  onChange={handleChange}
-                  placeholder="student@my.sliit.lk"
-                  className="ui-input"
-                />
-                {errors.studentEmail && <p className="mt-1 text-sm text-red-600">{errors.studentEmail}</p>}
-              </div>
-            </div>
-
+          {/* Row 1 */}
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="ui-label">Academic Year*</label>
+              <label className="block text-sm font-semibold mb-1">
+                Student ID*
+              </label>
               <input
                 type="text"
-                name="accodamicYear"
-                value={formData.accodamicYear}
+                name="studentId"
+                value={formData.studentId}
                 onChange={handleChange}
-                placeholder="Academic Year"
-                className="ui-input"
+                placeholder="IT12345678"
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+              {errors.studentId && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.studentId}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Student Email*
+              </label>
+              <input
+                type="email"
+                name="studentEmail"
+                value={formData.studentEmail}
+                onChange={handleChange}
+                placeholder="student@my.sliit.lk"
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+              {errors.studentEmail && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.studentEmail}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Row 2 */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Academic Year*
+              </label>
+              <input
+                type="text"
+                name="accadomicYear"
+                value={formData.accadomicYear}
+                onChange={handleChange}
+                placeholder="e.g. Year 3 Semester 1"
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label className="ui-label">Ticket Category*</label>
-              <select
-                name="ticketCategory"
-                value={formData.ticketCategory}
+              <label className="block text-sm font-semibold mb-1">
+                Faculty*
+              </label>
+              <input
+                type="text"
+                name="faculty"
+                value={formData.faculty}
                 onChange={handleChange}
-                className="ui-select"
-              >
-                <option value="">Select category</option>
-                <option value="Academic">Academic</option>
-                <option value="Complaint">Complaint</option>
-                <option value="Technical Issues">Technical Issues</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="ui-label">Description*</label>
-              <textarea
-                name="description"
-                rows="4"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Describe your issue..."
-                className="ui-textarea"
+                placeholder="e.g. Computing"
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full py-3 disabled:cursor-not-allowed disabled:opacity-70"
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Ticket Category*
+            </label>
+            <select
+              name="ticketCategory"
+              value={formData.ticketCategory}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              {loading ? "Submitting..." : "Submit Ticket"}
-            </button>
-          </form>
-        </div>
+              <option value="">Select category</option>
+              <option value="Academic">Academic</option>
+              <option value="Complaint">Complaint</option>
+              <option value="Technical">Technical</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Description*
+            </label>
+            <textarea
+              name="description"
+              rows="4"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Describe your issue..."
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            />
+          </div>
+
+          {/* Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-all disabled:opacity-70"
+          >
+            {loading ? "Submitting..." : "Submit Ticket"}
+          </button>
+
+        </form>
       </div>
-    </AppLayout>
+    </div>
   );
 }
 

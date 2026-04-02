@@ -83,6 +83,16 @@ export const StudentDashboard = () => {
           </Link>
 
           <Link
+            to="/student/view-ticket"
+            className="ui-card p-6 transition hover:-translate-y-0.5"
+          >
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">My Tickets</h2>
+            <p className="text-slate-600">
+              View answers, status, and recent official communication.
+            </p>
+          </Link>
+          
+          <Link
             to="/student/my-messages"
             className="ui-card p-6 transition hover:-translate-y-0.5"
           >
