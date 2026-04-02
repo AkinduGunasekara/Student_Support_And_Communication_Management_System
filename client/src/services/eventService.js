@@ -42,6 +42,7 @@ export const getApprovedEvents = async () => {
   return res.data;
 };
 
+
 // 🔹 MY EVENTS
 export const getMyEvents = async () => {
   const res = await axios.get(`${API}/my-events`, authHeader());

@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../../assets/Logo.png"; // ✅ added
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -12,12 +13,12 @@ const Footer = () => {
 
         {/* LEFT */}
         <div>
-          <h1
+          <img
+            src={logo}
+            alt="Campus One"
+            className="h-14 cursor-pointer" // ✅ same size as navbar
             onClick={() => navigate("/")}
-            className="text-xl font-bold text-blue-400 cursor-pointer"
-          >
-            Campus One
-          </h1>
+          />
 
           <p className="text-sm text-gray-400 mt-3">
             Discover. Join. Connect. <br />

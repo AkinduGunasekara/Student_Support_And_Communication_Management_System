@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, ChevronDown, CircleUserRound } from "lucide-react";
 import { useAuth } from "../../AuthContext";
+import logo from "../../assets/Logo.png"; // ✅ added
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -25,12 +26,12 @@ const Navbar = () => {
     <div className="flex justify-between items-center px-6 py-4 bg-white border-b">
 
       {/* 🔵 LOGO → LANDING */}
-      <h1
-        className="text-xl font-bold text-blue-600 cursor-pointer"
+      <img
+        src={logo}
+        alt="Campus One"
+        className="h-14 cursor-pointer"
         onClick={() => navigate("/")}
-      >
-        Campus One
-      </h1>
+      />
 
       {/* 🔵 CENTER LINKS */}
       <div className="flex items-center gap-6">
