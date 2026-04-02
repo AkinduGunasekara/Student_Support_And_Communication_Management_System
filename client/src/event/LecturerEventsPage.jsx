@@ -3,17 +3,18 @@ import { AppLayout } from "../components/AppLayout";
 import { Plus } from "lucide-react";
 import EventModal from "./components/EventModal";
 import EventCard from "./components/EventCard";
-import banner from "../assets/event-banner.jpg";
+import EventDetailsModal from "./components/EventDetailsModal";
 
-// 🔥 IMPORT API
+import banner from "../assets/event-banner.jpg";
 import { getMyEvents } from "../services/eventService";
 
 const LecturerEventsPage = () => {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [activeTab, setActiveTab] = useState("all");
 
-  // 🔥 FETCH FUNCTION (REUSABLE)
+  // 🔥 FETCH EVENTS
   const fetchMyEvents = async () => {
     try {
       const data = await getMyEvents();
@@ -33,16 +34,28 @@ const LecturerEventsPage = () => {
     }
   };
 
-  // 🔥 INITIAL LOAD
   useEffect(() => {
     fetchMyEvents();
   }, []);
+
+  // 🔥 FILTER
+  const filteredEvents =
+    activeTab === "all"
+      ? events
+      : events.filter((e) => e.status === activeTab);
+
+  // 🎨 SOFT COLORS
+  const statusStyles = {
+    pending: "bg-amber-100 text-amber-700",
+    approved: "bg-emerald-100 text-emerald-700",
+    rejected: "bg-rose-100 text-rose-700",
+  };
 
   return (
     <AppLayout>
       <div className="p-6">
 
-        {/* 🔥 HERO HEADER */}
+        {/* HERO */}
         <div className="relative rounded-2xl overflow-hidden mb-6 shadow">
           <img
             src={banner}
@@ -60,94 +73,94 @@ const LecturerEventsPage = () => {
           </div>
         </div>
 
-        {/* 🔥 ACTION BAR */}
+        {/* ACTION BAR */}
         <div className="flex justify-between items-center mb-6">
 
-          {/* FILTERS (UI ONLY FOR NOW) */}
+          {/* FILTERS */}
           <div className="flex gap-2">
-            <button className="px-4 py-2 rounded-full bg-blue-600 text-white text-sm">
-              All
-            </button>
-            <button className="px-4 py-2 rounded-full bg-gray-100 text-gray-600 text-sm">
-              Pending
-            </button>
-            <button className="px-4 py-2 rounded-full bg-gray-100 text-gray-600 text-sm">
-              Approved
-            </button>
-            <button className="px-4 py-2 rounded-full bg-gray-100 text-gray-600 text-sm">
-              Rejected
-            </button>
+            {["all", "pending", "approved", "rejected"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-full text-sm capitalize transition
+                  ${
+                    activeTab === tab
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
 
           {/* CREATE BUTTON */}
           <button
             onClick={() => {
-              setSelectedEvent(null); // 🔥 ensure create mode
+              setSelectedEvent(null);
               setShowModal(true);
             }}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
           >
             <Plus size={16} />
             Create Event
           </button>
         </div>
 
-        {/* 🔥 EVENT GRID */}
+        {/* GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <div key={event.id} className="relative">
 
-              {/* STATUS BADGE */}
+              {/* STATUS */}
               <span
-                className={`absolute top-3 left-3 z-10 text-xs px-3 py-1 rounded-full font-medium ${
-                  event.status === "approved"
-                    ? "bg-green-500 text-white"
-                    : event.status === "rejected"
-                    ? "bg-red-500 text-white"
-                    : "bg-yellow-400 text-white"
-                }`}
+                className={`absolute top-3 left-3 z-10 text-xs px-3 py-1 rounded-full font-medium
+                  ${statusStyles[event.status] || statusStyles.pending}`}
               >
                 {event.status}
               </span>
 
               {/* CARD */}
-              <EventCard event={event} onClick={() => {}} />
+              <EventCard
+                event={event}
+                onClick={() => setSelectedEvent(event)}
+              />
 
-              {/* ACTION BUTTONS */}
-              <div className="flex gap-2 mt-2">
+              {/* VIEW */}
+              <button
+                onClick={() => setSelectedEvent(event)}
+                className="w-full mt-2 bg-emerald-500 text-white text-xs py-2 rounded-lg hover:bg-emerald-600 transition"
+              >
+                View
+              </button>
 
-                {event.status !== "approved" && (
-                  <button
-                    onClick={() => {
-                      setSelectedEvent(event); // 🔥 pass event to modal
-                      setShowModal(true);
-                    }}
-                    className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
-                  >
-                    Edit
-                  </button>
-                )}
-
-                <button className="flex-1 bg-green-500 text-white text-xs py-2 rounded-lg hover:bg-green-600">
-                  View
+              {/* EDIT */}
+              {event.status !== "approved" && (
+                <button
+                  onClick={() => {
+                    setSelectedEvent(event);
+                    setShowModal(true);
+                  }}
+                  className="w-full mt-2 border border-blue-500 text-blue-600 text-xs py-2 rounded-lg hover:bg-blue-50 transition"
+                >
+                  Edit
                 </button>
-
-              </div>
+              )}
             </div>
           ))}
 
         </div>
 
-        {/* 🔥 EMPTY STATE */}
-        {events.length === 0 && (
-          <p className="text-center text-gray-500 mt-6">
-            No events created yet
-          </p>
+        {/* EMPTY */}
+        {filteredEvents.length === 0 && (
+          <div className="text-center text-slate-400 mt-10">
+            No {activeTab} events found
+          </div>
         )}
       </div>
 
-      {/* 🔥 MODAL */}
+      {/* CREATE / EDIT MODAL */}
       <EventModal
         isOpen={showModal}
         onClose={() => {
@@ -155,7 +168,13 @@ const LecturerEventsPage = () => {
           setSelectedEvent(null);
         }}
         event={selectedEvent}
-        onSave={fetchMyEvents}   // 🔥 FIXED (no crash now)
+        onSave={fetchMyEvents}
+      />
+
+      {/* VIEW MODAL */}
+      <EventDetailsModal
+        event={selectedEvent && !showModal ? selectedEvent : null}
+        onClose={() => setSelectedEvent(null)}
       />
 
     </AppLayout>
