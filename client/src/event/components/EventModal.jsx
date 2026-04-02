@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, UploadCloud } from "lucide-react";
+import { createEvent } from "../../services/eventService";
 
 const EventModal = ({ isOpen, onClose, onSave }) => {
   const [form, setForm] = useState({
@@ -34,41 +35,23 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
     }
   };
 
-  const handleSubmit = () => {
-    // ✅ SIMPLE VALIDATION (no alerts)
-    if (!form.title || !form.date) {
-      setError("Title and date are required");
+  const handleSubmit = async () => {
+  try {
+    if (!form.title || !form.date || !form.startTime || !form.endTime) {
+      setError("Please fill all required fields");
       return;
     }
 
-    if (form.startTime && form.endTime && form.startTime >= form.endTime) {
-      setError("End time must be after start time");
-      return;
-    }
+    await createEvent(form);
 
-    // ✅ SAVE
-    onSave({
-      ...form,
-      id: Date.now(),
-    });
-
-    // reset
-    setForm({
-      title: "",
-      description: "",
-      date: "",
-      startTime: "",
-      endTime: "",
-      location: "",
-      type: "academic",
-      image: null,
-    });
-
-    setError("");
-
-    // ✅ CLOSE IMMEDIATELY (no alerts, smooth UX)
+    if (onSave) onSave();
     onClose();
-  };
+
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || "Failed to create event");
+  }
+};
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
@@ -157,6 +140,13 @@ const EventModal = ({ isOpen, onClose, onSave }) => {
               value={form.startTime}
               onChange={handleChange}
               className="border border-slate-200 p-2 rounded-lg text-sm"
+            />
+             <input
+              type="time"
+              name="endTime"
+              value={form.endTime}
+              onChange={handleChange}
+              className="border p-2 rounded-lg text-sm"
             />
           </div>
 

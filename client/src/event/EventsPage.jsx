@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import EventCard from "./components/EventCard";
 import CalendarView from "./components/CalendarView";
 import EventModal from "./components/EventModal";
 import EventDetailsModal from "./components/EventDetailsModal";
 
-// 🔥 import your image here
+import { getApprovedEvents } from "../services/eventService";
+
+// 🔥 banner image
 import banner from "../assets/event-banner.jpg";
 
 const EventsPage = () => {
@@ -13,42 +15,37 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Quantum Computing: The Future of Logic",
-      time: "14:00 - 16:30",
-      location: "Main Auditorium",
-      date: "2026-04-10",
-      dateShort: "OCT 24",
-      type: "Seminar",
-      image:
-        "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
-    },
-    {
-      id: 2,
-      title: "UX Design Sprint: 48-Hour Challenge",
-      time: "09:00 - 12:00",
-      location: "Innovation Lab",
-      date: "2026-04-12",
-      dateShort: "OCT 28",
-      type: "Workshop",
-      image:
-        "https://images.unsplash.com/photo-1559027615-cd4628902d4a",
-    },
-    {
-      id: 3,
-      title: "Inter-Collegiate Basketball Finals",
-      time: "16:00",
-      location: "Sports Complex",
-      date: "2026-04-15",
-      dateShort: "NOV 05",
-      type: "Sports",
-      image:
-        "https://images.unsplash.com/photo-1517649763962-0c623066013b",
-    },
-  ]);
+  const [events, setEvents] = useState([]);
 
+  // 🔥 FETCH EVENTS FROM BACKEND
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await getApprovedEvents();
+
+        const formatted = data.map((e) => ({
+          ...e,
+          id: e._id, // ✅ VERY IMPORTANT
+          image: e.image
+            ? `http://localhost:5001${e.image}` // ✅ fix uploaded images
+            : "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
+          dateShort: new Date(e.date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
+          time: `${e.startTime} - ${e.endTime}`,
+        }));
+
+        setEvents(formatted);
+      } catch (err) {
+        console.error("Fetch events error:", err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // 🔹 Add event locally (optional)
   const handleAddEvent = (newEvent) => {
     setEvents((prev) => [...prev, newEvent]);
   };
@@ -59,20 +56,17 @@ const EventsPage = () => {
 
       <div className="p-6">
 
-        {/* 🔥 HERO HEADER (NEW DESIGN) */}
+        {/* 🔥 HERO HEADER */}
         <div className="relative rounded-2xl overflow-hidden mb-6 shadow">
 
-          {/* IMAGE */}
           <img
             src={banner}
             alt="events banner"
             className="w-full h-64 object-cover"
           />
 
-          {/* OVERLAY */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
 
-          {/* TEXT */}
           <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
             <h1 className="text-3xl font-bold">
               Discover. Join. Connect.
@@ -84,7 +78,7 @@ const EventsPage = () => {
           </div>
         </div>
 
-        {/* 🔳 MAIN CARD CONTAINER */}
+        {/* 🔳 MAIN CONTAINER */}
         <div className="bg-white rounded-2xl shadow p-6">
 
           {/* 🔹 TOP BAR */}
@@ -127,7 +121,7 @@ const EventsPage = () => {
           {/* 🔹 CONTENT */}
           {view === "card" ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {events.map((event) => (
+              {events?.map((event) => (
                 <EventCard
                   key={event.id}
                   event={event}

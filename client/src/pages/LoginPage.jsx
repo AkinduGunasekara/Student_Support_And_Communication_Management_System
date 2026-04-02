@@ -30,6 +30,7 @@ export const LoginPage = () => {
       }
 
       const data = await response.json();
+      localStorage.setItem("ssc_token", data.token);
       login(data);
 
       if (data.user.role === "student") {

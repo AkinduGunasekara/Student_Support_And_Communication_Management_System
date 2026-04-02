@@ -1,48 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppLayout } from "../components/AppLayout";
 import EventCard from "./components/EventCard";
 
-// 🔥 banner image
+import {
+  getPendingEvents,
+  approveEvent,
+  rejectEvent,
+} from "../services/eventService";
+
 import banner from "../assets/event-banner.jpg";
 
 const AdminEventsPage = () => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "AI Seminar",
-      date: "2026-04-10",
-      time: "10:00 - 12:00",
-      location: "Hall A",
-      type: "Seminar",
-      status: "pending",
-      image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
-    },
-    {
-      id: 2,
-      title: "UX Workshop",
-      date: "2026-04-12",
-      time: "09:00 - 12:00",
-      location: "Innovation Lab",
-      type: "Workshop",
-      status: "approved",
-      image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a",
-    },
-  ]);
+  const [events, setEvents] = useState([]);
 
-  const handleApprove = (id) => {
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.id === id ? { ...e, status: "approved" } : e
-      )
-    );
+  // 🔥 FETCH PENDING EVENTS
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await getPendingEvents();
+
+        const formatted = data.map((e) => ({
+          ...e,
+          id: e._id,
+          image: e.image
+            ? `http://localhost:5001${e.image}`
+            : "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
+          time: `${e.startTime} - ${e.endTime}`,
+        }));
+
+        setEvents(formatted);
+      } catch (err) {
+        console.error("Fetch pending events error:", err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // 🔥 APPROVE
+  const handleApprove = async (id) => {
+    try {
+      await approveEvent(id);
+
+      // remove from UI instantly
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+    } catch (err) {
+      console.error("Approve error:", err);
+    }
   };
 
-  const handleReject = (id) => {
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.id === id ? { ...e, status: "rejected" } : e
-      )
-    );
+  // 🔥 REJECT
+  const handleReject = async (id) => {
+    try {
+      await rejectEvent(id);
+
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+    } catch (err) {
+      console.error("Reject error:", err);
+    }
   };
 
   return (
@@ -74,44 +89,27 @@ const AdminEventsPage = () => {
             <div key={event.id} className="relative">
 
               {/* STATUS BADGE */}
-              <span
-                className={`absolute top-3 left-3 z-10 text-xs px-3 py-1 rounded-full font-medium ${
-                  event.status === "approved"
-                    ? "bg-green-500 text-white"
-                    : event.status === "rejected"
-                    ? "bg-red-500 text-white"
-                    : "bg-yellow-400 text-white"
-                }`}
-              >
-                {event.status}
+              <span className="absolute top-3 left-3 z-10 text-xs px-3 py-1 rounded-full font-medium bg-yellow-400 text-white">
+                pending
               </span>
 
-              {/* CARD */}
               <EventCard event={event} onClick={() => {}} />
 
-              {/* 🔥 ADMIN ACTIONS */}
+              {/* ACTIONS */}
               <div className="flex gap-2 mt-2">
 
-                {event.status === "pending" && (
-                  <>
-                    <button
-                      onClick={() => handleApprove(event.id)}
-                      className="flex-1 bg-green-500 text-white text-xs py-2 rounded-lg hover:bg-green-600"
-                    >
-                      Approve
-                    </button>
+                <button
+                  onClick={() => handleApprove(event.id)}
+                  className="flex-1 bg-green-500 text-white text-xs py-2 rounded-lg hover:bg-green-600"
+                >
+                  Approve
+                </button>
 
-                    <button
-                      onClick={() => handleReject(event.id)}
-                      className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
-                    >
-                      Reject
-                    </button>
-                  </>
-                )}
-
-                <button className="flex-1 border text-xs py-2 rounded-lg hover:bg-slate-100">
-                  View
+                <button
+                  onClick={() => handleReject(event.id)}
+                  className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
+                >
+                  Reject
                 </button>
 
               </div>
