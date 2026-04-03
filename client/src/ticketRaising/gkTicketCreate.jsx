@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function GkTicketCreate({ closeModal, refreshTickets, user }) {
   const [formData, setFormData] = useState({
