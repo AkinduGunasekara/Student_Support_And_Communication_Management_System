@@ -47,7 +47,7 @@ function gkAdminViewTicket() {
     } catch (err) {
       toast.error("Failed to send reply");
     } finally {
-      setLoadingReply(false);``
+      setLoadingReply(false);
     }
   };
 
@@ -175,7 +175,7 @@ function gkAdminViewTicket() {
                       </td>
 
                       <td className="px-6 py-4 text-gray-700">
-                        {ticket.accadomicYear}
+                        {ticket.academicYear}
                       </td>
 
                       <td className="px-6 py-4 text-gray-700 max-w-xs truncate hover:text-clip">
@@ -214,6 +214,7 @@ function gkAdminViewTicket() {
           </div>
         </div>
       </div>
+
       {/* Reply Modal */}
       {selectedTicket && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">

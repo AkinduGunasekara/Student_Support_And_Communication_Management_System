@@ -12,7 +12,8 @@ import eventRoutes from "./event/event.routes.js";
 import path from "path";
 
 import { connectDB } from "./config/db.js";
-
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -35,13 +36,11 @@ app.use("/api/tickets", ticketRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/feedback", feedbackRouter);
 
-// Events route
-app.use("/api/events", eventRoutes);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Serve uploaded files
-app.use("/uploads", express.static(path.resolve("uploads")));
-
-
+// Serve static files from uploads folder
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.listen(PORT, () => {
   console.log("Server started on port:", PORT);

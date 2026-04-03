@@ -8,6 +8,9 @@ dotenv.config();
  * ----------------------------------------
  * Get All Complaints (Admin)
  * ----------------------------------------
+ * --------------------------
+ * Get All Complaints (Admin 
+ * --------------------------
  */
 export const getAllComplaints = async (req, res) => {
   try {
@@ -22,9 +25,9 @@ export const getAllComplaints = async (req, res) => {
 };
 
 /**
- * ----------------------------------------
+ * ------------------------------------------------
  * Get Complaint By ID
- * ----------------------------------------
+ * ------------------------------------------------
  */
 export const getComplaintById = async (req, res) => {
   try {
@@ -46,18 +49,18 @@ export const getComplaintById = async (req, res) => {
  * ----------------------------------------
  * Get Logged-in User Complaints
  * ----------------------------------------
+ * 
  */
-export const getMyComplaints = async (req, res) => {
+   export const getMyComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find({ userId: req.user._id })
       .sort({ createdAt: -1 });
-
-    res.status(200).json(complaints);
+       res.status(200).json(complaints);
   } catch (error) {
     console.error("Error in getMyComplaints:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-};
+  };
 
   /**
  * ----------------------------------------
@@ -71,7 +74,7 @@ export const getMyComplaints = async (req, res) => {
       studentId,
       studentEmail,
       faculty,
-      accadomicYear,
+      academicYear,
       ticketCategory,
       description,
     } = req.body;
@@ -96,7 +99,7 @@ export const getMyComplaints = async (req, res) => {
       !studentId ||
       !studentEmail ||
       !faculty ||
-      !accadomicYear ||
+      !academicYear ||
       !ticketCategory ||
       !description
     ) {
@@ -104,10 +107,10 @@ export const getMyComplaints = async (req, res) => {
     }
 
     const complaint = new Complaint({
-      userId: req.user._id, // 🔥 CONNECT USER
+      userId: req.user._id,
       studentId,
       studentEmail,
-      accadomicYear,
+      academicYear,
       faculty,
       ticketCategory,
       description,
@@ -122,13 +125,12 @@ export const getMyComplaints = async (req, res) => {
   }
 };
 
-
 /**
  * ----------------------------------------
+* ----------------------------------------
  * Update Complaint (Only Owner)
  * ----------------------------------------
  */
-
 export const updateComplaint = async (req, res) => {
   try {
     const complaint = await Complaint.findById(req.params.id);
@@ -144,6 +146,7 @@ export const updateComplaint = async (req, res) => {
     const updatedComplaint = await Complaint.findByIdAndUpdate(
       req.params.id,
       req.body,
+       req.body,
       { returnDocument: 'after' }
     );
 
@@ -159,7 +162,6 @@ export const updateComplaint = async (req, res) => {
  * Delete Complaint (Only Owner)
  * ----------------------------------------
  */
-
 export const deleteComplaint = async (req, res) => {
   try {
     const complaint = await Complaint.findById(req.params.id);
@@ -186,6 +188,7 @@ export const deleteComplaint = async (req, res) => {
  * Nodemailer Setup
  * ----------------------------------------
  */
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -194,6 +197,7 @@ const transporter = nodemailer.createTransport({
   },
   tls: {
     rejectUnauthorized: false,
+     rejectUnauthorized: false,
   },
 });
 
@@ -202,6 +206,12 @@ const transporter = nodemailer.createTransport({
  * Admin Reply + Email
  * ----------------------------------------
  */
+  * ----------------------------------------
+ * Admin Reply + Email
+ * ----------------------------------------
+ 
+ */
+
 export const replyToComplaint = async (req, res) => {
   try {
     const { replyMessage } = req.body;
@@ -218,7 +228,7 @@ export const replyToComplaint = async (req, res) => {
         replyMessage,
         status: "Resolved",
       },
-      { returnDocument: 'after' }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!complaint) {
@@ -227,22 +237,29 @@ export const replyToComplaint = async (req, res) => {
       });
     }
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: complaint.studentEmail,
-      subject: "Complaint Response",
-      html: `
-        <h2>Complaint Response</h2>
-        <p>Hello ${complaint.studentId}</p>
-        <p><b>Your Issue:</b> ${complaint.description}</p>
-        <hr/>
-        <p><b>Reply:</b> ${replyMessage}</p>
-        <p>Status: <b>${complaint.status}</b></p>
-      `,
-    });
+    let emailSent = true;
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: complaint.studentEmail,
+        subject: "Complaint Response",
+        html: `
+          <h2>Complaint Response</h2>
+          <p>Hello ${complaint.studentId}</p>
+          <p><b>Your Issue:</b> ${complaint.description}</p>
+          <hr/>
+          <p><b>Reply:</b> ${replyMessage}</p>
+          <p>Status: <b>${complaint.status}</b></p>
+        `,
+      });
+    } catch (mailError) {
+      emailSent = false;
+      console.error("Email send error:", mailError);
+    }
 
     res.status(200).json({
-      message: "Reply sent & updated",
+      message: emailSent ? "Reply sent & updated" : "Reply updated, but email failed",
+      emailSent,
       complaint,
     });
   } catch (error) {
@@ -250,3 +267,7 @@ export const replyToComplaint = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
+

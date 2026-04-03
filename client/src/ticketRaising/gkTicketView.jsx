@@ -4,11 +4,12 @@ import toast from "react-hot-toast";
 import { XCircle } from "lucide-react";
 import { AppLayout } from "../components/AppLayout";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import GkTicketCreate from "./gkTicketCreate.jsx";
 import GkTicketUpdate from "./gkTicketUpdate.jsx";
 import GkTicketDelete from "./gkTicketDelete.jsx";
 import ticketsBanner from "../assets/tickets banner.jpg";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
 function GkTicketView() {
   const [tickets, setTickets] = useState([]);
@@ -26,7 +27,6 @@ function GkTicketView() {
   // Fetch ONLY logged-in user's tickets
   const fetchTickets = async () => {
     setLoading(true);
-
     if (!token) {
       toast.error("Please login first");
       return;
@@ -34,7 +34,7 @@ function GkTicketView() {
 
     try {
       const res = await axios.get(
-        "http://localhost:5001/api/tickets/my", 
+        `${API_BASE_URL}/api/tickets/my`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -58,11 +58,9 @@ function GkTicketView() {
   const filteredTickets = tickets.filter((t) =>
     t.ticketCategory?.toLowerCase().includes(searchCategory.toLowerCase())
   );
-
   const pendingCount = tickets.filter((t) => t.status === "Pending").length;
   const resolvedCount = tickets.filter((t) => t.status === "Resolved").length;
 
-  // Open update modal
   const handleEdit = (ticket) => {
     if (ticket.status === "Pending") {
       setSelectedTicket(ticket);
@@ -72,7 +70,6 @@ function GkTicketView() {
     }
   };
 
-  // Open delete modal
   const handleDelete = (ticket) => {
     if (ticket.status === "Pending") {
       setSelectedTicket(ticket);
@@ -84,38 +81,24 @@ function GkTicketView() {
 
   return (
     <AppLayout>
-        <main className="max-w-7xl mx-auto px-6 py-10">
-          <section className="relative mb-8 overflow-hidden rounded-2xl shadow">
-            <img
-              src={ticketsBanner}
-              alt="My tickets banner"
-              className="h-52 w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
-            <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
-              <h1 className="text-3xl font-bold">My Tickets</h1>
-              <p className="mt-2 text-sm text-white/85">Manage your support requests</p>
-            </div>
-          </section>
+      <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* Header */}
+        <section className="mb-8 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:justify-between sm:items-center">
+          <div>
+            <h1 className="text-3xl font-bold">My Tickets</h1>
+            <p className="text-gray-500">Manage your support requests</p>
+          </div>
 
-          <section className="mb-8 flex justify-end sm:mb-12">
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 text-white px-5 py-3 rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <FaPlus /> New Ticket
-            </button>
-          </section>
-
-          <section className="mb-8">
-            <div>
-              <h2 className="text-2xl font-bold">Ticket Overview</h2>
-              <p className="text-gray-500">Track all your support requests by status and category</p>
-            </div>
-          </section>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-blue-600 text-white px-5 py-3 rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
+            <FaPlus /> New Ticket
+          </button>
+        </section>
 
         {/* Stats */}
-        <section className="grid grid-cols-3 gap-6 mb-8">
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
           <div className="p-5 bg-white shadow rounded-xl">
             <p>Total</p>
             <h2 className="text-2xl font-bold">{tickets.length}</h2>
@@ -161,6 +144,7 @@ function GkTicketView() {
                   <tr>
                     <th className="px-6 py-4 text-left font-semibold">Ticket ID</th>
                     <th className="px-6 py-4 text-left font-semibold">Student ID</th>
+                    <th className="px-6 py-4 text-left font-semibold">Student Email</th>
                     <th className="px-6 py-4 text-left font-semibold">Category</th>
                     <th className="px-6 py-4 text-left font-semibold">Faculty</th>
                     <th className="px-6 py-4 text-left font-semibold">Year</th>
@@ -178,13 +162,11 @@ function GkTicketView() {
                       <td className="px-6 py-4 font-semibold text-gray-900">
                         {ticket.ticketId}
                       </td>
-                      <td className="px-6 py-4">
-                          <div className="text-xs text-gray-500">
-                            {ticket.studentId}
-                          </div>
-                          <div className="font-medium">
-                            {ticket.studentEmail}
-                          </div>
+                      <td className="px-6 py-4 font-semibold text-gray-900">
+                        {ticket.studentId}
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-gray-900">
+                        {ticket.studentEmail}
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-blue-700 font-medium">
@@ -195,9 +177,11 @@ function GkTicketView() {
                         {ticket.faculty}
                       </td>
                       <td className="px-6 py-4 text-gray-700">
-                        {ticket.accadomicYear}
+                        {ticket.academicYear || ticket.accadomicYear}
                       </td>
-                      <td className="p-3 max-w-md whitespace-pre-line break-words">{ticket.description}</td>
+                      <td className="px-6 py-4 text-gray-700 max-w-xs truncate">
+                        {ticket.description}
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -209,22 +193,32 @@ function GkTicketView() {
                           {ticket.status}
                         </span>
                       </td>
-                      <td className="p-3">
-                      <div className="flex gap-2 justify-center">
-                        <button
-                          onClick={() => handleEdit(ticket)}
-                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
-                        >
-                          <FaEdit /> Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(ticket)}
-                          className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs"
-                        >
-                          <FaTrash /> Delete
-                        </button>
-                      </div>
-                    </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2 justify-center">
+                          <button
+                            onClick={() => handleEdit(ticket)}
+                            disabled={ticket.status !== "Pending"}
+                            className={`px-3 py-1.5 rounded-lg transition-colors font-semibold text-sm ${
+                              ticket.status === "Pending"
+                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                          >
+                            <FaEdit className="inline mr-1" /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(ticket)}
+                            disabled={ticket.status !== "Pending"}
+                            className={`px-3 py-1.5 rounded-lg transition-colors font-semibold text-sm ${
+                              ticket.status === "Pending"
+                                ? "bg-red-600 text-white hover:bg-red-700"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                          >
+                            <FaTrash className="inline mr-1" /> Delete
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -235,17 +229,17 @@ function GkTicketView() {
 
         {/* CREATE MODAL */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white p-6 rounded-xl w-full max-w-3xl relative my-6 mx-4">
+          <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
+            <div className="relative my-6 mx-4 w-full max-w-3xl rounded-xl bg-white p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="absolute top-2 right-1 z-10 hover:text-red-600 cursor-pointer"
+                className="absolute top-4 right-4 z-10"
               >
                 <XCircle size={24} />
               </button>
-
               <GkTicketCreate
                 user={user}
+                embedded
                 closeModal={() => setShowCreateModal(false)}
                 refreshTickets={fetchTickets}
               />
@@ -255,20 +249,20 @@ function GkTicketView() {
 
         {/* UPDATE MODAL */}
         {selectedTicket && modalType === "update" && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white p-6 rounded-xl w-full max-w-3xl relative my-6 mx-4">
+          <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
+            <div className="relative my-6 mx-4 w-full max-w-3xl rounded-xl bg-white p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => {
                   setModalType(null);
                   setSelectedTicket(null);
                 }}
-                className="absolute top-2 right-1 z-10 hover:text-red-600 cursor-pointer"
+                className="absolute top-4 right-4 z-10"
               >
                 <XCircle size={24} />
               </button>
-
               <GkTicketUpdate
                 ticketId={selectedTicket._id}
+                embedded
                 closeModal={() => {
                   setModalType(null);
                   setSelectedTicket(null);
@@ -281,18 +275,17 @@ function GkTicketView() {
 
         {/* DELETE MODAL */}
         {selectedTicket && modalType === "delete" && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50 overflow-y-auto">
-            <div className="bg-white p-6 rounded-xl w-full max-w-3xl relative my-6 mx-4">
+          <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 overflow-y-auto">
+            <div className="relative my-6 mx-4 w-full max-w-3xl rounded-xl bg-white p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => {
                   setModalType(null);
                   setSelectedTicket(null);
                 }}
-                className="absolute top-2 right-1 z-10 hover:text-red-600 cursor-pointer"
+                className="absolute top-4 right-4 z-10"
               >
                 <XCircle size={24} />
               </button>
-
               <GkTicketDelete
                 ticketId={selectedTicket._id}
                 closeModal={() => {

@@ -41,7 +41,7 @@ export const AppLayout = ({ children }) => {
       {
         label: "My Tickets",
         to: "/student/view-ticket",
-        icon: MessagesSquare,
+        icon: FileQuestion,
       },
       {
         label: "Public FAQ",

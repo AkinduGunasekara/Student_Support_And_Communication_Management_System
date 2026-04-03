@@ -1,4 +1,3 @@
- 
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./AuthContext";
@@ -10,7 +9,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
-import { TicketCenter } from "./pages/TicketCenter";
+import TicketCenter from "./pages/TicketCenter";
 
 import StudentAskQuestion from "./officialMessaging/pages/StudentAskQuestion";
 import StudentMyMessages from "./officialMessaging/pages/StudentMyMessages";
@@ -36,8 +35,8 @@ export default function App() {
       <Toaster position="top-right" richColors />
       <Routes>
         {/* Root redirect to login */}
-
         <Route path="/" element={<LandingPage />} />
+
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -45,12 +44,11 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/public-faq" element={<PublicFAQ />} />
 
-        {/*Events*/}
+        {/* Events Routes */}
         <Route path="/events" element={<EventsPage />} />
         <Route path="/student/events" element={<StudentEventsPage />} />
         <Route path="/lecturer/events" element={<LecturerEventsPage />} />
         <Route path="/admin/events" element={<AdminEventsPage />} />
-
 
         {/* Student Routes */}
         <Route
@@ -86,16 +84,6 @@ export default function App() {
           }
         />
 
-
-        <Route
-          path="/student/view-ticket"
-          element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <GkTicketView />
-            </ProtectedRoute>
-          }
-        />
-
         {/* Lecturer Routes */}
         <Route
           path="/lecturer/dashboard"
@@ -115,7 +103,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/admin/tickets"
           element={
@@ -124,9 +111,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
-          path="/admin/tickets"
+          path="/admin/view-tickets"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <GkAdminViewTicket />
@@ -151,7 +137,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/ticket/delete/:id"
           element={
@@ -160,15 +145,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
-        <Route
-          path="/ticket/delete/:id"
-          element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <GkTicketDelete />
-            </ProtectedRoute>
-          }
-          />
       </Routes>
     </AuthProvider>
   );

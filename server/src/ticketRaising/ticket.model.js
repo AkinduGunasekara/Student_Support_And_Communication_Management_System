@@ -20,15 +20,7 @@ const ticketSchema = new mongoose.Schema(
     studentEmail: {
       type: String,
       required: true,
-      // match: [/.+@.+\..+/, "Please enter a valid email address"],
-    },
-    accadomicYear: {
-      type: String,
-      required: true,
-    },
-    faculty: {
-      type: String,
-      required: true,
+      match: [/.+@.+\..+/, "Please enter a valid email address"],
     },
     faculty: {
       type: String,
@@ -44,13 +36,19 @@ const ticketSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    replyMessage: {
-      type: String,
-    },
     status: {
       type: String,
+      enum: ["Pending", "Processing", "Resolved", "Completed", "Rejected"],
       enum: ["Pending", "Resolved"],
       default: "Pending",
+    },
+    replyMessage: {
+      type: String,
+      default: null,
+    },
+    academicYear: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true } // adds createdAt and updatedAt

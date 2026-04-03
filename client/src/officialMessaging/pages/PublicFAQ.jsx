@@ -75,6 +75,16 @@ export default function PublicFAQ() {
   const totalFiltered = filteredMessages.length;
   const facultyCount = [...new Set(messages.map((msg) => msg.faculty).filter(Boolean))].length;
 
+  const isImageFile = (fileType) => {
+    return fileType?.startsWith("image/");
+  };
+
+  const getFileIcon = (fileType) => {
+    if (fileType?.includes("pdf")) return "📕";
+    if (fileType?.includes("word") || fileType?.includes("document")) return "📄";
+    return "📎";
+  };
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
@@ -274,7 +284,7 @@ export default function PublicFAQ() {
               </div>
             ) : (
               <div className="space-y-6">
-                {filteredMessages.map((msg) => (
+                {filteredMessages.map((msg, index) => (
                   <div
                     key={msg._id}
                     className="overflow-hidden rounded-[28px] border border-blue-100 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
@@ -285,6 +295,9 @@ export default function PublicFAQ() {
                       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                         <div className="flex-1">
                           <div className="mb-4 flex flex-wrap items-center gap-2">
+                            <div className="inline-flex items-center justify-center rounded-full bg-blue-100 h-8 w-8 font-bold text-blue-700 text-sm">
+                              {index + 1}
+                            </div>
                             <h2 className="text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
                               {msg.subject || "Untitled Subject"}
                             </h2>
@@ -317,6 +330,55 @@ export default function PublicFAQ() {
                                 {msg.question || "-"}
                               </p>
                             </div>
+
+                            {msg.attachment && msg.attachment.fileUrl && (
+                              <div className="rounded-xl border border-purple-100 bg-purple-50 p-4">
+                                <p className="text-xs font-bold uppercase tracking-wide text-purple-700 mb-3">📎 Attachment</p>
+                                {isImageFile(msg.attachment.fileType) ? (
+                                  <div className="space-y-3">
+                                    <img
+                                      src={msg.attachment.fileUrl}
+                                      alt={msg.attachment.fileName}
+                                      className="max-h-64 w-full rounded-lg object-contain border border-purple-200"
+                                      onError={(e) => {
+                                        e.target.style.display = "none";
+                                      }}
+                                    />
+                                    <a
+                                      href={msg.attachment.fileUrl}
+                                      download={msg.attachment.fileName}
+                                      className="inline-flex items-center gap-2 text-sm font-semibold text-purple-700 hover:text-purple-900"
+                                    >
+                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                      </svg>
+                                      {msg.attachment.fileName}
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-3 rounded-lg border border-purple-200 bg-white p-3">
+                                    <div className="text-3xl">{getFileIcon(msg.attachment.fileType)}</div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-semibold text-slate-900 truncate">
+                                        {msg.attachment.fileName}
+                                      </p>
+                                      <p className="text-xs text-slate-500">
+                                        {msg.attachment.fileType || "Document"}
+                                      </p>
+                                    </div>
+                                    <a
+                                      href={msg.attachment.fileUrl}
+                                      download={msg.attachment.fileName}
+                                      className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-700 transition shrink-0"
+                                    >
+                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                      </svg>
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+                            )}
 
                             <div className="rounded-3xl border border-emerald-100 bg-emerald-50 p-5">
                               <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
@@ -377,34 +439,6 @@ export default function PublicFAQ() {
                           </div>
                         </div>
                       </div>
-
-                      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-                        <p className="text-sm font-semibold text-blue-700">
-                          Official Answer
-                        </p>
-                        <p className="mt-1 whitespace-pre-line text-sm text-slate-700">
-                          {msg.answer}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 md:max-w-xs">
-                      <p>
-                        <span className="font-semibold">Answered By:</span>{" "}
-                        {msg.answeredBy?.name || "Lecturer"}
-                      </p>
-
-                      <p className="mt-2">
-                        <span className="font-semibold">Lecturer Email:</span>{" "}
-                        {msg.answeredBy?.email || "-"}
-                      </p>
-
-                      <p className="mt-2">
-                        <span className="font-semibold">Answered At:</span>{" "}
-                        {msg.answeredAt
-                          ? new Date(msg.answeredAt).toLocaleString()
-                          : "-"}
-                      </p>
                     </div>
                   </div>
                 ))}
@@ -416,4 +450,3 @@ export default function PublicFAQ() {
     </AppLayout>
   );
 }
-

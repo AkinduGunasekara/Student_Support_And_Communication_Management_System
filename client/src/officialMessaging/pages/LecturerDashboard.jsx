@@ -199,7 +199,6 @@ export default function LecturerDashboard() {
   const answeredCount = messages.filter((msg) => msg.status === "ANSWERED").length;
   const publicCount = messages.filter((msg) => msg.isPublic).length;
   const privateCount = messages.filter((msg) => !msg.isPublic).length;
-  const totalMessages = messages.length;
 
   const getStatusClasses = (status) => {
     switch (status) {
@@ -215,7 +214,7 @@ export default function LecturerDashboard() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="relative mb-8 overflow-hidden rounded-[30px] border border-blue-100 shadow-lg shadow-blue-200/60">
             <img
@@ -223,7 +222,7 @@ export default function LecturerDashboard() {
               alt="Lecturer dashboard banner"
               className="h-52 w-full object-cover"
             />
-            <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
             <div className="absolute inset-0 px-6 py-8 text-white md:px-8 md:py-10">
               <div className="inline-flex rounded-full bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide text-blue-50 backdrop-blur">
                 Official Messaging + FAQ Management
@@ -253,7 +252,7 @@ export default function LecturerDashboard() {
                     Total Messages
                   </p>
                   <h2 className="mt-4 text-4xl font-bold text-slate-900">
-                    {totalMessages}
+                    {messages.length}
                   </h2>
                   <p className="mt-2 text-xs text-slate-500">
                     All student questions
@@ -493,7 +492,7 @@ export default function LecturerDashboard() {
                       </div>
                     )}
 
-                    <div className="h-1.5 w-full bg-linear-to-r from-blue-700 via-blue-500 to-blue-400" />
+                    <div className="h-1.5 w-full bg-gradient-to-r from-blue-700 via-blue-500 to-blue-400" />
 
                     <div className="p-6 md:p-7">
                       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -568,7 +567,7 @@ export default function LecturerDashboard() {
                                     {msg.attachment.fileType?.startsWith("image/") ? (
                                       <div className="space-y-2">
                                         <img
-                                          src={`${BACKEND_URL}${msg.attachment.fileUrl}`}
+                                          src={msg.attachment.fileUrl}
                                           alt={msg.attachment.fileName}
                                           className="max-w-full h-auto rounded-lg max-h-64 object-cover"
                                         />
@@ -577,7 +576,7 @@ export default function LecturerDashboard() {
                                             🖼️ {msg.attachment.fileName}
                                           </p>
                                           <a
-                                            href={`${BACKEND_URL}${msg.attachment.fileUrl}`}
+                                            href={msg.attachment.fileUrl}
                                             download={msg.attachment.fileName}
                                             className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline whitespace-nowrap"
                                           >
@@ -613,7 +612,7 @@ export default function LecturerDashboard() {
                                           </div>
                                         </div>
                                         <a
-                                          href={`${BACKEND_URL}${msg.attachment.fileUrl}`}
+                                          href={msg.attachment.fileUrl}
                                           download={msg.attachment.fileName}
                                           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition whitespace-nowrap"
                                         >
