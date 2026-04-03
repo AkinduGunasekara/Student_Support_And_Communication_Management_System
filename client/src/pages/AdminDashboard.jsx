@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
 import { UserProfile } from "../components/UserProfile";
+import adminDashboardBanner from "../assets/admin dashboard banner.jpg";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
@@ -164,12 +165,20 @@ export const AdminDashboard = () => {
   return (
     <AppLayout>
       <div className="ui-page">
-        <div className="ui-card mb-8 bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-blue-200">
-            Welcome {user?.name || "Admin"} — oversee users, feedback, and
-            official communication.
-          </p>
+        <div className="relative mb-8 overflow-hidden rounded-2xl shadow">
+          <img
+            src={adminDashboardBanner}
+            alt="Admin dashboard banner"
+            className="h-52 w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+          <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-sm text-white/85 max-w-2xl">
+              Welcome {user?.name || "Admin"} - oversee users, feedback, and
+              official communication.
+            </p>
+          </div>
         </div>
 
         <div id="profile-section" className="mb-8">
@@ -388,9 +397,9 @@ export const AdminDashboard = () => {
         <div className="grid md:grid-cols-2 gap-6">
           <Link
             to="/admin/tickets"
-            className="ui-card p-6 transition hover:-translate-y-0.5 bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200"
+            className="ui-card p-6 transition hover:-translate-y-0.5"
           >
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">🎫 Support Ticket Center</h2>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Support Ticket Center</h2>
             <p className="text-slate-600">
               Manage and respond to student support tickets.
             </p>
