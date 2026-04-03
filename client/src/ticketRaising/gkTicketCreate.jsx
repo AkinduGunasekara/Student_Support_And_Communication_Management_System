@@ -24,8 +24,8 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
     let error = "";
 
     if (name === "studentId") {
-      const typingRegex = /^IT\d{0,8}$/;
-      if (!typingRegex.test(value)) return;
+      // const typingRegex = /^IT\d{0,8}$/;
+      // if (!typingRegex.test(value)) return;
 
       const regex = /^IT\d{8}$/;
       if (!regex.test(value)) {
