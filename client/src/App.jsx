@@ -3,7 +3,6 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { TicketCenter } from "./pages/TicketCenter";
 
 import { LoginPage } from "./pages/LoginPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";

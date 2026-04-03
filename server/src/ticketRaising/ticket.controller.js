@@ -1,7 +1,6 @@
 import Complaint from "../ticketRaising/ticket.model.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import nodemailer from "nodemailer";
 
 dotenv.config();
 
@@ -72,7 +71,7 @@ export const getMyComplaints = async (req, res) => {
       studentId,
       studentEmail,
       faculty,
-      academicYear,
+      accadomicYear,
       ticketCategory,
       description,
     } = req.body;
