@@ -38,7 +38,6 @@ const ticketSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Resolved", "Completed", "Rejected"],
       enum: ["Pending", "Resolved"],
       default: "Pending",
     },
