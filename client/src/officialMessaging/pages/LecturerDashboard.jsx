@@ -9,6 +9,7 @@ import {
   updateVisibility,
 } from "../services/messageService";
 import { Trash2, AlertCircle } from "lucide-react";
+import lecturerDashboardBanner from "../../assets/lecture dashboard banner.jpg";
 
 const BACKEND_URL = "http://localhost:5001";
 
@@ -199,16 +200,21 @@ export default function LecturerDashboard() {
     <AppLayout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
         <div className="mx-auto max-w-7xl">
-          {/* Header Section */}
-          <div className="mb-8 overflow-hidden rounded-[30px] border border-blue-100 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200/60">
-            <div className="px-6 py-8 md:px-8 md:py-10">
+          <div className="relative mb-8 overflow-hidden rounded-[30px] border border-blue-100 shadow-lg shadow-blue-200/60">
+            <img
+              src={lecturerDashboardBanner}
+              alt="Lecturer dashboard banner"
+              className="h-52 w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+            <div className="absolute inset-0 px-6 py-8 text-white md:px-8 md:py-10">
               <div className="inline-flex rounded-full bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide text-blue-50 backdrop-blur">
                 Official Messaging + FAQ Management
               </div>
               <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
                 Lecturer Dashboard
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100 md:text-base">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/85 md:text-base">
                 Welcome <span className="font-semibold">{user?.name || "Lecturer"}</span> — Review student questions,
                 submit official replies, and manage FAQ publishing from one page.
               </p>

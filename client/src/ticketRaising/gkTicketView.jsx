@@ -8,6 +8,7 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import GkTicketCreate from "./gkTicketCreate.jsx";
 import GkTicketUpdate from "./gkTicketUpdate.jsx";
 import GkTicketDelete from "./gkTicketDelete.jsx";
+import ticketsBanner from "../assets/tickets banner.jpg";
 
 function GkTicketView() {
   const [tickets, setTickets] = useState([]);
@@ -83,22 +84,35 @@ function GkTicketView() {
 
   return (
     <AppLayout>
-      <main className="max-w-7xl mx-auto px-6 py-10">
+        <main className="max-w-7xl mx-auto px-6 py-10">
+          <section className="relative mb-8 overflow-hidden rounded-2xl shadow">
+            <img
+              src={ticketsBanner}
+              alt="My tickets banner"
+              className="h-52 w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+            <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
+              <h1 className="text-3xl font-bold">My Tickets</h1>
+              <p className="mt-2 text-sm text-white/85">Manage your support requests</p>
+            </div>
+          </section>
 
-        {/* Header */}
-        <section className="mb-12 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">My Tickets</h1>
-            <p className="text-gray-500">Manage your support requests</p>
-          </div>
+          <section className="mb-8 flex justify-end sm:mb-12">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-blue-600 text-white px-5 py-3 rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <FaPlus /> New Ticket
+            </button>
+          </section>
 
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-5 py-3 rounded-xl flex items-center gap-2"
-          >
-            <FaPlus /> New Ticket
-          </button>
-        </section>
+          <section className="mb-8">
+            <div>
+              <h2 className="text-2xl font-bold">Ticket Overview</h2>
+              <p className="text-gray-500">Track all your support requests by status and category</p>
+            </div>
+          </section>
 
         {/* Stats */}
         <section className="grid grid-cols-3 gap-6 mb-8">

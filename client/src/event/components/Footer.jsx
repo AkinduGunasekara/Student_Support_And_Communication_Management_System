@@ -55,7 +55,7 @@ const Footer = () => {
 
           <p className="text-sm text-gray-400">
             University Support System <br />
-            support@university.edu
+            support@campusone.edu
           </p>
         </div>
       </div>

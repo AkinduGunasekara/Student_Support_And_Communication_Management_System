@@ -4,6 +4,7 @@ import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
 import { UserProfile } from "../components/UserProfile";
 import { getMyFeedback, submitFeedback } from "../feedback/feedbackService";
+import dashboardBanner from "../assets/student dashboard banner.jpg";
 
 // Constants for star rating
 const STAR_FILLED = "★";
@@ -59,12 +60,20 @@ export const StudentDashboard = () => {
   return (
     <AppLayout>
       <div className="ui-page">
-        <div className="ui-card mb-6 bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white">
-          <h1 className="text-3xl font-bold">Student Dashboard</h1>
-          <p className="mt-2 text-blue-200">
-            Welcome {user?.name || "Student"} — manage feedback and access
-            official messaging.
-          </p>
+        <div className="relative mb-6 overflow-hidden rounded-2xl shadow">
+          <img
+            src={dashboardBanner}
+            alt="Student dashboard banner"
+            className="h-52 w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+          <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
+            <h1 className="text-3xl font-bold">Student Dashboard</h1>
+            <p className="mt-2 max-w-2xl text-sm text-white/85">
+              Welcome {user?.name || "Student"} - manage feedback and access
+              official messaging.
+            </p>
+          </div>
         </div>
 
         <div id="profile-section" className="mb-8">

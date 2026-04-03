@@ -66,8 +66,10 @@ const LecturerEventsPage = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
 
           <div className="absolute inset-0 flex flex-col justify-center px-8 text-white">
-            <h1 className="text-xl font-bold">My Events</h1>
-            <p className="text-sm mt-1 text-white/80">
+            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+              My Events
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/85 md:text-base">
               Manage events created by you
             </p>
           </div>
