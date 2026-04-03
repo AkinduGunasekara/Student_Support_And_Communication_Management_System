@@ -9,7 +9,7 @@ import ticketRouter from "./ticketRaising/ticket.routes.js";
 import messageRouter from "./officialMessaging/message.routes.js";
 import feedbackRouter from "./feedback/feedback.routes.js";
 import eventRoutes from "./event/event.routes.js";
-import path from "path";
+
 
 import { connectDB } from "./config/db.js";
 import path from "path";

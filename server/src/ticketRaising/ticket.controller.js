@@ -8,9 +8,6 @@ dotenv.config();
  * ----------------------------------------
  * Get All Complaints (Admin)
  * ----------------------------------------
- * --------------------------
- * Get All Complaints (Admin 
- * --------------------------
  */
 export const getAllComplaints = async (req, res) => {
   try {
@@ -49,26 +46,25 @@ export const getComplaintById = async (req, res) => {
  * ----------------------------------------
  * Get Logged-in User Complaints
  * ----------------------------------------
- * 
  */
-   export const getMyComplaints = async (req, res) => {
+export const getMyComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find({ userId: req.user._id })
       .sort({ createdAt: -1 });
-       res.status(200).json(complaints);
+
+    res.status(200).json(complaints);
   } catch (error) {
     console.error("Error in getMyComplaints:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-  };
+};
 
-  /**
+/**
  * ----------------------------------------
  * Create Complaint (User-wise)
  * ----------------------------------------
  */
-
-  export const createComplaint = async (req, res) => {
+export const createComplaint = async (req, res) => {
   try {
     const {
       studentId,
@@ -127,7 +123,6 @@ export const getComplaintById = async (req, res) => {
 
 /**
  * ----------------------------------------
-* ----------------------------------------
  * Update Complaint (Only Owner)
  * ----------------------------------------
  */
@@ -146,7 +141,6 @@ export const updateComplaint = async (req, res) => {
     const updatedComplaint = await Complaint.findByIdAndUpdate(
       req.params.id,
       req.body,
-       req.body,
       { returnDocument: 'after' }
     );
 
@@ -188,7 +182,6 @@ export const deleteComplaint = async (req, res) => {
  * Nodemailer Setup
  * ----------------------------------------
  */
-
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -197,7 +190,6 @@ const transporter = nodemailer.createTransport({
   },
   tls: {
     rejectUnauthorized: false,
-     rejectUnauthorized: false,
   },
 });
 
@@ -206,12 +198,6 @@ const transporter = nodemailer.createTransport({
  * Admin Reply + Email
  * ----------------------------------------
  */
-  * ----------------------------------------
- * Admin Reply + Email
- * ----------------------------------------
- 
- */
-
 export const replyToComplaint = async (req, res) => {
   try {
     const { replyMessage } = req.body;
@@ -237,6 +223,7 @@ export const replyToComplaint = async (req, res) => {
       });
     }
 
+    // Send email with error handling
     let emailSent = true;
     try {
       await transporter.sendMail({
@@ -267,7 +254,3 @@ export const replyToComplaint = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
-
-
