@@ -57,14 +57,16 @@ export const createMessage = async (req, res) => {
 
     let attachment = {
       fileName: "",
-      fileUrl: "",
+      fileData: "",
       fileType: "",
     };
 
     if (req.file) {
+      // Convert file buffer to base64
+      const base64Data = req.file.buffer.toString("base64");
       attachment = {
         fileName: req.file.originalname,
-        fileUrl: `/uploads/messages/${req.file.filename}`,
+        fileData: base64Data,
         fileType: req.file.mimetype,
       };
     }

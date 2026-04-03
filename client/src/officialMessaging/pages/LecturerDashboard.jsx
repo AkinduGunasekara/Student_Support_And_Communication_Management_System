@@ -283,6 +283,15 @@ export default function LecturerDashboard() {
     return "📎";
   };
 
+  const downloadFileFromBase64 = (base64Data, fileName, mimeType) => {
+    const link = document.createElement("a");
+    link.href = `data:${mimeType};base64,${base64Data}`;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
@@ -549,7 +558,7 @@ export default function LecturerDashboard() {
                           </p>
                         </div>
 
-                        {msg.attachment && msg.attachment.fileUrl && (
+                        {msg.attachment && msg.attachment.fileData && (
                           <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
                             <p className="text-sm font-semibold text-purple-700 mb-3">
                               📎 Student Attachment
@@ -557,11 +566,12 @@ export default function LecturerDashboard() {
                             {isImageFile(msg.attachment.fileType) ? (
                               <div className="space-y-3">
                                 <img
-                                  src={`http://localhost:5001${msg.attachment.fileUrl}`}
+                                  src={`data:${msg.attachment.fileType};base64,${msg.attachment.fileData}`}
                                   alt={msg.attachment.fileName}
                                   className="max-h-96 rounded-lg object-contain border border-purple-200"
                                   onError={(e) => {
-                                    e.target.style.display = "none";
+                                    console.error("Image failed to load");
+                                    e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23f3f4f6' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='14'%3EImage failed to load%3C/text%3E%3C/svg%3E";
                                   }}
                                 />
                                 <div className="flex items-center gap-2">
@@ -578,13 +588,9 @@ export default function LecturerDashboard() {
                                       d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                                     />
                                   </svg>
-                                  <a
-                                    href={`http://localhost:5001${msg.attachment.fileUrl}`}
-                                    download={msg.attachment.fileName}
-                                    className="text-sm text-purple-700 hover:text-purple-900 font-medium underline"
-                                  >
+                                  <span className="text-sm text-purple-700 font-medium">
                                     {msg.attachment.fileName}
-                                  </a>
+                                  </span>
                                 </div>
                               </div>
                             ) : (
@@ -600,9 +606,14 @@ export default function LecturerDashboard() {
                                     {msg.attachment.fileType || "Document"}
                                   </p>
                                 </div>
-                                <a
-                                  href={`http://localhost:5001${msg.attachment.fileUrl}`}
-                                  download={msg.attachment.fileName}
+                                <button
+                                  onClick={() =>
+                                    downloadFileFromBase64(
+                                      msg.attachment.fileData,
+                                      msg.attachment.fileName,
+                                      msg.attachment.fileType
+                                    )
+                                  }
                                   className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-700 transition"
                                 >
                                   <svg
@@ -619,7 +630,7 @@ export default function LecturerDashboard() {
                                     />
                                   </svg>
                                   Download
-                                </a>
+                                </button>
                               </div>
                             )}
                           </div>
