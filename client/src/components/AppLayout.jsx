@@ -120,7 +120,9 @@ export const AppLayout = ({ children }) => {
       >
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="mt-1 text-lg font-bold text-slate-900">CAMPUS ONE</h1>
+            <Link to="/" className="mt-1 text-lg font-bold text-slate-900 hover:text-blue-600 cursor-pointer">
+            CAMPUS ONE
+          </Link>
           </div>
 
           <button
