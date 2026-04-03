@@ -64,7 +64,7 @@ export const createMessage = async (req, res) => {
     if (req.file) {
       attachment = {
         fileName: req.file.originalname,
-        fileUrl: `/uploads/messages/${req.file.filename}`,
+        fileUrl: `http://localhost:5001/uploads/messages/${req.file.filename}`,
         fileType: req.file.mimetype,
       };
     }

@@ -214,15 +214,16 @@ export default function LecturerDashboard() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
         <div className="mx-auto max-w-7xl">
+          {/* Banner Section */}
           <div className="relative mb-8 overflow-hidden rounded-[30px] border border-blue-100 shadow-lg shadow-blue-200/60">
             <img
               src={lecturerDashboardBanner}
               alt="Lecturer dashboard banner"
               className="h-52 w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+            <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/30" />
             <div className="absolute inset-0 px-6 py-8 text-white md:px-8 md:py-10">
               <div className="inline-flex rounded-full bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide text-blue-50 backdrop-blur">
                 Official Messaging + FAQ Management
@@ -492,7 +493,7 @@ export default function LecturerDashboard() {
                       </div>
                     )}
 
-                    <div className="h-1.5 w-full bg-gradient-to-r from-blue-700 via-blue-500 to-blue-400" />
+                    <div className="h-1.5 w-full bg-linear-to-r from-blue-700 via-blue-500 to-blue-400" />
 
                     <div className="p-6 md:p-7">
                       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -570,18 +571,24 @@ export default function LecturerDashboard() {
                                           src={msg.attachment.fileUrl}
                                           alt={msg.attachment.fileName}
                                           className="max-w-full h-auto rounded-lg max-h-64 object-cover"
+                                          onError={(e) => {
+                                            e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50%' y='50%' font-size='12' fill='%23999' text-anchor='middle' dy='.3em'%3EImage not found%3C/text%3E%3C/svg%3E";
+                                          }}
                                         />
                                         <div className="flex items-center justify-between gap-2">
                                           <p className="text-sm font-semibold text-slate-700 break-all flex-1">
                                             🖼️ {msg.attachment.fileName}
                                           </p>
-                                          <a
-                                            href={msg.attachment.fileUrl}
-                                            download={msg.attachment.fileName}
-                                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline whitespace-nowrap"
-                                          >
-                                            Download
-                                          </a>
+                                          {msg.attachment.fileUrl && (
+                                            <a
+                                              href={msg.attachment.fileUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline whitespace-nowrap"
+                                            >
+                                              View
+                                            </a>
+                                          )}
                                         </div>
                                       </div>
                                     ) : (
@@ -611,16 +618,19 @@ export default function LecturerDashboard() {
                                             </p>
                                           </div>
                                         </div>
-                                        <a
-                                          href={msg.attachment.fileUrl}
-                                          download={msg.attachment.fileName}
-                                          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition whitespace-nowrap"
-                                        >
-                                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                          </svg>
-                                          Download
-                                        </a>
+                                        {msg.attachment.fileUrl && (
+                                          <a
+                                            href={msg.attachment.fileUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition whitespace-nowrap"
+                                          >
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                            Open
+                                          </a>
+                                        )}
                                       </div>
                                     )}
                                   </div>
