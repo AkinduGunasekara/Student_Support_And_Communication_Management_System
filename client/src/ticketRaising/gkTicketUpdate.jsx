@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
+function GkTicketUpdate({ ticketId, closeModal, refreshTickets, embedded = false }) {
   const [formData, setFormData] = useState({
     studentId: "",
     studentEmail: "",
@@ -28,7 +30,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
 
       try {
         const res = await axios.get(
-          `http://localhost:5001/api/tickets/${ticketId}`,
+          `${API_BASE_URL}/api/tickets/${ticketId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setFormData(res.data);
@@ -99,7 +101,7 @@ function GkTicketUpdate({ ticketId, closeModal, refreshTickets }) {
 
     try {
       await axios.put(
-        `http://localhost:5001/api/tickets/${ticketId}`,
+        `${API_BASE_URL}/api/tickets/${ticketId}`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

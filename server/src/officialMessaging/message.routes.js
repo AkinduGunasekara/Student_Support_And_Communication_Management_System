@@ -12,6 +12,7 @@ import {
 } from "./message.controller.js";
 
 import { authMiddleware, requireRole } from "../middleware/auth.middleware.js";
+import upload from "../middleware/upload.middleware.js";
 
 const router = express.Router();
 
@@ -19,7 +20,13 @@ const router = express.Router();
 router.get("/public", getPublicMessages);
 
 // Student routes
-router.post("/", authMiddleware, requireRole("student"), createMessage);
+router.post(
+  "/",
+  authMiddleware,
+  requireRole("student"),
+  upload.single("attachment"),
+  createMessage
+);
 router.get("/my", authMiddleware, requireRole("student"), getMyMessages);
 router.patch("/:id/notified", authMiddleware, requireRole("student"), markAsNotified);
 

@@ -23,49 +23,50 @@ export const createMessage = async (req, res) => {
       !studentRegistrationId ||
       !(studentEmail || req.user.email) ||
       !academicYear ||
-      !semester ||
-      !faculty ||
-      !course ||
-      !lecturerId
+      !semester
     ) {
       return res.status(400).json({
         message:
-          "Subject, question, studentRegistrationId, studentEmail, academicYear, semester, faculty, course and lecturerId are required",
+          "Subject, question, studentRegistrationId, studentEmail, academicYear and semester are required",
       });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(lecturerId)) {
-      return res.status(400).json({ message: "Invalid lecturer ID" });
+    let assignedLecturer = null;
+
+    if (lecturerId) {
+      if (!mongoose.Types.ObjectId.isValid(lecturerId)) {
+        return res.status(400).json({ message: "Invalid lecturer ID" });
+      }
+
+      const lecturer = await User.findById(lecturerId);
+
+      if (!lecturer) {
+        return res.status(404).json({ message: "Lecturer not found" });
+      }
+
+      if (lecturer.role !== "lecturer") {
+        return res.status(400).json({ message: "Selected user is not a lecturer" });
+      }
+
+      if (!lecturer.isActive) {
+        return res.status(400).json({ message: "Selected lecturer is inactive" });
+      }
+
+      assignedLecturer = lecturer._id;
     }
 
-    const lecturer = await User.findById(lecturerId);
+    let attachment = {
+      fileName: "",
+      fileUrl: "",
+      fileType: "",
+    };
 
-    if (!lecturer) {
-      return res.status(404).json({ message: "Lecturer not found" });
-    }
-
-    if (lecturer.role !== "lecturer") {
-      return res
-        .status(400)
-        .json({ message: "Selected user is not a lecturer" });
-    }
-
-    if (!lecturer.isActive) {
-      return res
-        .status(400)
-        .json({ message: "Selected lecturer is inactive" });
-    }
-
-    if (lecturer.faculty !== faculty) {
-      return res.status(400).json({
-        message: "Selected lecturer does not match the selected faculty",
-      });
-    }
-
-    if (lecturer.course !== course) {
-      return res.status(400).json({
-        message: "Selected lecturer does not match the selected course",
-      });
+    if (req.file) {
+      attachment = {
+        fileName: req.file.originalname,
+        fileUrl: `/uploads/messages/${req.file.filename}`,
+        fileType: req.file.mimetype,
+      };
     }
 
     const message = await Message.create({
@@ -74,11 +75,12 @@ export const createMessage = async (req, res) => {
       studentEmail: studentEmail || req.user.email || "",
       academicYear: academicYear || req.user.year || null,
       semester,
-      lecturerId: lecturer._id,
-      faculty,
-      course,
+      lecturerId: assignedLecturer,
+      faculty: faculty || "",
+      course: course || "",
       subject,
       question,
+      attachment,
       studentNotified: false,
     });
 

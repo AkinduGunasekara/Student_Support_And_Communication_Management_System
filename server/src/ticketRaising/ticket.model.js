@@ -30,6 +30,16 @@ const ticketSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    academicYear: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    faculty: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     ticketCategory: {
       type: String,
       required: true,

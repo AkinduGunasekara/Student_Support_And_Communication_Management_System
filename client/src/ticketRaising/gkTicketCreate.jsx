@@ -238,6 +238,12 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
       </div>
     </div>
   );
+
+  if (embedded) {
+    return formContent;
+  }
+
+  return <AppLayout><div className="ui-page">{formContent}</div></AppLayout>;
 }
 
 export default GkTicketCreate;

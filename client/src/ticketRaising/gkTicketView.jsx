@@ -40,7 +40,6 @@ function GkTicketView() {
           },
         }
       );
-
       setTickets(res.data);
     } catch (err) {
       console.error("Error fetching tickets:", err);

@@ -213,7 +213,6 @@ function gkAdminViewTicket() {
             </table>
           </div>
         </div>
-      </div>
 
       {/* Reply Modal */}
       {selectedTicket && (

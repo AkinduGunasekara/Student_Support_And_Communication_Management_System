@@ -1,4 +1,5 @@
 import Complaint from "../ticketRaising/ticket.model.js";
+import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 
@@ -14,7 +15,6 @@ export const getAllComplaints = async (req, res) => {
     const complaints = await Complaint.find()
       .populate("userId", "name email")
       .sort({ createdAt: -1 });
-
     res.status(200).json(complaints);
   } catch (error) {
     console.error("Error in getAllComplaints:", error);
@@ -60,18 +60,19 @@ export const getMyComplaints = async (req, res) => {
   }
 };
 
-/**
+  /**
  * ----------------------------------------
  * Create Complaint (User-wise)
  * ----------------------------------------
  */
-export const createComplaint = async (req, res) => {
+
+  export const createComplaint = async (req, res) => {
   try {
     const {
       studentId,
       studentEmail,
       faculty,
-      accadomicYear,
+      academicYear,
       ticketCategory,
       description,
     } = req.body;
@@ -122,15 +123,16 @@ export const createComplaint = async (req, res) => {
   }
 };
 
+
 /**
  * ----------------------------------------
  * Update Complaint (Only Owner)
  * ----------------------------------------
  */
+
 export const updateComplaint = async (req, res) => {
   try {
     const complaint = await Complaint.findById(req.params.id);
-
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
     }
@@ -158,10 +160,10 @@ export const updateComplaint = async (req, res) => {
  * Delete Complaint (Only Owner)
  * ----------------------------------------
  */
+
 export const deleteComplaint = async (req, res) => {
   try {
     const complaint = await Complaint.findById(req.params.id);
-
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
     }

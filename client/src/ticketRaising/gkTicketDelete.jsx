@@ -37,7 +37,6 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   // Handle ticket deletion
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this ticket?")) return;
-
     const token = localStorage.getItem("ssc_token");
     if (!token) {
       toast.error("Unauthorized. Please login again.");
