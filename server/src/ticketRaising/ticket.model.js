@@ -68,7 +68,7 @@ ticketSchema.pre("save", async function () {
       counter.seq += 1;
       await counter.save();
 
-      this.ticketId = "t" + counter.seq.toString().padStart(3, "0");
+      this.ticketId = "T" + counter.seq.toString().padStart(3, "0");
     }
   } catch (err) {
     console.error("Error in pre-save hook:", err);
