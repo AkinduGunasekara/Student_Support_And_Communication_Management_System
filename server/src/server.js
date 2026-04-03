@@ -8,10 +8,24 @@ import userRouter from "./userManagement/user.routes.js";
 import ticketRouter from "./ticketRaising/ticket.routes.js";
 import messageRouter from "./officialMessaging/message.routes.js";
 import feedbackRouter from "./feedback/feedback.routes.js";
-
-import { connectDB } from "./config/db.js";
+import eventRoutes from "./event/event.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+
+import { connectDB } from "./config/db.js";
+
+// Commented out routes for future use:
+// import { initializeRentCronJobs } from "./jobs/sn_monthlyReminder.js";
+// import noteRoutes from "./routes/SDnotesRoutes.js";
+// import purchaseRoutes from "./routes/SDpurchaseRoutes.js";
+// import conventionHallBookingRoutes from "./routes/SDConventionHallBookingRoutes.js";
+// import laundryRoutes from "./routes/SDlaundryRoutes.js";
+// import feedbackRoutes from "./routes/vd_feedbackRoutes.js";
+// import notificationRoutes from "./routes/vd_notificaionRoutes.js";
+// import { initSocket } from "./socket.js";
+// import "./jobs/ks_ParcelRemaiderJob.js";
+// import searchRoutes from "./routes/vd_searchRoutes.js";
+// import { initializeParcelCronJobs } from "./jobs/ks_ParcelRemaiderJob.js";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -25,7 +39,7 @@ app.use(
   })
 );
 
-//middleware
+// middleware
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
@@ -33,11 +47,13 @@ app.use("/api/users", userRouter);
 app.use("/api/tickets", ticketRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/feedback", feedbackRouter);
+app.use("/api/events", eventRoutes);
 
+// Setup static files
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files from uploads folder
+// Serve uploaded files from uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.listen(PORT, () => {

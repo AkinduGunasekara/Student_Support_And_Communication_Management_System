@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user);
     localStorage.setItem("ssc_token", data.token);
     localStorage.setItem("ssc_user", JSON.stringify(data.user));
+    
   };
 
   const logout = (redirectToLogin = false) => {

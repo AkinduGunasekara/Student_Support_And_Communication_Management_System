@@ -1,3 +1,4 @@
+
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./AuthContext";
@@ -22,20 +23,34 @@ import GkTicketCreate from "./ticketRaising/gkTicketCreate";
 import GkTicketUpdate from "./ticketRaising/gkTicketUpdate";
 import GkTicketDelete from "./ticketRaising/gkTicketDelete.jsx";
 
+import EventsPage from "./event/EventsPage";
+import StudentEventsPage from "./event/StudentEventsPage";
+import LecturerEventsPage from "./event/LecturerEventsPage";
+import AdminEventsPage from "./event/AdminEventsPage";
+
+import LandingPage from "./pages/LandingPage";
+
 export default function App() {
   return (
     <AuthProvider>
       <Toaster position="top-right" richColors />
       <Routes>
         {/* Root redirect to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        
+
+        <Route path="/" element={<LandingPage />} />
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/public-faq" element={<PublicFAQ />} />
+
+        {/*Events*/}
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="/student/events" element={<StudentEventsPage />} />
+        <Route path="/lecturer/events" element={<LecturerEventsPage />} />
+        <Route path="/admin/events" element={<AdminEventsPage />} />
+
 
         {/* Student Routes */}
         <Route

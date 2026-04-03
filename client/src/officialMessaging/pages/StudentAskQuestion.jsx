@@ -4,7 +4,7 @@ import { useAuth } from "../../AuthContext.jsx";
 import { createMessage } from "../services/messageService";
 import QuestionForm from "../components/QuestionForm";
 import { AppLayout } from "../../components/AppLayout";
-import { CheckCircle, Mail, Shield } from "lucide-react";
+import askQuestionBanner from "../../assets/Ask question banner.jpg";
 
 export default function StudentAskQuestion() {
   const { token, user } = useAuth();
@@ -29,18 +29,23 @@ export default function StudentAskQuestion() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
-        <div className="mx-auto max-w-5xl">
-          {/* Header Section */}
-          <div className="mb-8 overflow-hidden rounded-[30px] border border-blue-100 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200/60">
-            <div className="px-6 py-8 md:px-8 md:py-10">
-              <div className="inline-flex rounded-full bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide text-blue-50 backdrop-blur">
+      <div className="min-h-screen bg-slate-50 px-4 py-6 md:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="relative mb-6 overflow-hidden rounded-2xl shadow">
+            <img
+              src={askQuestionBanner}
+              alt="Ask a question banner"
+              className="h-52 w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+            <div className="absolute inset-0 flex flex-col items-start justify-center px-8 text-white">
+              <div className="inline-flex self-start rounded-full bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide text-blue-50 backdrop-blur">
                 Official Messaging System
               </div>
-              <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+              <h1 className="mt-4 text-3xl font-bold tracking-tight">
                 Ask a Question
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100 md:text-base">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/85">
                 Submit your academic or official question to the relevant lecturer or department. Your question will be reviewed and answered promptly.
               </p>
             </div>
