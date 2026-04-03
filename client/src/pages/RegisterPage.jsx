@@ -113,7 +113,7 @@ export const RegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen px-4 py-10 md:px-8">
+    <div className="auth-page-bg min-h-screen px-4 py-10 md:px-8">
       <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl md:grid-cols-[1fr_1.2fr]">
         <section 
           className="relative px-8 py-10 text-white overflow-hidden bg-cover bg-center"
@@ -124,7 +124,7 @@ export const RegisterPage = () => {
           }}
         >
           <div className="relative z-10">
-            <p className="text-xs uppercase tracking-[0.16em] text-blue-100">Academic Atelier</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-blue-100">Campus One</p>
             <h1 className="mt-8 text-4xl font-bold leading-tight">Join the Academic Network</h1>
             <p className="mt-4 max-w-sm text-sm text-blue-100">
               Create your account to manage support tickets, communicate with lecturers, and track important updates.

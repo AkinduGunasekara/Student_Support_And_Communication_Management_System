@@ -49,7 +49,7 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen px-4 py-10 md:px-8">
+    <div className="auth-page-bg flex min-h-screen items-center px-4 py-6 md:px-8">
       <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl md:grid-cols-2">
 
         {/* LEFT */}
@@ -62,7 +62,7 @@ export const LoginPage = () => {
         >
           <div className="relative z-10">
             <p className="text-xs uppercase tracking-[0.16em] text-blue-100">
-              Academic Atelier
+              Campus One
             </p>
 
             <h1 className="mt-8 text-4xl font-bold leading-tight">

@@ -120,10 +120,7 @@ export const AppLayout = ({ children }) => {
       >
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
-              Academic Atelier
-            </p>
-            <h1 className="mt-1 text-lg font-bold text-slate-900">Support Hub</h1>
+            <h1 className="mt-1 text-lg font-bold text-slate-900">CAMPUS ONE</h1>
           </div>
 
           <button
@@ -191,13 +188,7 @@ export const AppLayout = ({ children }) => {
             </div>
 
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-100"
-                aria-label="Notifications"
-              >
-                <Bell size={16} />
-              </button>
+              
 
               <div className="relative">
                 <button
