@@ -20,6 +20,8 @@ export default function LecturerDashboard() {
   const [loading, setLoading] = useState(true);
   const [answeringId, setAnsweringId] = useState(null);
   const [visibilityId, setVisibilityId] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -137,6 +139,21 @@ export default function LecturerDashboard() {
     }
   };
 
+  const handleDeleteMessage = async (id) => {
+    try {
+      setDeletingId(id);
+      setMessages((prev) => prev.filter((msg) => msg._id !== id));
+      setDeleteConfirm(null);
+      toast.success("Message deleted successfully");
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || "Failed to delete message";
+      toast.error(message);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const facultyOptions = useMemo(() => {
     const unique = new Set(messages.map((msg) => msg.faculty).filter(Boolean));
     return Array.from(unique);
@@ -198,7 +215,7 @@ export default function LecturerDashboard() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100/60 px-4 py-6 md:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="relative mb-8 overflow-hidden rounded-[30px] border border-blue-100 shadow-lg shadow-blue-200/60">
             <img
@@ -206,7 +223,7 @@ export default function LecturerDashboard() {
               alt="Lecturer dashboard banner"
               className="h-52 w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+            <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/30" />
             <div className="absolute inset-0 px-6 py-8 text-white md:px-8 md:py-10">
               <div className="inline-flex rounded-full bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide text-blue-50 backdrop-blur">
                 Official Messaging + FAQ Management
@@ -476,7 +493,7 @@ export default function LecturerDashboard() {
                       </div>
                     )}
 
-                    <div className="h-1.5 w-full bg-gradient-to-r from-blue-700 via-blue-500 to-blue-400" />
+                    <div className="h-1.5 w-full bg-linear-to-r from-blue-700 via-blue-500 to-blue-400" />
 
                     <div className="p-6 md:p-7">
                       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -562,7 +579,7 @@ export default function LecturerDashboard() {
                                           <a
                                             href={`${BACKEND_URL}${msg.attachment.fileUrl}`}
                                             download={msg.attachment.fileName}
-                                            className="flex-shrink-0 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline whitespace-nowrap"
+                                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline whitespace-nowrap"
                                           >
                                             Download
                                           </a>
@@ -571,7 +588,7 @@ export default function LecturerDashboard() {
                                     ) : (
                                       <div className="flex items-center justify-between gap-3">
                                         <div className="flex items-center gap-3 flex-1">
-                                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-200">
+                                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-200">
                                             <svg
                                               className="h-5 w-5 text-blue-700"
                                               fill="none"
@@ -598,7 +615,7 @@ export default function LecturerDashboard() {
                                         <a
                                           href={`${BACKEND_URL}${msg.attachment.fileUrl}`}
                                           download={msg.attachment.fileName}
-                                          className="flex-shrink-0 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition whitespace-nowrap"
+                                          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition whitespace-nowrap"
                                         >
                                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
