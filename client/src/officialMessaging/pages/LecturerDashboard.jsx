@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../../AuthContext.jsx";
 import { AppLayout } from "../../components/AppLayout";
 import { UserProfile } from "../../components/UserProfile";
 import {
   answerMessage,
+  deleteMessage,
   getLecturerMessages,
   updateVisibility,
 } from "../services/messageService";
@@ -20,6 +21,8 @@ export default function LecturerDashboard() {
   const [loading, setLoading] = useState(true);
   const [answeringId, setAnsweringId] = useState(null);
   const [visibilityId, setVisibilityId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -28,7 +31,7 @@ export default function LecturerDashboard() {
 
   const [answerInputs, setAnswerInputs] = useState({});
 
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getLecturerMessages(token);
@@ -40,13 +43,13 @@ export default function LecturerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) {
       loadMessages();
     }
-  }, [token]);
+  }, [token, loadMessages]);
 
   const handleAnswerChange = (id, value) => {
     setAnswerInputs((prev) => ({
@@ -134,6 +137,29 @@ export default function LecturerDashboard() {
       toast.error(message);
     } finally {
       setVisibilityId(null);
+    }
+  };
+
+  const handleDeleteMessage = async (id) => {
+    try {
+      setDeletingId(id);
+      await deleteMessage(id, token);
+
+      setMessages((prev) => prev.filter((msg) => msg._id !== id));
+      setAnswerInputs((prev) => {
+        const updated = { ...prev };
+        delete updated[id];
+        return updated;
+      });
+      setDeleteConfirm(null);
+
+      toast.success("Message deleted successfully");
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || "Failed to delete message";
+      toast.error(message);
+    } finally {
+      setDeletingId(null);
     }
   };
 
