@@ -94,7 +94,7 @@ export const TicketCenter = () => {
           </div>
         </div>
 
-          {/* HEADER */}
+          {/* HEADER
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white rounded-2xl mb-10">
             <h1 className="text-3xl font-extrabold">
               🎫 Ticket Management System
@@ -102,7 +102,7 @@ export const TicketCenter = () => {
             <p className="mt-2">
               Manage and respond to student support requests efficiently.
             </p>
-          </div>
+          </div> */}
 
           {/* PROFILE
           <div className="mb-8">
