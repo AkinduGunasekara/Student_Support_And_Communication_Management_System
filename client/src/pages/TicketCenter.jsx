@@ -3,7 +3,7 @@ import { useAuth } from "../AuthContext";
 import { AppLayout } from "../components/AppLayout";
 import { UserProfile } from "../components/UserProfile";
 import { XCircle } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import ticketsBanner from "../assets/tickets banner.jpg";
 
 const API_BASE_URL =
