@@ -33,7 +33,7 @@ export const LoginPage = () => {
       login(data);
 
       // ✅ ALWAYS go to landing page
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
       alert("Something went wrong. Please try again.");
@@ -45,7 +45,7 @@ export const LoginPage = () => {
 
   // ✅ if already logged in → go to landing page
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (

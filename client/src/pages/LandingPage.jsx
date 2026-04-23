@@ -95,12 +95,12 @@ const LandingPage = () => {
               Explore Events
             </button>
 
-            <button
+            {/* <button
               onClick={() => navigate("/login")}
               className="px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200"
             >
               Login
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

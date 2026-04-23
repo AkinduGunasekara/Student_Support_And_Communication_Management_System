@@ -29,15 +29,17 @@ import LecturerEventsPage from "./event/LecturerEventsPage";
 import AdminEventsPage from "./event/AdminEventsPage";
 
 import LandingPage from "./pages/LandingPage";
+import HomePage from "./pages/HomePage.jsx"
 
 export default function App() {
   return (
     <AuthProvider>
       <Toaster position="top-right" richColors />
       <Routes>
+        <Route path="/" element={<HomePage />} />
         {/* Root redirect to login */}
 
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<LandingPage />} />
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
