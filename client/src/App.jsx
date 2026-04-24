@@ -39,7 +39,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         {/* Root redirect to login */}
 
-        <Route path="/dashboard" element={<LandingPage />} />
+        <Route path="/dashboard" element={<HomePage />} />
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
