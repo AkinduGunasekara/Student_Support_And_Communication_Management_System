@@ -12,7 +12,7 @@ import {
 import { Trash2, AlertCircle } from "lucide-react";
 import lecturerDashboardBanner from "../../assets/lecture dashboard banner.jpg";
 
-const BACKEND_URL = "http://localhost:5001";
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function LecturerDashboard() {
   const { token, user } = useAuth();

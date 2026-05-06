@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API = "http://localhost:5001/api/events";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API = `${API_BASE_URL}/api/events`;
 
 // 🔐 AUTH HEADER
 const authHeader = () => ({

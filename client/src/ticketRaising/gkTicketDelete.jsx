@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
 
       try {
         const res = await axios.get(
-          `http://localhost:5001/api/tickets/${ticketId}`,
+          `${API_BASE_URL}/api/tickets/${ticketId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setTicket(res.data);
@@ -45,7 +47,7 @@ function GkTicketDelete({ ticketId, closeModal, refreshTickets }) {
 
     try {
       await axios.delete(
-        `http://localhost:5001/api/tickets/${ticketId}`,
+        `${API_BASE_URL}/api/tickets/${ticketId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Ticket deleted successfully!", { position: "top-center" });

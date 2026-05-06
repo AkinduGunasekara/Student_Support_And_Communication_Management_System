@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { XCircle } from "lucide-react";
 import { AppLayout } from "../components/AppLayout";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function gkAdminViewTicket() {
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
@@ -17,7 +19,7 @@ function gkAdminViewTicket() {
 
   const fetchTickets = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/api/tickets/getall");
+      const res = await axios.get(`${API_BASE_URL}/api/tickets/getall`);
       setTickets(res.data || []);
     } catch (err) {
       toast.error("Failed to fetch tickets");
@@ -34,7 +36,7 @@ function gkAdminViewTicket() {
 
     try {
       const res = await axios.put(
-        `http://localhost:5001/api/tickets/${selectedTicket._id}/reply`,
+        `${API_BASE_URL}/api/tickets/${selectedTicket._id}/reply`,
         { replyMessage }
       );
 

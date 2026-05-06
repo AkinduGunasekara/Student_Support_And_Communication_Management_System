@@ -6,7 +6,7 @@ import { UserProfile } from "../components/UserProfile";
 import adminDashboardBanner from "../assets/admin dashboard banner.jpg";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+  import.meta.env.VITE_API_BASE_URL;
 
 const FACULTY_OPTIONS = ["Computing", "Engineering", "Business"];
 

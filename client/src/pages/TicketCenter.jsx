@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import ticketsBanner from "../assets/tickets banner.jpg";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+  import.meta.env.VITE_API_BASE_URL;
 
 export const TicketCenter = () => {
   const { token } = useAuth();

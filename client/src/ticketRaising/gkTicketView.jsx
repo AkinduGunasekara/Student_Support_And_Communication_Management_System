@@ -10,6 +10,8 @@ import GkTicketUpdate from "./gkTicketUpdate.jsx";
 import GkTicketDelete from "./gkTicketDelete.jsx";
 import ticketsBanner from "../assets/tickets banner.jpg";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function GkTicketView() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ function GkTicketView() {
 
     try {
       const res = await axios.get(
-        "http://localhost:5001/api/tickets/my", 
+        `${API_BASE_URL}/api/tickets/my`, 
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -10,6 +10,8 @@ import {
 
 import banner from "../assets/event-banner.jpg";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AdminEventsPage = () => {
   const [events, setEvents] = useState([]);
   const [activeTab, setActiveTab] = useState("pending");
@@ -24,7 +26,7 @@ const AdminEventsPage = () => {
           ...e,
           id: e._id,
           image: e.image
-            ? `http://localhost:5001${e.image}`
+            ? `${API_BASE_URL}${e.image}`
             : "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
           time: `${e.startTime} - ${e.endTime}`,
         }));

@@ -70,7 +70,7 @@ function GkTicketCreate({ closeModal, refreshTickets, user }) {
       const token = localStorage.getItem("ssc_token");
 
       await axios.post(
-        "http://localhost:5001/api/tickets/create",
+        `${import.meta.env.VITE_API_BASE_URL}/api/tickets/create`,
         formData,
         {
           headers: {

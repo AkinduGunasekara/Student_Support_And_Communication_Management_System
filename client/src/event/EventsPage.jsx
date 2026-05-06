@@ -11,6 +11,8 @@ import { getApprovedEvents } from "../services/eventService";
 // 🔥 banner image
 import banner from "../assets/event-banner.jpg";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EventsPage = () => {
   const { user } = useAuth(); // ✅ ADDED
 
@@ -34,7 +36,7 @@ const EventsPage = () => {
           ...e,
           id: e._id,
           image: e.image
-            ? `http://localhost:5001${e.image}`
+            ? `${API_BASE_URL}${e.image}`
             : "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
           dateShort: new Date(e.date).toLocaleDateString("en-US", {
             month: "short",

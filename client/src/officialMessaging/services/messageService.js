@@ -1,7 +1,8 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:5001/api/messages";
-const AUTH_BASE = "http://localhost:5001/api/auth";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = `${API_BASE_URL}/api/messages`;
+const AUTH_BASE = `${API_BASE_URL}/api/auth`;
 
 export const createMessage = async (data, token) => {
   return axios.post(API_BASE, data, {
